@@ -18,5 +18,5 @@ Qualora in magazzino non risultano più caffé, **manda una notifica al gestore*
 
 ## Non solo caffé!
 
-L'applicazione **è stata creata per i caffé** ma **non** vuol dire che **dobbiamo limitarci solo ad essi**!
+L'applicazione **è stata creata per i caffé**, ma **non** vuol dire che **dobbiamo limitarci solo ad essi**!
 Si possono mettere in "magazzino" bottigliette d'acqua, snack e molto altro, **l'unico limite è la tua fantasia**!
