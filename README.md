@@ -1,7 +1,5 @@
 # Vivere Kaffettino
 
-## Un app, tanti servizi
-
 ![Project's banner](./banner.png)
 
 ## Buongiornissimo, KAFFÈÈÈ?!
