@@ -14,7 +14,7 @@ La card verrà poi ricaricata da un gestore.
 
 ## Gestione Magazzino
 
-Qualora in magazzino non risultano più caffé, **manda una notifica al gestore**, non permettendo di accreditare altri caffé.
+Qualora in magazzino non risultino più caffé, **manda una notifica al gestore**, non permettendo di accreditare altri caffé.
 
 ## Non solo caffé!
 
