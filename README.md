@@ -10,7 +10,7 @@ Vivere Kaffettino è un **applicativo telegram** che permette agli utenti dell'a
 
 Un esp8266 scannerizza una **carta NFC** precedentemente assegnata ad un utente.
 Se il suo saldo è positivo (o di poco negativo) decurta il costo del caffé.
-La card verrà poi ricaricata da un gesteore.
+La card verrà poi ricaricata da un gestore.
 
 ## Gestione Magazzino
 
