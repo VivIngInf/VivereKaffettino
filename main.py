@@ -9,11 +9,12 @@ from dotenv import load_dotenv, find_dotenv
 # Librerie Telegram
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, filters
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler
 
-# Altri file python
+# File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
+# un porcile nel file main
 from TelegramBot.InsertUser import CreateAddUserHandler
-from TelegramBot.HandleDatabase import TryConnect
+from TelegramBot.DatabaseHandler import TryConnect
 
 OnServer = False # Variabile booleana per evitare di collegarsi al db e ricevere errore
 
@@ -27,6 +28,7 @@ logging.basicConfig(
 async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="BUONGIORNISSIMO, KAFFÈ!?")
 
+# Creiamo la funzione Cancel che ci permette di uscire dalle conversazioni
 async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Arrivederci!")
     return ConversationHandler.END
@@ -49,6 +51,7 @@ if __name__ == "__main__":
     application.add_handler(start_handler)
 
     # Creiamo il comando AddUser e lo aggiungiamo ai comandi runnabili
+    # N.B: CreateAddUserHandler è un comando esterno presente in InsertUser.py
     addUser_handler = CreateAddUserHandler(Cancel=Cancel)
     application.add_handler(addUser_handler)
 
