@@ -9,14 +9,12 @@ from dotenv import load_dotenv, find_dotenv
 # Librerie Telegram
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
-from TelegramBot.InsertUser import CreateAddUserHandler
+from TelegramBot.InsertUser import CreateAddUserHandler, InsertUserButton
 from TelegramBot.DatabaseHandler import TryConnect
-
-OnServer = False # Variabile booleana per evitare di collegarsi al db e ricevere errore
 
 # Configurazione di logging base
 logging.basicConfig(
@@ -39,12 +37,12 @@ if __name__ == "__main__":
     application = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build() # Ci impossessiamo del bot con il nostro TOKEN
     
     # Se siamo nel server ci connettiamo al database
-    if (OnServer):
+    if (os.environ.get("IS_SERVER") == "TRUE"):
         TryConnect(
-            os.environ.get("DB_Host"),
-            os.environ.get("DB_Username"),
-            os.environ.get("DB_Password"),
-            os.environ.get("DB_Database"))
+            os.environ.get("DB_HOST"),
+            os.environ.get("DB_USERNAME"),
+            os.environ.get("DB_PASSWORD"),
+            os.environ.get("DB_DATABASE"))
 
     # Creiamo il comando start e lo aggiungiamo ai comandi runnabili
     start_handler = CommandHandler('start', Start)
@@ -54,6 +52,8 @@ if __name__ == "__main__":
     # N.B: CreateAddUserHandler è un comando esterno presente in InsertUser.py
     addUser_handler = CreateAddUserHandler(Cancel=Cancel)
     application.add_handler(addUser_handler)
+
+    application.add_handler(CallbackQueryHandler(InsertUserButton))
 
     application.run_polling() # Inizializza l'app
     

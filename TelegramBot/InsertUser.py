@@ -1,4 +1,4 @@
-from telegram import Update
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
 from TelegramBot.DatabaseHandler import GetAulette
@@ -45,18 +45,31 @@ async def InsertSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     saldo = float(saldo)
     usersAndValues[update.message.chat_id].Saldo = saldo
 
-    await update.message.reply_text(f"Ottimo, l'utente {usersAndValues[update.message.chat_id].Nome}, verrà memorizzato con saldo pari a: {usersAndValues[update.message.chat_id].Saldo}€")
-    return ConversationHandler.END
+    rows = GetAulette()
+
+    keyboard = []
+    
+    for row in rows:
+        button = InlineKeyboardButton(text=row[1], callback_data=row[0])
+        keyboard.append([button])
+        
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text(f"Ora seleziona in quale auletta vuoi prendere la carta:", reply_markup=reply_markup)
+
+    return NOTIFICA
 
 # Memorizziamo il messaggio mandato dall'utente come saldo
 async def InsertNotifica(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    rows = GetAulette()
-    for row in rows:
-        await update.message.reply_text(f"{row}")
-
     await update.message.reply_text(f"Ottimo, l'utente {usersAndValues[update.message.chat_id].Nome}, verrà memorizzato con saldo pari a: {usersAndValues[update.message.chat_id].Saldo}€")
     return ConversationHandler.END
+
+async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
+    query = update.callback_query
+    
+    await query.answer()
+    await query.edit_message_text(text=f"Selected option: {query.data}")
 
 # TODO: MANDARE RICHIESTA AL DB ED UNA VOLTA ENTRATO RIMUOVERE L'UTENTE DAL DIZIONARIO
 
@@ -66,7 +79,8 @@ def CreateAddUserHandler(Cancel):
         states={
             # Dipende dallo stato nella quale ci troviamo, richiama una funzione specifica
             NOME_COMPLETO: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertNomeCompleto)],
-            SALDO: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertSaldo)]
+            SALDO: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertSaldo)],
+            NOTIFICA: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertNotifica)]
         },
         fallbacks=[CommandHandler('cancel', Cancel)] # Possiamo annullare il comando corrente utilizzando /cancel
     )
