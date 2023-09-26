@@ -1,6 +1,7 @@
 # Vivere Kaffettino
 
 ![Project's banner](./banner_dark.png)
+![Project's banner](./banner.png)
 
 ## Buongiornissimo, KAFFÈÈÈ?!
 
