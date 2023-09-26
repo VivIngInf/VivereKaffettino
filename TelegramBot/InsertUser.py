@@ -1,9 +1,10 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
+from TelegramBot.DatabaseHandler import GetAulette
 
 # Gli stati della conversazione
-NOME_COMPLETO, SALDO = range(2)
+NOME_COMPLETO, SALDO, NOTIFICA = range(3)
 
 # Creiamo una struct in modo tale da potere memorizzare tutte le informazioni 
 # in base ad una chiave (id Telegram dello scrittore)
@@ -11,6 +12,7 @@ NOME_COMPLETO, SALDO = range(2)
 class User:
     Nome: str
     Saldo: float
+    Notifica: int
 
 # Inizializziamo il dizionario
 usersAndValues = {}
@@ -19,7 +21,7 @@ usersAndValues = {}
 async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il nome completo dell'utente: ")
     
-    usersAndValues[update.message.chat_id] = User("", 0)
+    usersAndValues[update.message.chat_id] = User("", 0, 0)
 
     return NOME_COMPLETO # Ritorniamo lo stato ID_TELEGRAM per andare in quella funzione
 
@@ -42,6 +44,16 @@ async def InsertSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     saldo = float(saldo)
     usersAndValues[update.message.chat_id].Saldo = saldo
+
+    await update.message.reply_text(f"Ottimo, l'utente {usersAndValues[update.message.chat_id].Nome}, verrà memorizzato con saldo pari a: {usersAndValues[update.message.chat_id].Saldo}€")
+    return ConversationHandler.END
+
+# Memorizziamo il messaggio mandato dall'utente come saldo
+async def InsertNotifica(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+    rows = GetAulette()
+    for row in rows:
+        await update.message.reply_text(f"{row}")
 
     await update.message.reply_text(f"Ottimo, l'utente {usersAndValues[update.message.chat_id].Nome}, verrà memorizzato con saldo pari a: {usersAndValues[update.message.chat_id].Saldo}€")
     return ConversationHandler.END
