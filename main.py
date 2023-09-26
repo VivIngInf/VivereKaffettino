@@ -1,3 +1,8 @@
+# IMPORTANTE: INSTALLARE PIGAR USANDO "pip install pigar"
+# SE AGGIUNGETE LIBRERIE, ESEGUITE IL COMANDO "pigar generate"
+# QUESTO COMANDO SERVE A CREARE UN FILE CHE SPECIFICA TUTTE LE LIBRERIE
+# DA INSTALLARE SU UNA MACCHINA FRESCA
+
 import os
 from dotenv import load_dotenv, find_dotenv
 
@@ -6,10 +11,20 @@ import logging
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 
+# Librerie DB
+import mysql.connector
+
 # Configurazione di logging base
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
+)
+
+# Configurazione DB
+mydb = mysql.connector.connect(
+  host="localhost",
+  user="yourusername",
+  password="yourpassword"
 )
 
 # Creiamo la funzione start che se richiamata stampa a video "BUONGIORNISSIMO, KAFFÈ!?"
