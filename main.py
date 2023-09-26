@@ -9,10 +9,13 @@ from dotenv import load_dotenv, find_dotenv
 # Librerie Telegram
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, MessageHandler, filters
 
-# Librerie DB
-import mysql.connector
+# Altri file python
+from TelegramBot.InsertUser import CreateAddUserHandler
+from TelegramBot.HandleDatabase import TryConnect
+
+OnServer = False # Variabile booleana per evitare di collegarsi al db e ricevere errore
 
 # Configurazione di logging base
 logging.basicConfig(
@@ -20,33 +23,34 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-mydb = None
-
 # Creiamo la funzione start che se richiamata stampa a video "BUONGIORNISSIMO, KAFFÈ!?"
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="BUONGIORNISSIMO, KAFFÈ!?")
+
+async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Arrivederci!")
+    return ConversationHandler.END
 
 if __name__ == "__main__":
 
     load_dotenv(find_dotenv()) # Carichiamo il file di ambiente dove è salvato il token
     application = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build() # Ci impossessiamo del bot con il nostro TOKEN
     
-    # Prova a connetterti al DB, altrimenti dai errore
-    try:
-        mydb = mysql.connector.connect(
-            host=os.environ.get("DB_HOST"),
-            user=os.environ.get("DB_USER"),
-            password=os.environ.get("DB_PASSWORD")
-        )
-    except:
-        print("Non è stato possibile connettersi al DB.")
-        exit(-1)
+    # Se siamo nel server ci connettiamo al database
+    if (OnServer):
+        TryConnect(
+            os.environ.get("DB_Host"),
+            os.environ.get("DB_Username"),
+            os.environ.get("DB_Password"),
+            os.environ.get("DB_Database"))
 
     # Creiamo il comando start e lo aggiungiamo ai comandi runnabili
-    start_handler = CommandHandler('start', start)
+    start_handler = CommandHandler('start', Start)
     application.add_handler(start_handler)
-    
-    application.run_polling() # Inizializza l'app
 
-    print(mydb)
+    # Creiamo il comando AddUser e lo aggiungiamo ai comandi runnabili
+    addUser_handler = CreateAddUserHandler(Cancel=Cancel)
+    application.add_handler(addUser_handler)
+
+    application.run_polling() # Inizializza l'app
     
