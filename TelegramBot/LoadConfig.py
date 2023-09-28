@@ -15,10 +15,12 @@ def LoadConfigs() -> None:
     global token, host, username, password, database
 
     token = os.environ.get("BOT_TOKEN")
-    host = os.environ.get("DB_HOST"),
-    username = os.environ.get("DB_USERNAME"),
-    password = os.environ.get("DB_PASSWORD"),
+    host = os.environ.get("DB_HOST")
+    username = os.environ.get("DB_USERNAME")
+    password = os.environ.get("DB_PASSWORD")
     database = os.environ.get("DB_DATABASE")
+
+    print(f"{token}, {host}, {username}, {password}, {database}")
 
     return None
 

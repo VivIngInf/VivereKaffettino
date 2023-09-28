@@ -15,7 +15,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 from TelegramBot.InsertUser import CreateAddUserHandler, InsertUserButton
 from TelegramBot.ShowBalance import CreateShowBalanceHandler
 
-from TelegramBot.LoadConfig import GetToken
+from TelegramBot.LoadConfig import LoadConfigs, GetToken
 
 # Configurazione di logging base
 logging.basicConfig(
@@ -34,6 +34,7 @@ async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
 
+    LoadConfigs()
     application = ApplicationBuilder().token(token=GetToken()).build() # Ci impossessiamo del bot con il nostro TOKEN
 
     # Creiamo il comando start e lo aggiungiamo ai comandi runnabili

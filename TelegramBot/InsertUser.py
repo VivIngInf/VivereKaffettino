@@ -78,7 +78,7 @@ async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await query.edit_message_text(text=f"Selected option: {query.data}")
     return ConversationHandler.END
 
-# TODO: MANDARE RICHIESTA AL DB ED UNA VOLTA ENTRATO RIMUOVERE L'UTENTE DAL DIZIONARIO
+# TODO: MANDARE RICHIESTA INSERT AL DB ED UNA VOLTA ENTRATO RIMUOVERE L'UTENTE DAL DIZIONARIO
 # TODO: IL BOT SI BLOCCA FINO A QUANDO NON GLI ARRIVA CANCEL ALLA FINE DELL'INSERIMENTO, DOPO AVER AMMACCATO UN BOTTONE
 
 def CreateAddUserHandler(Cancel):

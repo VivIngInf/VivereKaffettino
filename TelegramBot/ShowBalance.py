@@ -1,11 +1,9 @@
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
+from telegram import Update
+from telegram.ext import ContextTypes, ConversationHandler, CommandHandler
 from TelegramBot.DatabaseHandler import GetBalance
 
-NOME_COMPLETO = range(1)
-
-# Creiamo la funzione Cancel che ci permette di uscire dalle conversazioni
 async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """SHOW_BALANCE: Manda come messaggio all'utente il suo saldo a partire dall'ID_Telegram"""
 
     idTelegram = str(update.effective_chat.id)
     saldo = GetBalance(idTelegram)

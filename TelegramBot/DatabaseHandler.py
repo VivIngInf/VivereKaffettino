@@ -2,14 +2,22 @@
 from mysql.connector import cursor, connect, MySQLConnection
 from TelegramBot.LoadConfig import GetHost, GetUsername, GetPassword, GetDatabase
 
+# TODO: Inserire l'utente nel db
+
 def TryConnect() -> MySQLConnection:    
     """DATABASE_HANDLER: Prova a connettersi al DB tramite i parametri, altrimenti da errore"""
 
     try:
-        cnx : MySQLConnection = connect(host=GetHost(), user=GetUsername(), password=GetPassword(), database=GetDatabase())
+        cnx : MySQLConnection = connect(
+            host=GetHost(),
+            user=GetUsername(),
+            password=GetPassword(),
+            database=GetDatabase()
+        )
+
         return cnx
 
-    except Exception as e:
+    except Exception as e:  
         print("Non è stato possibile connettersi al DB.")
         print(e)
         exit(-1)
@@ -35,13 +43,15 @@ def GetAulette():
     
     crs.execute(query)
 
-    cursor.execute(query)
-    rows = cursor.fetchall()
+    rows = crs.fetchall()
+
+    TryDisconnect(cnx=cnx, crs=crs)
 
     return rows
 
 def GetBalance(idTelegram : str) -> float:
     """SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
+    
     query = f"SELECT Saldo FROM Utente WHERE ID_Telegram = '{idTelegram}';"
     
     cnx : MySQLConnection = TryConnect()
