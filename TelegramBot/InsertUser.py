@@ -17,24 +17,26 @@ class User:
 # Inizializziamo il dizionario
 usersAndValues = {}
 
-# Chiediamo all'utente di Inserire il tag del nuovo utente
-async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """ADD_USER: Funzione iniziale per inserire un utente nel DB"""
+
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il nome completo dell'utente: ")
     
     usersAndValues[update.message.chat_id] = User("", 0, 0)
 
     return NOME_COMPLETO # Ritorniamo lo stato ID_TELEGRAM per andare in quella funzione
 
-# Memorizziamo il messaggio mandato dall'utente come nome completo e chiediamo il saldo
 async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ADD_USER: Memorizziamo il messaggio mandato dall'utente come nome completo e chiediamo il saldo"""
     
     usersAndValues[update.message.chat_id].Nome = update.message.text
 
     await update.message.reply_text(f"Ora inserisci il saldo inziale dell'utente:")
     return SALDO
 
-# Memorizziamo il messaggio mandato dall'utente come saldo
 async def InsertSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ADD_USER: Memorizziamo il messaggio mandato dall'utente come saldo e prepariamo la keyboard per chiedere l'auletta"""
+
     saldo = update.message.text
 
     # Ma solo se è un numero, altrimenti ripeti
@@ -45,27 +47,31 @@ async def InsertSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     saldo = float(saldo)
     usersAndValues[update.message.chat_id].Saldo = saldo
 
+    # Facciamo una chiamata al DB per prendere le varie aulette
     rows = GetAulette()
 
     keyboard = []
     
+    # Mettiamo le aulette in riga
     for row in rows:
         button = InlineKeyboardButton(text=row[1], callback_data=row[0])
         keyboard.append([button])
         
     reply_markup = InlineKeyboardMarkup(keyboard)
 
+    # Mandiamo il messaggio con la tastiera per poter scegliere l'auletta di riferimento
     await update.message.reply_text(f"Ora seleziona in quale auletta vuoi prendere la carta:", reply_markup=reply_markup)
 
     return NOTIFICA
 
-# Memorizziamo il messaggio mandato dall'utente come saldo
 async def InsertNotifica(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """ADD_USER: Memorizziamo l'auletta e mostriamo il risultato finale"""
 
     await update.message.reply_text(f"Ottimo, l'utente {usersAndValues[update.message.chat_id].Nome}, verrà memorizzato con saldo pari a: {usersAndValues[update.message.chat_id].Saldo}€")
     return ConversationHandler.END
 
 async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
+    """ADD_USER: Quando l'utente seleziona un bottone chiama questo metodo"""
     query = update.callback_query
     
     await query.answer()
@@ -76,6 +82,8 @@ async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 # TODO: IL BOT SI BLOCCA FINO A QUANDO NON GLI ARRIVA CANCEL ALLA FINE DELL'INSERIMENTO, DOPO AVER AMMACCATO UN BOTTONE
 
 def CreateAddUserHandler(Cancel):
+    """ADD_USER: Handler Della funzione ADD_USER"""
+    
     return ConversationHandler(
         entry_points=[CommandHandler('add', AddUser)],
         states={

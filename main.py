@@ -3,8 +3,7 @@
 # QUESTO COMANDO SERVE A CREARE UN FILE CHE SPECIFICA TUTTE LE LIBRERIE
 # DA INSTALLARE SU UNA MACCHINA FRESCA
 
-import os
-from dotenv import load_dotenv, find_dotenv
+import atexit # Libreria che ci permette di creare un metodo per quando il codice viene interrotto
 
 # Librerie Telegram
 import logging
@@ -14,7 +13,9 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
 from TelegramBot.InsertUser import CreateAddUserHandler, InsertUserButton
-from TelegramBot.DatabaseHandler import TryConnect
+from TelegramBot.ShowBalance import CreateShowBalanceHandler
+
+from TelegramBot.LoadConfig import GetToken
 
 # Configurazione di logging base
 logging.basicConfig(
@@ -33,16 +34,7 @@ async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
 
-    load_dotenv(find_dotenv()) # Carichiamo il file di ambiente dove è salvato il token
-    application = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build() # Ci impossessiamo del bot con il nostro TOKEN
-    
-    # Se siamo nel server ci connettiamo al database
-    if (os.environ.get("IS_SERVER") == "TRUE"):
-        TryConnect(
-            os.environ.get("DB_HOST"),
-            os.environ.get("DB_USERNAME"),
-            os.environ.get("DB_PASSWORD"),
-            os.environ.get("DB_DATABASE"))
+    application = ApplicationBuilder().token(token=GetToken()).build() # Ci impossessiamo del bot con il nostro TOKEN
 
     # Creiamo il comando start e lo aggiungiamo ai comandi runnabili
     start_handler = CommandHandler('start', Start)
@@ -53,7 +45,11 @@ if __name__ == "__main__":
     addUser_handler = CreateAddUserHandler(Cancel=Cancel)
     application.add_handler(addUser_handler)
 
+    showBalance_handler = CreateShowBalanceHandler(Cancel=Cancel)
+    application.add_handler(showBalance_handler)
+
+    # Handler della keyboard per l'auletta
     application.add_handler(CallbackQueryHandler(InsertUserButton))
 
-    application.run_polling() # Inizializza l'app
+    application.run_polling() # Inizializza l'app    
     
