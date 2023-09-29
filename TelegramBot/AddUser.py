@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
-from TelegramBot.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta
+from TelegramBot.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser
 
 # Gli stati della conversazione
 NOME_COMPLETO, NOTIFICA = range(2)
@@ -59,9 +59,12 @@ async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await query.answer()
     await query.edit_message_text(text=f"Selected option: {query.data}")
 
-    usersAndValues[update.effectuve_chat.id].Auletta = update.message.text
+    usersAndValues[update.effective_chat.id].Auletta = query.data
 
+    username = usersAndValues[update.effective_chat.id].Nome
     nomeAuletta : str = GetAuletta(query.data)
+
+    InsertUser(idTelegram=update.effective_chat.id, username=username)
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Ottimo, l'utente {usersAndValues[update.effective_chat.id].Nome} farà riferimento all'auletta {nomeAuletta}")
 

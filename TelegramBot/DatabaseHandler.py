@@ -2,7 +2,7 @@
 from mysql.connector import cursor, connect, MySQLConnection
 from TelegramBot.LoadConfig import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
-# TODO: Inserire l'utente nel db
+# TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
 
 def TryConnect() -> MySQLConnection:    
     """DATABASE_HANDLER: Prova a connettersi al DB tramite i parametri, altrimenti da errore"""
@@ -83,8 +83,9 @@ def GetAulette() -> list:
     return rows
 
 def GetAuletta(idAuletta : int) -> str:
+    """DATABASE_HANDLER / ADD_USER: Dato l'ID di un'auletta, restituisce il suo nome"""
 
-    query = f"SELECT NomeAuletta From Auletta WHERE ID_Auletta = '{idAuletta}'"
+    query = f"SELECT Nome From Auletta WHERE ID_Auletta = '{idAuletta}'"
 
     cnx = TryConnect()
     crs = cnx.cursor()
@@ -100,12 +101,13 @@ def GetAuletta(idAuletta : int) -> str:
 def InsertUser(idTelegram : str, username : str) -> None: 
     """DATABASE_HANDLER / ADD_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
 
-    query = f"INSERT INTO Utente (ID_Telegram, Nominativo, Saldo) VALUES ('{idTelegram}', '{username}');"
+    query = f"INSERT INTO Utente (ID_Telegram, Username) VALUES ('{idTelegram}', '{username}');"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()
 
     crs.execute(query)
+    cnx.commit() 
 
     TryDisconnect(cnx=cnx, crs=crs)
 
