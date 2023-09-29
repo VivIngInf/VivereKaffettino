@@ -82,6 +82,21 @@ def GetAulette() -> list:
 
     return rows
 
+def GetAuletta(idAuletta : int) -> str:
+
+    query = f"SELECT NomeAuletta From Auletta WHERE ID_Auletta = '{idAuletta}'"
+
+    cnx = TryConnect()
+    crs = cnx.cursor()
+
+    crs.execute(query)
+    nomeAuletta = crs.fetchone()[0]
+
+    crs.close()
+    cnx.close()
+
+    return str(nomeAuletta)
+
 def InsertUser(idTelegram : str, username : str) -> None: 
     """DATABASE_HANDLER / ADD_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
 
