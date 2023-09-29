@@ -29,11 +29,25 @@ def TryDisconnect(cnx : MySQLConnection, crs : cursor.MySQLCursor) -> None:
         crs.close()
         cnx.close()
     except Exception as e:
-        ("Non è s tato possibile chiudere la connessione. ABORT.")
+        ("Non è stato possibile chiudere la connessione. ABORT.")
         print(e)
         exit(-1)
 
-def GetAulette():
+def CheckUserExists(idTelegram : str) -> bool:
+    """DATABASE_HANDLER / INSERT_USER: Controlla se l'utente esiste dato un ID_Telegram, ritorna un valore booleano"""
+
+    query = "SELECT EXISTS (SELECT 1 FROM Utente WHERE ID_Telegram = '{idTelegram}');"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+
+    userExists = crs.fetchone()[0]
+
+    return bool(userExists)
+
+def GetAulette() -> list:
     """DATABASE_HANDLER / INSERT_USER: Prendiamo tutti gli id ed i nomi delle aulette"""
 
     query = "SELECT ID_Auletta, Nome FROM Auletta;"
@@ -49,8 +63,22 @@ def GetAulette():
 
     return rows
 
+def InsertUser(idTelegram : str, username : str) -> None: 
+    """DATABASE_HANDLER / INSERT_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
+
+    query = f"INSERT INTO Utente (ID_Telegram, Nominativo, Saldo) VALUES ('{idTelegram}', '{username}');"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+
+    TryDisconnect(cnx=cnx, crs=crs)
+
+    return None
+
 def GetBalance(idTelegram : str) -> float:
-    """SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
+    """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
     
     query = f"SELECT Saldo FROM Utente WHERE ID_Telegram = '{idTelegram}';"
     

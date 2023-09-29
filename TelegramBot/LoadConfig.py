@@ -20,8 +20,6 @@ def LoadConfigs() -> None:
     password = os.environ.get("DB_PASSWORD")
     database = os.environ.get("DB_DATABASE")
 
-    print(f"{token}, {host}, {username}, {password}, {database}")
-
     return None
 
 def GetToken() -> str : return token

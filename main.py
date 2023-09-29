@@ -13,7 +13,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
 from TelegramBot.InsertUser import CreateAddUserHandler, InsertUserButton
-from TelegramBot.ShowBalance import CreateShowBalanceHandler
+from TelegramBot.ShowBalance import ShowBalance
 
 from TelegramBot.LoadConfig import LoadConfigs, GetToken
 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
     addUser_handler = CreateAddUserHandler(Cancel=Cancel)
     application.add_handler(addUser_handler)
 
-    showBalance_handler = CreateShowBalanceHandler(Cancel=Cancel)
+    showBalance_handler = CommandHandler('saldo', ShowBalance)
     application.add_handler(showBalance_handler)
 
     # Handler della keyboard per l'auletta

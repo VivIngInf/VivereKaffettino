@@ -1,18 +1,18 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
-from TelegramBot.DatabaseHandler import GetAulette
+from TelegramBot.DatabaseHandler import GetAulette, CheckUserExists
 
 # Gli stati della conversazione
-NOME_COMPLETO, SALDO, NOTIFICA = range(3)
+NOME_COMPLETO, NOTIFICA = range(2)
 
 # Creiamo una struct in modo tale da potere memorizzare tutte le informazioni 
 # in base ad una chiave (id Telegram dello scrittore)
 @dataclass
 class User:
     Nome: str
-    Saldo: float
     Notifica: int
+    Auletta: int
 
 # Inizializziamo il dizionario
 usersAndValues = {}
@@ -22,30 +22,19 @@ async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il nome completo dell'utente: ")
     
+    if(CheckUserExists()):
+        # Se l'utente esiste, manda un messaggio e chiude il comando
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai già un account! Ti sei dimenticato l'username? Fai /info")
+        return ConversationHandler.END
+
     usersAndValues[update.message.chat_id] = User("", 0, 0)
 
     return NOME_COMPLETO # Ritorniamo lo stato ID_TELEGRAM per andare in quella funzione
 
 async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ADD_USER: Memorizziamo il messaggio mandato dall'utente come nome completo e chiediamo il saldo"""
+    """ADD_USER: Memorizziamo il messaggio mandato dall'utente come nome completo e chiediamo l'auletta di riferimento"""
     
     usersAndValues[update.message.chat_id].Nome = update.message.text
-
-    await update.message.reply_text(f"Ora inserisci il saldo inziale dell'utente:")
-    return SALDO
-
-async def InsertSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """ADD_USER: Memorizziamo il messaggio mandato dall'utente come saldo e prepariamo la keyboard per chiedere l'auletta"""
-
-    saldo = update.message.text
-
-    # Ma solo se è un numero, altrimenti ripeti
-    if(not saldo.isdigit()):
-        await update.message.reply_text(f"{update.message.text} non è un numero, riprova!")
-        return SALDO
-
-    saldo = float(saldo)
-    usersAndValues[update.message.chat_id].Saldo = saldo
 
     # Facciamo una chiamata al DB per prendere le varie aulette
     rows = GetAulette()
@@ -89,7 +78,6 @@ def CreateAddUserHandler(Cancel):
         states={
             # Dipende dallo stato nella quale ci troviamo, richiama una funzione specifica
             NOME_COMPLETO: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertNomeCompleto)],
-            SALDO: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertSaldo)],
             NOTIFICA: [MessageHandler(filters.TEXT & ~filters.COMMAND, InsertNotifica)]
         },
         fallbacks=[CommandHandler('cancel', Cancel)] # Possiamo annullare il comando corrente utilizzando /cancel
