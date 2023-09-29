@@ -23,7 +23,7 @@ def LoadConfigs() -> None:
     return None
 
 def GetToken() -> str : return token
-def GetHost() -> str : return host
-def GetUsername() -> str : return username
-def GetPassword() -> str : return password
-def GetDatabase() -> str : return database
+def GetDBHost() -> str : return host
+def GetDBUsername() -> str : return username
+def GetDBPassword() -> str : return password
+def GetDBDatabase() -> str : return database

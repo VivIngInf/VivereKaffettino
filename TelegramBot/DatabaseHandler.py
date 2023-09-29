@@ -1,6 +1,6 @@
 # Librerie DB
 from mysql.connector import cursor, connect, MySQLConnection
-from TelegramBot.LoadConfig import GetHost, GetUsername, GetPassword, GetDatabase
+from TelegramBot.LoadConfig import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 # TODO: Inserire l'utente nel db
 
@@ -9,10 +9,10 @@ def TryConnect() -> MySQLConnection:
 
     try:
         cnx : MySQLConnection = connect(
-            host=GetHost(),
-            user=GetUsername(),
-            password=GetPassword(),
-            database=GetDatabase()
+            host=GetDBHost(),
+            user=GetDBUsername(),
+            password=GetDBPassword(),
+            database=GetDBDatabase()
         )
 
         return cnx
@@ -34,9 +34,9 @@ def TryDisconnect(cnx : MySQLConnection, crs : cursor.MySQLCursor) -> None:
         exit(-1)
 
 def CheckUserExists(idTelegram : str) -> bool:
-    """DATABASE_HANDLER / INSERT_USER: Controlla se l'utente esiste dato un ID_Telegram, ritorna un valore booleano"""
+    """DATABASE_HANDLER / ADD_USER: Controlla se l'utente esiste dato un ID_Telegram, ritorna un valore booleano"""
 
-    query = "SELECT EXISTS (SELECT 1 FROM Utente WHERE ID_Telegram = '{idTelegram}');"
+    query = f"SELECT EXISTS (SELECT 1 FROM Utente WHERE ID_Telegram = '{idTelegram}');"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()
@@ -45,10 +45,29 @@ def CheckUserExists(idTelegram : str) -> bool:
 
     userExists = crs.fetchone()[0]
 
+    print(userExists)
+
     return bool(userExists)
 
+def GetUsername(idTelegram : str) -> str:
+    """DATABASE_HANDLER / USER_INFO: Ritorna l'username partendo dall'ID_Telegram passato come parametro"""
+
+    query = f"SELECT Username FROM Utente WHERE ID_Telegram = '{idTelegram}'"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+
+    username : str = crs.fetchone()[0]
+
+    crs.close()
+    cnx.close()
+
+    return username
+
 def GetAulette() -> list:
-    """DATABASE_HANDLER / INSERT_USER: Prendiamo tutti gli id ed i nomi delle aulette"""
+    """DATABASE_HANDLER / ADD_USER: Prendiamo tutti gli id ed i nomi delle aulette"""
 
     query = "SELECT ID_Auletta, Nome FROM Auletta;"
 
@@ -64,7 +83,7 @@ def GetAulette() -> list:
     return rows
 
 def InsertUser(idTelegram : str, username : str) -> None: 
-    """DATABASE_HANDLER / INSERT_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
+    """DATABASE_HANDLER / ADD_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
 
     query = f"INSERT INTO Utente (ID_Telegram, Nominativo, Saldo) VALUES ('{idTelegram}', '{username}');"
 

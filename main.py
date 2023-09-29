@@ -12,10 +12,12 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
-from TelegramBot.InsertUser import CreateAddUserHandler, InsertUserButton
+from TelegramBot.AddUser import CreateAddUserHandler, InsertUserButton
 from TelegramBot.ShowBalance import ShowBalance
-
+from TelegramBot.UserInfo import Info
 from TelegramBot.LoadConfig import LoadConfigs, GetToken
+
+from telegram import BotCommand, Bot
 
 # Configurazione di logging base
 logging.basicConfig(
@@ -31,6 +33,21 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text="Arrivederci!")
     return ConversationHandler.END
+
+async def SetCommands() -> None:
+    
+    bot = application.updater.bot
+
+    commands = [
+        BotCommand("start", "un bellissimo risveglio"),
+        BotCommand("saldo", "Visualizza il saldo rimanente sul tuo conto"),
+        BotCommand("info", "Visualizza l'ID Telegram ed il tuo username"),
+        BotCommand("add", "Ti permette di registrarti se non hai già un account"),
+    ]
+
+    await bot.setMyCommands(commands)
+    
+    return None
 
 if __name__ == "__main__":
 
@@ -51,6 +68,12 @@ if __name__ == "__main__":
 
     # Handler della keyboard per l'auletta
     application.add_handler(CallbackQueryHandler(InsertUserButton))
+
+    # Handler info
+    info_handler = CommandHandler('info', Info)
+    application.add_handler(info_handler)
+
+    SetCommands()
 
     application.run_polling() # Inizializza l'app    
     

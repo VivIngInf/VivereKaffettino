@@ -20,12 +20,12 @@ usersAndValues = {}
 async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """ADD_USER: Funzione iniziale per inserire un utente nel DB"""
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il nome completo dell'utente: ")
-    
-    if(CheckUserExists()):
+    if(CheckUserExists(idTelegram=update.effective_chat.id)):
         # Se l'utente esiste, manda un messaggio e chiude il comando
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai già un account! Ti sei dimenticato l'username? Fai /info")
         return ConversationHandler.END
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il nome completo dell'utente: ")
 
     usersAndValues[update.message.chat_id] = User("", 0, 0)
 
