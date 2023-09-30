@@ -16,6 +16,7 @@ from Modules.AddUser import CreateAddUserHandler, InsertUserButton
 from Modules.ShowBalance import ShowBalance
 from Modules.UserInfo import Info
 from Modules.LoadConfig import LoadConfigs, GetToken
+from Modules.AddAdmin import CreateAddAdminHandler
 
 from telegram import BotCommand, Bot
 
@@ -72,6 +73,10 @@ if __name__ == "__main__":
     # Handler info
     info_handler = CommandHandler('info', Info)
     application.add_handler(info_handler)
+
+    # Creiamo il comando AddAdmin e lo aggiungiamo ai comandi runnabili
+    addAdmin_handler = CreateAddAdminHandler(Cancel=Cancel)
+    application.add_handler(addAdmin_handler)
 
     SetCommands()
 
