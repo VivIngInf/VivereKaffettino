@@ -12,10 +12,10 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
-from TelegramBot.AddUser import CreateAddUserHandler, InsertUserButton
-from TelegramBot.ShowBalance import ShowBalance
-from TelegramBot.UserInfo import Info
-from TelegramBot.LoadConfig import LoadConfigs, GetToken
+from Modules.AddUser import CreateAddUserHandler, InsertUserButton
+from Modules.ShowBalance import ShowBalance
+from Modules.UserInfo import Info
+from Modules.LoadConfig import LoadConfigs, GetToken
 
 from telegram import BotCommand, Bot
 

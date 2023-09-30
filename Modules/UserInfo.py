@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from TelegramBot.DatabaseHandler import GetUsername, CheckUserExists
+from Modules.DatabaseHandler import GetUsername, CheckUserExists
 
 async def Info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """USER_INFO: Permette all'utente di vedere il suo ID_Telegram ed il suo Username"""

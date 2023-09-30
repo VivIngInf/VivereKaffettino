@@ -1,6 +1,6 @@
 # Librerie DB
 from mysql.connector import cursor, connect, MySQLConnection
-from TelegramBot.LoadConfig import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
+from Modules.LoadConfig import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 # TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
 

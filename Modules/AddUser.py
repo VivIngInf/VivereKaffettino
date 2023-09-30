@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
-from TelegramBot.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser
+from Modules.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser
 
 # Gli stati della conversazione
 NOME_COMPLETO, NOTIFICA = range(2)
