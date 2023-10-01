@@ -9,11 +9,11 @@ app = FastAPI()
 @app.on_event("startup")
 async def startup():
     await LoadConfigs()
-    await TryConnect()
+    TryConnect()
 
 @app.on_event("shutdown")
 async def shutdown():
-    await TryDisconnect()
+    TryDisconnect()
 
 ######## ROTTE ########
 
