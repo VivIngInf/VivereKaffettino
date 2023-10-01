@@ -18,6 +18,7 @@ from Modules.UserInfo import Info
 from Modules.LoadConfig import LoadConfigs, GetToken
 from Modules.SetAdmin import CreateSetAdminHandler, CreateUnsetAdminHandler
 from Modules.Nostalgia import Nostalgia
+from Modules.Start import Start
 
 from telegram import BotCommand, Bot
 
@@ -26,10 +27,6 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
-
-# Creiamo la funzione start che se richiamata stampa a video "BUONGIORNISSIMO, KAFFÈ!?"
-async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="BUONGIORNISSIMO, KAFFÈ!?")
 
 # Creiamo la funzione Cancel che ci permette di uscire dalle conversazioni
 async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):

@@ -28,6 +28,11 @@ async def InsertUsernamePromote(update: Update, context: ContextTypes.DEFAULT_TY
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Non esiste un utente con username: {username}\nRiprova oppure fai \cancel")
         return USERNAME
 
+    # Se già l'utente è un amministratore, allora dai errore e annulla
+    if(GetIsAdmin(idTelegram=idTelegram)):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"L'utente {username} è già un amministratore!")
+        return ConversationHandler.END
+
     SetAdminDB(idTelegram=idTelegram, state=True)
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Cambiati i permessi di {username}.\nAdesso è: Amministratore!")
 
@@ -44,6 +49,11 @@ async def InsertUsernameDemote(update: Update, context: ContextTypes.DEFAULT_TYP
     if(not CheckUserExists(idTelegram=idTelegram)):
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Non esiste un utente con username: {username}\nRiprova oppure fai \cancel")
         return USERNAME
+
+    # Se già l'utente non ha i permessi, allora dai errore e annulla
+    if(not GetIsAdmin(idTelegram=idTelegram)):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"L'utente {username} già non aveva i permessi!")
+        return ConversationHandler.END
 
     SetAdminDB(idTelegram=idTelegram, state=False)
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Cambiati i permessi di {username}.\nAdesso è: Utente!")
