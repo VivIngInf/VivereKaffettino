@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from Modules.DatabaseHandler import GetUsername, CheckUserExists, GetIsAdmin
+from Modules.DatabaseHandler import GetUsername, CheckUserExists, GetIsAdmin, GetIsVerified
 
 async def Info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """USER_INFO: Permette all'utente di vedere il suo ID_Telegram ed il suo Username"""
@@ -13,9 +13,12 @@ async def Info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     telegramID = update.effective_chat.id
     username = GetUsername(idTelegram=telegramID)
     isAdmin = GetIsAdmin(idTelegram=telegramID)
+    isVerified = GetIsVerified(idTelegram=telegramID)
 
-    ruolo : str = "Amministratore" if isAdmin else "Utente"
+    role : str = "Amministratore" if isAdmin else "Utente"
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Il tuo ID_Telegram è: {telegramID}.\nIl tuo username è: {username}.\nIl tuo ruolo è: {ruolo}")
+    state : str = "Verificato" if  isVerified else "Richiesta in sospeso"
+
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Il tuo ID_Telegram è: {telegramID}.\nIl tuo username è: {username}.\nIl tuo ruolo è: {role}\nStato: {state}")
 
     return None

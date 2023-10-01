@@ -161,6 +161,7 @@ def SetAdminDB(idTelegram : str, state : bool) -> None:
 
 def GetIsAdmin(idTelegram : str) -> bool:
     """DATABASE_HANDLER: Ritorna il ruolo dell'utente"""
+    
     query = f"SELECT IsAdmin FROM Utente WHERE ID_Telegram = '{idTelegram}';"
 
     cnx : MySQLConnection = TryConnect()
@@ -169,4 +170,21 @@ def GetIsAdmin(idTelegram : str) -> bool:
     crs.execute(query)
     isAdmin = crs.fetchone()[0]
 
+    TryDisconnect(cnx=cnx, crs=crs)
+
     return bool(isAdmin)
+
+def GetIsVerified(idTelegram : str) -> bool:
+    """DATABASE_HANDLER: Ritorna se l'utente è stato approvato"""
+    
+    query = f"SELECT IsVerified From UTENTE WHERE ID_TELEGRAM = '{idTelegram}'"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+    isVerified = crs.fetchone()[0]
+
+    TryDisconnect(cnx=cnx, crs=crs)
+
+    return bool(isVerified)
