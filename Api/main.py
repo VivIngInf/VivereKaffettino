@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from Modules.Database import TryConnect, TryDisconnect, GetAulette
+from Modules.Configs import LoadConfigs
 
 app = FastAPI()
 
@@ -7,6 +8,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
+    await LoadConfigs()
     await TryConnect()
 
 @app.on_event("shutdown")

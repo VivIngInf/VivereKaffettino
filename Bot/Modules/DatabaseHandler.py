@@ -7,7 +7,8 @@ from Modules.LoadConfig import GetDBHost, GetDBUsername, GetDBPassword, GetDBDat
 def TryConnect() -> MySQLConnection:    
     """DATABASE_HANDLER: Prova a connettersi al DB tramite i parametri, altrimenti da errore"""
 
-    try:
+    try:        
+
         cnx : MySQLConnection = connect(
             host=GetDBHost(),
             user=GetDBUsername(),

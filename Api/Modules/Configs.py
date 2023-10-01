@@ -7,7 +7,7 @@ username : str = ""
 password : str = ""
 database : str = ""
 
-def LoadConfigs() -> None:
+async def LoadConfigs() -> None:
     """LOAD_CONFIG: Carichiamo le stringhe dal file '.env' """
     
     load_dotenv(find_dotenv()) # Carichiamo il file di ambiente dove sono stati salvati i file di config
