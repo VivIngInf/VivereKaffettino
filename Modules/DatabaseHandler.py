@@ -143,11 +143,11 @@ def GetBalance(idTelegram : str) -> float:
 
     return float(saldo)
 
-def SetAdmin(idTelegram : str) -> None:
+def SetAdminDB(idTelegram : str, state : bool) -> None:
     """DATABASE_HANDLER / ADD_ADMIN: Aggiorniamo l'utente con idTelegram passato come parametro impostando
     isAdmin ad 1"""
 
-    query = f"UPDATE Utente SET IsAdmin = 1 WHERE ID_Telegram = '{idTelegram}';"
+    query = f"UPDATE Utente SET IsAdmin = {int(state)} WHERE ID_Telegram = '{idTelegram}';"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()

@@ -16,7 +16,8 @@ from Modules.AddUser import CreateAddUserHandler, InsertUserButton
 from Modules.ShowBalance import ShowBalance
 from Modules.UserInfo import Info
 from Modules.LoadConfig import LoadConfigs, GetToken
-from Modules.AddAdmin import CreateAddAdminHandler
+from Modules.SetAdmin import CreateSetAdminHandler, CreateUnsetAdminHandler
+from Modules.Nostalgia import Nostalgia
 
 from telegram import BotCommand, Bot
 
@@ -50,6 +51,8 @@ async def SetCommands() -> None:
     
     return None
 
+# TODO: IMPLEMENTARE CHE TUTTI I COMANDI AD ESCLUSIONE DI INFO, ADD E KAMERATA KAFFETTINO DEBBANO AVERE L'UTENTE
+
 if __name__ == "__main__":
 
     LoadConfigs()
@@ -75,8 +78,16 @@ if __name__ == "__main__":
     application.add_handler(info_handler)
 
     # Creiamo il comando AddAdmin e lo aggiungiamo ai comandi runnabili
-    addAdmin_handler = CreateAddAdminHandler(Cancel=Cancel)
-    application.add_handler(addAdmin_handler)
+    setAdmin_handler = CreateSetAdminHandler(Cancel=Cancel)
+    application.add_handler(setAdmin_handler)
+
+    # Creiamo il comando AddAdmin e lo aggiungiamo ai comandi runnabili
+    unsetAdmin_handler = CreateUnsetAdminHandler(Cancel=Cancel)
+    application.add_handler(unsetAdmin_handler)
+
+    # Creiamo il comando kamerataKaffettino e lo aggiungiamo ai comandi runnabili
+    kamerata_handler = CommandHandler('kamerataKaffettino', Nostalgia)
+    application.add_handler(kamerata_handler)
 
     SetCommands()
 

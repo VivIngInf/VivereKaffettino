@@ -2,6 +2,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
 from Modules.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser
+import re # Importiamo le RegEx
+import os
 
 # Gli stati della conversazione
 NOME_COMPLETO, NOTIFICA = range(2)
@@ -33,7 +35,29 @@ async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """ADD_USER: Memorizziamo il messaggio mandato dall'utente come nome completo e chiediamo l'auletta di riferimento"""
     
-    usersAndValues[update.message.chat_id].Nome = update.message.text
+    usernamePattern = "^[A-Z][a-zA-Z]*\.[A-Z][a-zA-Z]*(\d{2})?$" # Espressione regolare che controlla se il formato dell'username è nome.cognome00
+    username = update.message.text
+
+    # Controlliamo se il formato è giusto
+    if not re.match(usernamePattern, username): # Se non appatta allora dai errore e richiedi
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="L'username non è nel formato UniPa 'nome.cognome00'. Iniziali grandi.")
+        return NOME_COMPLETO
+
+    modulePath = os.path.dirname(os.path.abspath(__file__)) # Otteniamo il percorso di questo file
+    filePath = os.path.join(modulePath, '..', 'Resources', "ParoleVolgari.txt") # Directory delle cose "Parole Volgari"
+
+    print(filePath)
+
+    # Leggi il file delle parole volgari e crea un set di parole
+    with open(filePath, 'r') as file:
+        paroleVolgari = set(line.strip() for line in file)
+
+        # Controlla se una delle parole volgari è contenuta nell'username
+        if any(parola in username.upper() for parola in paroleVolgari):
+            await context.bot.send_message(chat_id=update.effective_chat.id, text="L'username contiene parole volgari. Riprova.")
+            return NOME_COMPLETO
+
+    usersAndValues[update.message.chat_id].Nome = username # Salviamo l'username
 
     # Facciamo una chiamata al DB per prendere le varie aulette
     rows = GetAulette()
