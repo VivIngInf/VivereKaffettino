@@ -10,7 +10,7 @@ def GiornoCorrente() -> str:
     weekdays : list = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
     return weekdays[datetime.now().weekday()]
 
-def GiornoFestivo() -> tuple:
+def GiornoFestivo():
     """ Funzione per verificare se la data attuale è una festività specifica"""
     
     current_date = datetime.now()
@@ -20,16 +20,16 @@ def GiornoFestivo() -> tuple:
         (12, 13),  # Santa Lucia (13 dicembre)
         (12, 24),  # Vigilia Natale (24 dicembre)
         (12, 25),  # Natale (25 dicembre)
-        (pasqua.month, pasqua.day) # Pasqua
+        (pasqua.month, pasqua.day), # Pasqua
         (pasqua.month, pasqua.day + 1) # Pasquetta 
         # Aggiungi altre festività qui
     ]
     
     return (current_date.month, current_date.day) in festive_dates
 
-def calcola_pasqua(anno) -> datetime: 
+def calcola_pasqua(anno) -> datetime:
     """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
-    
+
     a = anno % 19
     b = anno // 100
     c = anno % 100
@@ -40,14 +40,16 @@ def calcola_pasqua(anno) -> datetime:
     h = (19 * a + b - d - g + 15) % 30
     i = c // 4
     k = c % 4
-    L = (32 + 2 * e + 2 * i - h - k) % 7
-    m = (a + 11 * h + 22 * L) // 451
+    l = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l) // 451
 
-    data_pasqua = datetime.date(anno, (h + L - 7 * m + 114) // 31, ((h + L - 7 * m + 114) % 31) + 1)
+    # Creare un oggetto datetime anziché chiamare datetime.date()
+    data_pasqua = datetime(anno, (h + l - 7 * m + 114) // 31, ((h + l - 7 * m + 114) % 31) + 1)
 
     return data_pasqua
 
-def SendRandomImage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> InputFile:
+
+def SendRandomImage() -> InputFile:
     """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
 
     # Determina la data attuale
@@ -98,4 +100,4 @@ def SendRandomImage(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Input
 
 async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     image : InputFile = SendRandomImage()
-    update.message.reply_photo(image)
+    await update.message.reply_photo(image)
