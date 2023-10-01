@@ -177,7 +177,7 @@ def GetIsAdmin(idTelegram : str) -> bool:
 def GetIsVerified(idTelegram : str) -> bool:
     """DATABASE_HANDLER: Ritorna se l'utente è stato approvato"""
     
-    query = f"SELECT IsVerified From UTENTE WHERE ID_TELEGRAM = '{idTelegram}'"
+    query = f"SELECT IsVerified From Utente WHERE ID_TELEGRAM = '{idTelegram}'"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()

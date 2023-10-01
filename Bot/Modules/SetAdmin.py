@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
-from Modules.DatabaseHandler import GetIdTelegram, SetAdminDB, CheckUserExists, GetIsAdmin
+from Modules.DatabaseHandler import GetIdTelegram, SetAdminDB, CheckUserExists, GetIsAdmin, GetIsVerified
 
 USERNAME = range(1)
 
@@ -8,12 +8,12 @@ async def SetAdmin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """SET_ADMIN:  Questa funzione deve permettere ad un amministratore
     di inserire l'username di un utente e renderlo amministratore"""
 
+    idTelegram = update.effective_chat.id
+
     # Controlliamo se amministratore
-    if not GetIsAdmin(idTelegram=update.effective_chat.id):
+    if not GetIsAdmin(idTelegram=idTelegram):
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Non hai i permessi per eseguire questo comando")
         return ConversationHandler.END
-
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci l'username dell'utente da promuovere:")
 
     return USERNAME
 
@@ -27,6 +27,11 @@ async def InsertUsernamePromote(update: Update, context: ContextTypes.DEFAULT_TY
     if(not CheckUserExists(idTelegram=idTelegram)):
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Non esiste un utente con username: {username}\nRiprova oppure fai \cancel")
         return USERNAME
+
+    # Se l'utente non è verificato allora annulla
+    if not GetIsVerified(idTelegram=idTelegram):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="L'utente non è stato ancora verificato")
+        return ConversationHandler.END
 
     # Se già l'utente è un amministratore, allora dai errore e annulla
     if(GetIsAdmin(idTelegram=idTelegram)):
