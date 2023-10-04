@@ -26,7 +26,7 @@ async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai già un account! Ti sei dimenticato l'username? Fai /info")
         return ConversationHandler.END
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il nome completo dell'utente: ")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il tuo nominativo in formato nome.cognome: ")
 
     usersAndValues[update.message.chat_id] = User("", 0)
 
