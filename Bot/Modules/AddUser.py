@@ -26,7 +26,7 @@ async def AddUser(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Hai già un account! Ti sei dimenticato l'username? Fai /info")
         return ConversationHandler.END
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il tuo nominativo in formato nome.cognome: ")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Inserisci il tuo nominativo in formato Nome.Cognome: ")
 
     usersAndValues[update.message.chat_id] = User("", 0)
 
@@ -40,7 +40,7 @@ async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     # Controlliamo se il formato è giusto
     if not re.match(usernamePattern, username): # Se non appatta allora dai errore e richiedi
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="L'username non è nel formato UniPa 'nome.cognome00'. Iniziali grandi.")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="L'username non è nel formato UniPa 'Nome.Cognome00'. Iniziali grandi.")
         return NOME_COMPLETO
 
     modulePath = os.path.dirname(os.path.abspath(__file__)) # Otteniamo il percorso di questo file
@@ -81,7 +81,7 @@ async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     query = update.callback_query
     
     await query.answer()
-    await query.edit_message_text(text=f"Selected option: {query.data}")
+    await query.edit_message_text(text=f"Hai selezionato: {query.data}")
 
     usersAndValues[update.effective_chat.id].Auletta = query.data
 
