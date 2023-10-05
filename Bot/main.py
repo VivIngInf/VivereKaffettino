@@ -8,7 +8,7 @@ import atexit # Libreria che ci permette di creare un metodo per quando il codic
 # Librerie Telegram
 import logging
 from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
@@ -27,6 +27,8 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
+
+MAIN_MENU, USER, ADMIN = range(3)
 
 # Creiamo la funzione Cancel che ci permette di uscire dalle conversazioni
 async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -55,11 +57,17 @@ if __name__ == "__main__":
     LoadConfigs()
     application = ApplicationBuilder().token(token=GetToken()).build() # Ci impossessiamo del bot con il nostro TOKEN
 
-    # Creiamo il comando start e lo aggiungiamo ai comandi runnabili
-    start_handler = CommandHandler('start', Start)
-    application.add_handler(start_handler)
 
-    # Creiamo il comando AddUser e lo aggiungiamo ai comandi runnabili
+
+    # Creiamo il comando start e lo aggiungiamo ai comandi runnabili
+    start_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', Start)],
+        states={
+        },
+        fallbacks=CommandHandler('cancel', Cancel)
+    )
+
+    """# Creiamo il comando AddUser e lo aggiungiamo ai comandi runnabili
     # N.B: CreateAddUserHandler è un comando esterno presente in InsertUser.py
     addUser_handler = CreateAddUserHandler(Cancel=Cancel)
     application.add_handler(addUser_handler)
@@ -86,7 +94,7 @@ if __name__ == "__main__":
     kamerata_handler = CommandHandler('kamerataKaffettino', Nostalgia)
     application.add_handler(kamerata_handler)
 
-    SetCommands()
+    SetCommands()"""
 
     application.run_polling() # Inizializza l'app    
     

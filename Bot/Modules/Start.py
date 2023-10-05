@@ -1,8 +1,9 @@
 import os
 import random
 from datetime import datetime
-from telegram import Update, InputFile
+from telegram import Update, InputFile, ReplyKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler
+from Modules.DatabaseHandler import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
 
 def GiornoCorrente() -> str:
     """Funzione per ottenere il giorno della settimana attuale come stringa"""
@@ -100,4 +101,28 @@ def SendRandomImage() -> InputFile:
 
 async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     image : InputFile = SendRandomImage()
-    await update.message.reply_photo(image)
+
+    risposta = ""
+    mainMenuKeyboard = None
+
+    if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
+        risposta = """Hey, è la prima volta che visiti vivere kaffetino?
+        Registrati premendo il bottone sottostante!"""
+        mainMenuKeyboard = [["Registrati"]]
+
+    elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
+        risposta = """Ancora non ti è stato attivato l'account!
+        Riceverai un messaggio appena la tua card sarà pronta!"""
+        mainMenuKeyboard = [["Visualizza INFO"], ["Stop"]]
+
+    elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
+        username = GetUsername(idTelegram=update.effective_chat.id)
+        risposta = f"""Bentornato {username}, che vuoi fare?"""
+        mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Stop"]]
+
+    else: # Sei amministratores
+        username = GetUsername(idTelegram=update.effective_chat.id)
+        risposta = f"""Bentornato {username}, che vuoi fare?"""
+        mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Aggiungi Admin"], ["Rimuovi Admin"] ["Stop"]]
+
+    await update.message.reply_photo(photo=image, caption=risposta, reply_markup=ReplyKeyboardMarkup(mainMenuKeyboard))
