@@ -109,7 +109,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         risposta = """Hey, è la prima volta che visiti vivere kaffetino?
         Registrati premendo il bottone sottostante!"""
         
-        register = InlineKeyboardButton(text="REGISTRATI", callback_data="REG")
+        register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="REG")
 
         mainMenuKeyboard.append([register])
 
@@ -117,8 +117,8 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         risposta = """Ancora non ti è stato attivato l'account!
         Riceverai un messaggio appena la tua card sarà pronta!"""
 
-        info = InlineKeyboardButton(text="INFO", callback_data="INFO")
-        stop = InlineKeyboardButton(text="STOP", callback_data="STOP")
+        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
+        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
 
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([stop])
@@ -127,9 +127,9 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username = GetUsername(idTelegram=update.effective_chat.id)        
         risposta = f"""Bentornato {username}, che vuoi fare?"""
 
-        saldo = InlineKeyboardButton(text="SALDO", callback_data="SAL")
-        info = InlineKeyboardButton(text="INFO", callback_data="INFO")
-        stop = InlineKeyboardButton(text="STOP", callback_data="STOP")
+        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="SAL")
+        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
+        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
 
         mainMenuKeyboard.append([saldo])
         mainMenuKeyboard.append([info])
@@ -139,11 +139,11 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         username = GetUsername(idTelegram=update.effective_chat.id)
         risposta = f"""Bentornato {username}, che vuoi fare?"""
 
-        saldo = InlineKeyboardButton(text="SALDO", callback_data="SAL")
-        addAdmin = InlineKeyboardButton(text="AGGIUNGI ADMIN", callback_data="ADD")
-        remAdmin = InlineKeyboardButton(text="RIMUOVI ADMIN", callback_data="REM")
-        info = InlineKeyboardButton(text="INFO", callback_data="INFO")
-        stop = InlineKeyboardButton(text="STOP", callback_data="STOP")
+        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="SAL")
+        addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 AGGIUNGI ADMIN 👩🏽‍🔧", callback_data="ADD")
+        remAdmin = InlineKeyboardButton(text="🚷 RIMUOVI ADMIN 🚷", callback_data="REM")
+        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
+        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
 
         mainMenuKeyboard.append([saldo])
         mainMenuKeyboard.append([addAdmin])
