@@ -3,15 +3,16 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 from Modules.AddUser import AddUserKeyboardHandler
 from Modules.ShowBalance import ShowBalance
 
-async def KeyboardAulette(update: Update, context: ContextTypes.DEFAULT_TYPE, data: int, query: CallbackQuery) -> None: 
+async def KeyboardAulette(update: Update, context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery, data: int) -> None: 
     
     AddUserKeyboardHandler(update=update, context=context, idAuletta=data)
     await query.edit_message_text(text=f"Hai selezionato: {data}")
     return None
 
-async def KeyboardSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def KeyboardSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE, query: CallbackQueryHandler, data: int) -> None:
 
     ShowBalance(update=update, context=context)
+    await query.edit_message_text(text=f"Hai selezionato: {data}")
     return None
 
 async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
@@ -31,7 +32,7 @@ async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     match flag:
         case "SAL":
-            KeyboardSaldo(update=update, context=context)
+            KeyboardSaldo(update=update, context=context, query=query, data=data)
 
         case "Auletta":
             KeyboardAulette(update=update, context=context, data=data, query=query)
