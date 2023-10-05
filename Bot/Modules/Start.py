@@ -123,6 +123,8 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else: # Sei amministratores
         username = GetUsername(idTelegram=update.effective_chat.id)
         risposta = f"""Bentornato {username}, che vuoi fare?"""
-        mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Aggiungi Admin"], ["Rimuovi Admin"] ["Stop"]]
+        mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Aggiungi Admin"], ["Rimuovi Admin"], ["Stop"]]
 
     await update.message.reply_photo(photo=image, caption=risposta, reply_markup=ReplyKeyboardMarkup(mainMenuKeyboard))
+
+    return ConversationHandler.END
