@@ -5,6 +5,7 @@ from Modules.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, Ins
 import re # Importiamo le RegEx
 import os
 
+
 # Gli stati della conversazione
 NOME_COMPLETO, NOTIFICA = range(2)
 
@@ -70,7 +71,7 @@ async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE)
     
     # Mettiamo le aulette in riga
     for row in rows:
-        button = InlineKeyboardButton(text=row[1], callback_data=row[0])
+        button = InlineKeyboardButton(text=row[1], callback_data="Auletta:"+row[0])
         keyboard.append([button])
         
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -80,23 +81,18 @@ async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
     return ConversationHandler.END
 
-async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
-    """ADD_USER: Quando l'utente seleziona un bottone chiama questo metodo"""
-    query = update.callback_query
-    
-    await query.answer()
-    await query.edit_message_text(text=f"Hai selezionato: {query.data}")
-
-    usersAndValues[update.effective_chat.id].Auletta = query.data
+async def AddUserKeyboardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE, idAuletta: int) -> None:
+    usersAndValues[update.effective_chat.id].Auletta = idAuletta
 
     username = usersAndValues[update.effective_chat.id].Nome
-    nomeAuletta : str = GetAuletta(query.data)
+    nomeAuletta : str = GetAuletta(idAuletta=idAuletta)
 
     InsertUser(idTelegram=update.effective_chat.id, username=username)
 
     usersAndValues.pop([update.effective_chat.id])
 
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Ottimo, l'utente {usersAndValues[update.effective_chat.id].Nome} farà riferimento all'auletta {nomeAuletta}")
+
 
 def CreateAddUserHandler(Cancel):
     """ADD_USER: Handler Della funzione ADD_USER"""

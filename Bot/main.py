@@ -12,13 +12,14 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
-from Modules.AddUser import CreateAddUserHandler, InsertUserButton
+from Modules.AddUser import CreateAddUserHandler
 from Modules.ShowBalance import ShowBalance
 from Modules.UserInfo import Info
 from Modules.LoadConfig import LoadConfigs, GetToken
 from Modules.SetAdmin import CreateSetAdminHandler, CreateUnsetAdminHandler
 from Modules.Nostalgia import Nostalgia
 from Modules.Start import Start
+from Modules.KeyboardsHandler import KeyBoardHandler
 
 from telegram import BotCommand, Bot
 
@@ -67,6 +68,9 @@ if __name__ == "__main__":
 
     application.add_handler(start_handler)
 
+    # Handler delle keyboards
+    application.add_handler(CallbackQueryHandler(KeyBoardHandler))
+
     """# Creiamo il comando AddUser e lo aggiungiamo ai comandi runnabili
     # N.B: CreateAddUserHandler è un comando esterno presente in InsertUser.py
     addUser_handler = CreateAddUserHandler(Cancel=Cancel)
@@ -74,9 +78,6 @@ if __name__ == "__main__":
 
     showBalance_handler = CommandHandler('saldo', ShowBalance)
     application.add_handler(showBalance_handler)
-
-    # Handler della keyboard per l'auletta
-    application.add_handler(CallbackQueryHandler(InsertUserButton))
 
     # Handler info
     info_handler = CommandHandler('info', Info)

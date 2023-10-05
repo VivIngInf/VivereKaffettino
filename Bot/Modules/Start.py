@@ -106,16 +106,14 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mainMenuKeyboard = []
 
     if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
-        risposta = """Hey, è la prima volta che visiti vivere kaffetino?
-        Registrati premendo il bottone sottostante!"""
+        risposta = "Hey, è la prima volta che visiti vivere kaffetino?\nRegistrati premendo il bottone sottostante!"
         
         register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="REG")
 
         mainMenuKeyboard.append([register])
 
     elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
-        risposta = """Ancora non ti è stato attivato l'account!
-        Riceverai un messaggio appena la tua card sarà pronta!"""
+        risposta = "Ancora non ti è stato attivato l'account!\nRiceverai un messaggio appena la tua card sarà pronta!"
 
         info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
         stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
@@ -125,7 +123,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
         username = GetUsername(idTelegram=update.effective_chat.id)        
-        risposta = f"""Bentornato {username}, che vuoi fare?"""
+        risposta = f"Bentornato {username}, che vuoi fare?"
 
         saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="SAL")
         info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
@@ -137,7 +135,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     else: # Sei amministratores
         username = GetUsername(idTelegram=update.effective_chat.id)
-        risposta = f"""Bentornato {username}, che vuoi fare?"""
+        risposta = f"Bentornato {username}, che vuoi fare?"
 
         saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="SAL")
         addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 AGGIUNGI ADMIN 👩🏽‍🔧", callback_data="ADD")
