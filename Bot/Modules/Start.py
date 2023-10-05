@@ -125,6 +125,6 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         risposta = f"""Bentornato {username}, che vuoi fare?"""
         mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Aggiungi Admin"], ["Rimuovi Admin"], ["Stop"]]
 
-    await update.message.reply_photo(photo=image, caption=risposta, reply_markup=InlineKeyboardMarkup(mainMenuKeyboard, one_time_keyboard=True))
+    await update.message.reply_photo(photo=image, caption=risposta, reply_markup=InlineKeyboardMarkup(mainMenuKeyboard))
 
     return ConversationHandler.END
