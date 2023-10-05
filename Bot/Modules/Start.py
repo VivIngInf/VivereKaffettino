@@ -1,7 +1,7 @@
 import os
 import random
 from datetime import datetime
-from telegram import Update, InputFile, InlineKeyboardMarkup
+from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler
 from Modules.DatabaseHandler import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
 
@@ -108,22 +108,48 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
         risposta = """Hey, è la prima volta che visiti vivere kaffetino?
         Registrati premendo il bottone sottostante!"""
-        mainMenuKeyboard = [["Registrati"]]
+        
+        register = InlineKeyboardButton(text="REGISTRATI", callback_data="REG")
+
+        mainMenuKeyboard.append([register])
 
     elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
         risposta = """Ancora non ti è stato attivato l'account!
         Riceverai un messaggio appena la tua card sarà pronta!"""
-        mainMenuKeyboard = [["Visualizza INFO"], ["Stop"]]
+
+        info = InlineKeyboardButton(text="INFO", callback_data="INFO")
+        stop = InlineKeyboardButton(text="STOP", callback_data="STOP")
+
+        mainMenuKeyboard.append([info])
+        mainMenuKeyboard.append([stop])
 
     elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)
+        username = GetUsername(idTelegram=update.effective_chat.id)        
         risposta = f"""Bentornato {username}, che vuoi fare?"""
-        mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Stop"]]
+
+        saldo = InlineKeyboardButton(text="SALDO", callback_data="SAL")
+        info = InlineKeyboardButton(text="INFO", callback_data="INFO")
+        stop = InlineKeyboardButton(text="STOP", callback_data="STOP")
+
+        mainMenuKeyboard.append([saldo])
+        mainMenuKeyboard.append([info])
+        mainMenuKeyboard.append([stop])
 
     else: # Sei amministratores
         username = GetUsername(idTelegram=update.effective_chat.id)
         risposta = f"""Bentornato {username}, che vuoi fare?"""
-        mainMenuKeyboard = [["Visualizza Saldo"], ["Visualizza INFO"], ["Aggiungi Admin"], ["Rimuovi Admin"], ["Stop"]]
+
+        saldo = InlineKeyboardButton(text="SALDO", callback_data="SAL")
+        addAdmin = InlineKeyboardButton(text="AGGIUNGI ADMIN", callback_data="ADD")
+        remAdmin = InlineKeyboardButton(text="RIMUOVI ADMIN", callback_data="REM")
+        info = InlineKeyboardButton(text="INFO", callback_data="INFO")
+        stop = InlineKeyboardButton(text="STOP", callback_data="STOP")
+
+        mainMenuKeyboard.append([saldo])
+        mainMenuKeyboard.append([addAdmin])
+        mainMenuKeyboard.append([remAdmin])
+        mainMenuKeyboard.append([info])
+        mainMenuKeyboard.append([stop])
 
     await update.message.reply_photo(photo=image, caption=risposta, reply_markup=InlineKeyboardMarkup(mainMenuKeyboard))
 
