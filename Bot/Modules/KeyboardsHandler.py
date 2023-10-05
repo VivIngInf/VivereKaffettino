@@ -3,6 +3,8 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 from Modules.AddUser import AddUserKeyboardHandler
 from Modules.ShowBalance import ShowBalance
 
+# TODO: SISTEMARE FATTO CHE RIMANE KEYBOARD
+
 async def KeyboardAulette(update: Update, context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery, data: int) -> None: 
     
     await AddUserKeyboardHandler(update=update, context=context, idAuletta=data)
