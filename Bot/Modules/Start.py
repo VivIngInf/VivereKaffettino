@@ -103,7 +103,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     image : InputFile = SendRandomImage()
 
     risposta = ""
-    mainMenuKeyboard = None
+    mainMenuKeyboard = []
 
     if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
         risposta = """Hey, è la prima volta che visiti vivere kaffetino?
