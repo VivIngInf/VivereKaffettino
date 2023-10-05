@@ -48,6 +48,20 @@ def CheckUserExists(idTelegram : str) -> bool:
 
     return bool(userExists)
 
+def CheckUsernameExists(username : str) -> bool:
+    """DATABASE_HANDLER: Controlla se l'username è già stato preso"""
+
+    query = f"SELECT EXISTS (SELECT 1 FROM Utente WHERE Username = '{username}');"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+
+    usernameExists = crs.fetchone()[0]
+
+    return bool(usernameExists)
+
 def GetUsername(idTelegram : str) -> str:
     """DATABASE_HANDLER / USER_INFO: Ritorna l'username partendo dall'ID_Telegram passato come parametro"""
 

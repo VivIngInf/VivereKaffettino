@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
-from Modules.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser
+from Modules.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser, CheckUsernameExists
 import re # Importiamo le RegEx
 import os
 
@@ -54,8 +54,12 @@ async def InsertNomeCompleto(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
         # Controlla se una delle parole volgari è contenuta nell'username
         if any(parola in username.upper() for parola in paroleVolgari):
-            await context.bot.send_message(chat_id=update.effective_chat.id, text="L'username contiene parole volgari. Riprova.")
             return NOME_COMPLETO
+
+    # Controllare se esiste già lo stesso username
+    if CheckUsernameExists(username=username):
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Questo username esiste già, riprova.")
+        return NOME_COMPLETO
 
     usersAndValues[update.message.chat_id].Nome = username # Salviamo l'username
 
@@ -90,10 +94,9 @@ async def InsertUserButton(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     InsertUser(idTelegram=update.effective_chat.id, username=username)
 
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Ottimo, l'utente {usersAndValues[update.effective_chat.id].Nome} farà riferimento all'auletta {nomeAuletta}")
+    usersAndValues.pop([update.effective_chat.id])
 
-# TODO: MANDARE RICHIESTA INSERT AL DB ED UNA VOLTA ENTRATO RIMUOVERE L'UTENTE DAL DIZIONARIO
-# TODO: IL BOT SI BLOCCA FINO A QUANDO NON GLI ARRIVA CANCEL ALLA FINE DELL'INSERIMENTO, DOPO AVER AMMACCATO UN BOTTONE
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Ottimo, l'utente {usersAndValues[update.effective_chat.id].Nome} farà riferimento all'auletta {nomeAuletta}")
 
 def CreateAddUserHandler(Cancel):
     """ADD_USER: Handler Della funzione ADD_USER"""
