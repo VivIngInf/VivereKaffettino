@@ -77,7 +77,7 @@ def SendRandomImage() -> InputFile:
 
     # Se non è un giorno festivo, aggiungi 'generiche' e la cartella specifica del giorno della settimana
     if not possible_folders:
-        possible_folders.extend(['generiche', GiornoCorrente()])
+        possible_folders.extend(['Generiche', GiornoCorrente()])
 
     # Seleziona casualmente una cartella tra quelle possibili
     selected_folder = random.choice(possible_folders)
