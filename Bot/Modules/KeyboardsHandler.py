@@ -21,12 +21,11 @@ async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     await query.answer()
 
-    qSplit : str
     flag : str
     data : str
 
     if ":" in query.data:
-        qSplit = query.data.split(":")
+        qSplit : str = query.data.split(":")
         flag = qSplit[0]
         data = qSplit[1]
     else:
@@ -35,9 +34,9 @@ async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
     match flag:
         case "SAL":
-            KeyboardSaldo(update=update, context=context, query=query, data=data)
+            await KeyboardSaldo(update=update, context=context, query=query, data=data)
 
         case "Auletta":
-            KeyboardAulette(update=update, context=context, data=data, query=query)
+            await KeyboardAulette(update=update, context=context, data=data, query=query)
 
     return None
