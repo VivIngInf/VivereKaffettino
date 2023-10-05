@@ -6,13 +6,13 @@ from Modules.ShowBalance import ShowBalance
 async def KeyboardAulette(update: Update, context: ContextTypes.DEFAULT_TYPE, query: CallbackQuery, data: int) -> None: 
     
     AddUserKeyboardHandler(update=update, context=context, idAuletta=data)
-    await query.edit_message_text(text=f"Hai selezionato: {data}")
+    #await query.edit_message_text(text=f"Hai selezionato: {data}")
     return None
 
 async def KeyboardSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE, query: CallbackQueryHandler, data: int) -> None:
 
     ShowBalance(update=update, context=context)
-    await query.edit_message_text(text=f"Hai selezionato: {data}")
+    #await query.edit_message_text(text=f"Hai selezionato: {data}")
     return None
 
 async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
