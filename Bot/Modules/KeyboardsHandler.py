@@ -2,6 +2,7 @@ from telegram import Update, CallbackQuery
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
 from Modules.AddUser import AddUserKeyboardHandler
 from Modules.ShowBalance import ShowBalance
+from Modules.AddUser import AddUser
 
 # TODO: SISTEMARE FATTO CHE RIMANE KEYBOARD
 
@@ -16,6 +17,10 @@ async def KeyboardSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE, quer
     await ShowBalance(update=update, context=context)
     #await query.edit_message_text(text=f"Hai selezionato: {data}")
     return None
+
+async def KeboardRegister(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+    pass
 
 async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
 
@@ -35,6 +40,10 @@ async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         data = query.data
 
     match flag:
+
+        case "REG":
+            await KeyboardRegister(update=update, context=context, query=query, data=data)
+
         case "SAL":
             await KeyboardSaldo(update=update, context=context, query=query, data=data)
 
