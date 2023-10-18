@@ -76,7 +76,7 @@ def GetIDTelegram(idCard : int) -> float:
 
     return float(saldo)
 
-def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int):
+def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> list:
     """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
     queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto = '{ID_Prodotto}' AND ID_Auletta = '{ID_Auletta}';"
 
@@ -86,12 +86,10 @@ def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int):
     crs.execute(queryCosto)
 
     row = crs.fetchone()
-    quantita : int = row[0]
-    costo : float = row[1]
 
     TryDisconnect(cnx=cnx, crs=crs)
     
-    return {quantita, costo}
+    return row
 
 def GetDebito(ID_Auletta : int) -> int:
     query = f"SELECT DebitoMax FROM Auletta WHERE Auletta = '{ID_Auletta}';"
