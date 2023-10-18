@@ -93,7 +93,7 @@ def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> list:
     return row
 
 def GetDebito(ID_Auletta : int) -> int:
-    query = f"SELECT DebitoMax FROM Auletta WHERE Auletta = '{ID_Auletta}';"
+    query = f"SELECT DebitoMax FROM Auletta WHERE ID_Auletta = '{ID_Auletta}';"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()
