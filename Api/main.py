@@ -28,6 +28,6 @@ async def pay(idAuletta : int):
 async def porcodue(request: Request):
     a = request.query_params['a']
     b = request.query_params['b']
-    return { {"message_a" : a }, {"message_b" : b } }
+    return { "message": [["a", a], ["b", b]] }
 
 
