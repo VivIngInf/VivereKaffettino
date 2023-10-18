@@ -1,9 +1,17 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from Modules.Configs import LoadConfigs
 from Modules.Database import GetAulette
-
+from pydantic import BaseModel
 
 app = FastAPI()
+
+######## CLASSI ########
+
+class CoffeRequest(BaseModel):
+    ID_Auletta: int
+    ID_Utente : int
+
+
 ######## EVENTI ########
 
 @app.on_event("startup")
@@ -20,7 +28,11 @@ async def shutdown():
 async def suca():
     return {"message": "milla"}
 
-@app.post("/pay")
+@app.post("/gigibarba")
+async def gigibarba(cRequest: CoffeRequest):
+    return cRequest
+
+"""@app.post("/pay")
 async def pay(request : Request):
     if len(request.query_params) < 2:
         return { "Error:": "Non hai inserito abbastanza parametri"}
@@ -31,4 +43,4 @@ async def pay(request : Request):
     if user == None or auletta == None:
         return {"Error:" "Uno dei due parametri era nullo!"}
 
-    return {"messageUser": user, "messageAuletta": auletta}
+    return {"messageUser": user, "messageAuletta": auletta}"""
