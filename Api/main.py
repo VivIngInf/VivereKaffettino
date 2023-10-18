@@ -30,7 +30,7 @@ async def suca():
 
 @app.post("/gigibarba")
 async def gigibarba(cRequest: CoffeRequest):
-    return cRequest.model_dump()
+    return { "ID_Auletta" : cRequest.ID_Auletta, "ID_Utente" : cRequest.ID_Utente}
 
 """@app.post("/pay")
 async def pay(request : Request):
