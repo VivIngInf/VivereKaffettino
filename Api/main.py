@@ -24,23 +24,16 @@ async def shutdown():
 
 ######## ROTTE ########
 
-@app.post("/suca")
-async def suca():
-    return {"message": "milla"}
-
 @app.post("/gigibarba")
-async def gigibarba(cRequest: CoffeRequest):
+async def gigibarba():
     return { "ID_Auletta" : cRequest.ID_Auletta, "ID_Utente" : cRequest.ID_Utente}
 
-"""@app.post("/pay")
-async def pay(request : Request):
-    if len(request.query_params) < 2:
-        return { "Error:": "Non hai inserito abbastanza parametri"}
-
-    user : int = request.query_params['ID_Utente']
-    auletta : int = request.query_params['ID_Auletta']
+@app.post("/pay")
+async def pay(cRequest: CoffeRequest):
+    user : int = cRequest.query_params['ID_Utente']
+    auletta : int = cRequest.query_params['ID_Auletta']
 
     if user == None or auletta == None:
         return {"Error:" "Uno dei due parametri era nullo!"}
 
-    return {"messageUser": user, "messageAuletta": auletta}"""
+    return {"ID_Utente": user, "ID_Auletta": auletta}
