@@ -45,3 +45,25 @@ def GetAulette() -> list:
     TryDisconnect(cnx=cnx, crs=crs)
 
     return rows
+
+def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
+    """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
+    queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto == {ID_Prodotto} AND WHERE ID_Auletta == {ID_Auletta}"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(queryCosto)
+
+    row = crs.fetchone()
+    quantita = row[0]
+    costo = row[1]
+
+    return row
+
+    # TODO: Controllare quanto costa un elemento in una determinata auletta
+    # TODO: Controllare se si ha abbastanza soldi per non andare fuori debito max
+    # TODO: Creare storico della transazione come "Non eseguita"
+    # TODO: Decurtatre saldo
+    # TODO: Scalare dal magazzino un unità di quel tipo
+    # TODO: Modificare storico della transazione come "Eseguito"

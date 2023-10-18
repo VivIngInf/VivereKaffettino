@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from Modules.Configs import LoadConfigs
-from Modules.Database import GetAulette
+from Modules.Database import GetAulette, PayDB
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -10,6 +10,7 @@ app = FastAPI()
 class CoffeRequest(BaseModel):
     ID_Auletta : int
     ID_Utente : int
+    ID_Prodotto : int
 
 
 ######## EVENTI ########
@@ -24,10 +25,6 @@ async def shutdown():
 
 ######## ROTTE ########
 
-@app.get("/test")
-async def test():
-    return {"Message" : "Suca"}
-
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
-    return {"ID_Utente": cRequest.ID_Utente, "ID_Auletta": cRequest.ID_Auletta}
+    return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta)
