@@ -27,7 +27,4 @@ async def shutdown():
 
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
-    if cRequest.ID_Utente == None or cRequest.ID_Utente == None:
-        return {"Error:" "Uno dei due parametri era nullo!"}
-
     return {"ID_Utente": cRequest.ID_Utente, "ID_Auletta": cRequest.ID_Auletta}
