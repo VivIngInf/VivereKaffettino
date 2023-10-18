@@ -94,7 +94,7 @@ async def AddUserKeyboardHandler(update: Update, context: ContextTypes.DEFAULT_T
     await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Ottimo, l'utente {usersAndValues[update.effective_chat.id].Nome} farà riferimento all'auletta {nomeAuletta}")
 
 
-def CreateAddUserHandler(Cancel):
+async def CreateAddUserHandler(Cancel):
     """ADD_USER: Handler Della funzione ADD_USER"""
     
     return ConversationHandler(

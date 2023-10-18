@@ -1,6 +1,6 @@
 from telegram import Update, CallbackQuery
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
-from Modules.AddUser import AddUserKeyboardHandler
+from Modules.AddUser import AddUserKeyboardHandler, CreateAddUserHandler
 from Modules.ShowBalance import ShowBalance
 from Modules.AddUser import AddUser
 
@@ -18,8 +18,8 @@ async def KeyboardSaldo(update: Update, context: ContextTypes.DEFAULT_TYPE, quer
     #await query.edit_message_text(text=f"Hai selezionato: {data}")
     return None
 
-async def KeboardRegister(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-
+async def KeyboardRegister(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    
     pass
 
 async def KeyBoardHandler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:    
