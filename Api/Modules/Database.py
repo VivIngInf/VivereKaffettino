@@ -100,7 +100,7 @@ def GetDebito(ID_Auletta : int) -> int:
 
     crs.execute(query)
 
-    debito = crs.fetchone()
+    debito = crs.fetchone()[0]
     
     TryDisconnect(cnx=cnx, crs=crs)
 
