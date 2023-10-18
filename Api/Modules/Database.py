@@ -127,12 +127,18 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     # Controllare se si ha abbastanza soldi per non andare fuori debito max
     
     saldo -= costo
-    debito = costo * debito    
 
-    if saldo >= 0:
+    i = 0
+    debitoMax = 0
+    while(i > debito):
+        debitoMax += costo
+
+    saldo -= costo
+
+    if saldo >= -debitoMax:
         return{"Status" : "Approved"}
 
-    if saldo <= debito:
+    if saldo <= debitoMax:
         return{"Status" : f"Indebitato di {saldo}€"}
 
     # TODO: Creare storico della transazione come "Non eseguita"
