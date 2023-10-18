@@ -49,6 +49,8 @@ def GetAulette() -> list:
 def GetBalance(idTelegram : str) -> float:
     """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
     
+    print(f"IDTELEGRAM: {idTelegram}")
+
     query = f"SELECT Saldo FROM Utente WHERE ID_Telegram = '{idTelegram}';"
     
     cnx : MySQLConnection = TryConnect()
