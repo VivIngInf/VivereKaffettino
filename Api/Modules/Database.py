@@ -98,7 +98,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
     quancosto = CostoEQuantita(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
-    return {quancosto[0], quancosto[1]}
+    return quancosto
 
 
     # TODO: Controllare se si ha abbastanza soldi per non andare fuori debito max
