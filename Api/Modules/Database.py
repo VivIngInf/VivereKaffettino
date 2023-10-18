@@ -76,7 +76,7 @@ def GetIDTelegram(idCard : int) -> float:
 
     return float(saldo)
 
-def CostoEQuantita(ID_Prodotto : int, ID_Auletta : int) -> list:
+def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> list:
     """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
     queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto = '{ID_Prodotto}' AND ID_Auletta = '{ID_Auletta}';"
 
@@ -93,19 +93,48 @@ def CostoEQuantita(ID_Prodotto : int, ID_Auletta : int) -> list:
     
     return {quantita, costo}
 
+def GetDebito(ID_Auletta : int) -> int:
+    query = f"SELECT DebitoMax FROM Auletta WHERE Auletta = '{ID_Auletta}';"
 
-def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+
+    debito = crs.fetchone()
+    
+    TryDisconnect(cnx=cnx, crs=crs)
+
+    return debito
+
+def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
-    quancosto = CostoEQuantita(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
-    return quancosto
+    quancosto = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
+    quantita = quancosto[0]
+    costo = quancosto[1]
 
+    idTelegram = GetIDTelegram(idCard=ID_Card)
 
-    # TODO: Controllare se si ha abbastanza soldi per non andare fuori debito max
+    saldo = GetBalance(idTelegram=idTelegram)
 
+    debito = GetDebito(idAuletta=ID_Auletta)
+
+    # Controllare se quantità disponibile
+
+    if quantita <= 0:
+        return {"Error" : "Quantità dell'item inferiore a 0"}
     
+    # Controllare se si ha abbastanza soldi per non andare fuori debito max
+    
+    saldo -= costo
+    debito = costo * debito    
 
-    return row
+    if saldo >= 0:
+        return{"Status" : "Approved"}
+
+    if saldo <= debito:
+        return{"Status" : f"Indebitato di {saldo}€"}
 
     # TODO: Creare storico della transazione come "Non eseguita"
     # TODO: Decurtatre saldo
