@@ -22,6 +22,9 @@ async def suca():
 
 @app.post("/pay")
 async def pay(request : Request):
+    if len(request.query_params) < 2:
+        return { "suca": "suca"}
+    
     user = request.query_params['ID_Utente']
     auletta = request.query_params['ID_Auletta']
 
