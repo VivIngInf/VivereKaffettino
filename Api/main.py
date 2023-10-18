@@ -24,6 +24,9 @@ async def shutdown():
 
 ######## ROTTE ########
 
+@app.get("/test")
+async def test():
+    return {"Message" : "Suca"}
 
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
