@@ -133,8 +133,6 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     while(i > debito):
         debitoMax += costo
 
-    saldo -= costo
-
     if saldo >= -debitoMax:
         return{"Status" : "Approved"}
 
