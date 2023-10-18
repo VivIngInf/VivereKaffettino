@@ -20,6 +20,6 @@ async def shutdown():
 async def suca():
     return {"message": "milla"}
 
-@app.post("/pay/{idAuletta}&{idCard}")
-async def pay(idAuletta : int, idCard : int):
-    return {"message": [["Auletta: ", idAuletta], ["Card:", idCard]]}
+@app.post("/pay/{idAuletta}")
+async def pay(idAuletta : int):
+    return {"message": [["Auletta: ", idAuletta]]}
