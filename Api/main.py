@@ -8,7 +8,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    LoadConfigs()
+    await LoadConfigs()
 
 @app.on_event("shutdown")
 async def shutdown():
