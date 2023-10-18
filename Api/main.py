@@ -20,12 +20,12 @@ async def shutdown():
 async def suca():
     return {"message": "milla"}
 
-@app.post("/pay/{idAuletta}")
-async def pay(idAuletta : int):
-    return {"message": [["Auletta: ", idAuletta]]}
+@app.post("/pay")
+async def pay(request : Request):
+    user = request.query_params['ID_Utente']
+    auletta = request.query_params['ID_Auletta']
 
-@app.post("/porcodue")
-async def porcodue(request: Request):
-    a = request.query_params['a']
-    b = request.query_params['b']
-    return { "message_a": a, "message_b" : b  }
+    if user == None or auletta == None:
+        return {"Error:" "Non hai inserito i parametri necessari!"}
+
+    return {"messageUser": user, "messageAuletta": auletta}
