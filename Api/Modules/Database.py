@@ -48,7 +48,7 @@ def GetAulette() -> list:
 
 def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
-    queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto == {ID_Prodotto} AND WHERE ID_Auletta == {ID_Auletta}"
+    queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto == {ID_Prodotto} AND ID_Auletta == {ID_Auletta}"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()
