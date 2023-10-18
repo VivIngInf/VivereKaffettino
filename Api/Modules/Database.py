@@ -113,11 +113,11 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     quantita = quancosto[0]
     costo = quancosto[1]
 
-    idTelegram = GetIDTelegram(idCard=ID_Card)
+    idTelegram : str = GetIDTelegram(idCard=ID_Card)
 
-    saldo = GetBalance(idTelegram=idTelegram)
+    saldo : float = GetBalance(idTelegram=idTelegram)
 
-    debito = GetDebito(ID_Auletta=ID_Auletta)
+    debito : float = float(GetDebito(ID_Auletta=ID_Auletta))
 
     # Controllare se quantità disponibile
 
