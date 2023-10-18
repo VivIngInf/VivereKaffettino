@@ -1,4 +1,6 @@
 from fastapi import FastAPI
+from Modules.Configs import LoadConfigs
+from Modules.Database import GetAulette
 
 app = FastAPI()
 
@@ -6,7 +8,7 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup():
-    pass
+    LoadConfigs()
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -16,4 +18,4 @@ async def shutdown():
 
 @app.get("/")
 async def root():
-    return {"message": "suca"}
+    return {"message": GetAulette()}
