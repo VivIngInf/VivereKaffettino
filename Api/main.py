@@ -8,7 +8,7 @@ app = FastAPI()
 ######## CLASSI ########
 
 class CoffeRequest(BaseModel):
-    ID_Auletta: int
+    ID_Auletta : int
     ID_Utente : int
 
 
