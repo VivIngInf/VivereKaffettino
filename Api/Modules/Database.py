@@ -46,10 +46,39 @@ def GetAulette() -> list:
 
     return rows
 
-def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
-    """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
-    print(f"ID_Prodotto: {ID_Prodotto}, ID_Auletta: {ID_Auletta}")
-    queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto = '{ID_Prodotto}' AND ID_Auletta = '{ID_Auletta}'"
+def GetBalance(idTelegram : str) -> float:
+    """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
+    
+    query = f"SELECT Saldo FROM Utente WHERE ID_Telegram = '{idTelegram}';"
+    
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+    saldo = crs.fetchone()[0]
+
+    TryDisconnect(cnx=cnx, crs=crs)
+
+    return float(saldo)
+
+def GetIDTelegram(idCard : int) -> float:
+    """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
+    
+    query = f"SELECT Saldo FROM Utente WHERE ID_Telegram = '{idCard}';"
+    
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+    saldo = crs.fetchone()
+
+    TryDisconnect(cnx=cnx, crs=crs)
+
+    return float(saldo)
+
+def CostoEQuantita(ID_Prodotto : int, ID_Auletta : int) -> list:
+    """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
+    queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto = '{ID_Prodotto}' AND ID_Auletta = '{ID_Auletta}';"
 
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()
@@ -57,13 +86,27 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
     crs.execute(queryCosto)
 
     row = crs.fetchone()
-    quantita = row[0]
-    costo = row[1]
+    quantita : int = row[0]
+    costo : float = row[1]
+
+    TryDisconnect(cnx=cnx, crs=crs)
+    
+    return {quantita, costo}
+
+
+def PayDB(ID_Prodotto : int, ID_Auletta : int) -> list:
+    """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
+
+    quancosto = CostoEQuantita(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
+    return {quancosto[0], quancosto[1]}
+
+
+    # TODO: Controllare se si ha abbastanza soldi per non andare fuori debito max
+
+    
 
     return row
 
-    # TODO: Controllare quanto costa un elemento in una determinata auletta
-    # TODO: Controllare se si ha abbastanza soldi per non andare fuori debito max
     # TODO: Creare storico della transazione come "Non eseguita"
     # TODO: Decurtatre saldo
     # TODO: Scalare dal magazzino un unità di quel tipo
