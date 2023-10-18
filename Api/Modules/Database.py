@@ -61,20 +61,19 @@ def GetBalance(idTelegram : str) -> float:
 
     return float(saldo)
 
-def GetIDTelegram(idCard : int) -> float:
-    """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
+def GetIDTelegram(idCard : int) -> str:
     
-    query = f"SELECT Saldo FROM Utente WHERE ID_Telegram = '{idCard}';"
+    query = f"SELECT ID_Telegram FROM Utente WHERE ID_Card = '{idCard}';"
     
     cnx : MySQLConnection = TryConnect()
     crs : cursor.MySQLCursor = cnx.cursor()
 
     crs.execute(query)
-    saldo = crs.fetchone()
+    idTelegram = crs.fetchone()
 
     TryDisconnect(cnx=cnx, crs=crs)
 
-    return float(saldo)
+    return idTelegram
 
 def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> list:
     """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
