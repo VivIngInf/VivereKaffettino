@@ -69,7 +69,7 @@ def GetIDTelegram(idCard : int) -> str:
     crs : cursor.MySQLCursor = cnx.cursor()
 
     crs.execute(query)
-    idTelegram = crs.fetchone()
+    idTelegram = crs.fetchone()[0]
 
     TryDisconnect(cnx=cnx, crs=crs)
 
