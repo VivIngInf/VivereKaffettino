@@ -30,8 +30,8 @@ async def gigibarba():
 
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
-    user : int = cRequest.query_params['ID_Utente']
-    auletta : int = cRequest.query_params['ID_Auletta']
+    user : str = cRequest.query_params['ID_Utente']
+    auletta : str = cRequest.query_params['ID_Auletta']
 
     if user == None or auletta == None:
         return {"Error:" "Uno dei due parametri era nullo!"}
