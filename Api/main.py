@@ -24,16 +24,10 @@ async def shutdown():
 
 ######## ROTTE ########
 
-@app.post("/gigibarba")
-async def gigibarba():
-    return { "ID_Auletta" : cRequest.ID_Auletta, "ID_Utente" : cRequest.ID_Utente}
 
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
-    user : str = cRequest.query_params['ID_Utente']
-    auletta : str = cRequest.query_params['ID_Auletta']
-
-    if user == None or auletta == None:
+    if cRequest.ID_Utente == None or cRequest.ID_Utente == None:
         return {"Error:" "Uno dei due parametri era nullo!"}
 
-    return {"ID_Utente": user, "ID_Auletta": auletta}
+    return {"ID_Utente": cRequest.ID_Utente, "ID_Auletta": cRequest.ID_Auletta}
