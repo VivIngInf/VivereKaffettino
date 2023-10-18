@@ -76,7 +76,7 @@ def GetIDTelegram(idCard : int) -> float:
 
     return float(saldo)
 
-def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> list:
+def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int):
     """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
     queryCosto = f"SELECT Quantità, Costo FROM Magazzino WHERE ID_Prodotto = '{ID_Prodotto}' AND ID_Auletta = '{ID_Auletta}';"
 
