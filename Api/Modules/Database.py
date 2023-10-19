@@ -161,6 +161,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
         return { "Error" : "Saldo Insufficiente" }
 
     #Decurtatre saldo
+    saldo -= costo
     DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
 
     # TODO: Scalare dal magazzino un unità di quel tipo
