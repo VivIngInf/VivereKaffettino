@@ -132,9 +132,9 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
 
     # Verifica se l'utente può permettersi il prodotto
     if totaleDisponibile >= costo:
-        print("L'utente può permettersi di acquistare il prodotto.")
+        return "L'utente può permettersi di acquistare il prodotto."
     else:
-        print("L'utente non può permettersi di acquistare il prodotto.")
+        return "L'utente non può permettersi di acquistare il prodotto."
 
     # TODO: Creare storico della transazione come "Non eseguita"
     # TODO: Decurtatre saldo
