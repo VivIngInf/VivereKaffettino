@@ -132,12 +132,24 @@ def DecurtaSaldo(ID_Telegram : str, saldo : float) -> None:
 
     TryDisconnect(cnx=cnx, crs=crs)
 
+def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
+    query = f"UPDATE Magazzino SET Quantità = '{quantita}' WHERE ID_Prodotto = '{idProdotto}' AND ID_Auletta = '{idAuletta}';"
+
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+    cnx.commit()
+
+    TryDisconnect(cnx=cnx, crs=crs)
+
+# TODO: Sistemare notazione
 def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
-    quancosto = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
-    quantita = quancosto[0]
-    costo = quancosto[1]
+    quancosto : list = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
+    quantita : int = quancosto[0]
+    costo : float = quancosto[1]
 
     idTelegram : str = GetIDTelegram(idCard=ID_Card)
 
@@ -160,13 +172,15 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     if totaleDisponibile < costo:
         return { "Error" : "Saldo Insufficiente" }
 
-    #Decurtatre saldo
+    # Decurtatre saldo
     saldo -= costo
     DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
 
-    # TODO: Scalare dal magazzino un unità di quel tipo
-    
-    # TODO: Creare storico della transazione come "Eseguito"
-    #CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto= ID_Prodotto, costo=costo)
+    # Scalare dal magazzino un unità di quel tipo
+    quantita -= 1
+    DecurtaMagazzino(idProdotto=ID_Prodotto, idAuletta=ID_Auletta, quantita=quantita)
 
-    return "L'utente può permettersi di acquistare il prodotto."
+    # Creare storico della transazione come "Eseguito"
+    CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto= ID_Prodotto, costo=costo)
+
+    return {"State" : "Comprato"}
