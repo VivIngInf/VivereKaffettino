@@ -119,7 +119,7 @@ def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, cos
     crs.execute(query)
     cnx.commit()
 
-    TryDisconnect(cnx=cnx, query=query)
+    TryDisconnect(cnx=cnx, crs=crs)
 
 def DecurtaSaldo(ID_Telegram : str, saldo : float) -> None:
     query = f"UPDATE Utente SET Saldo = '{saldo}' WHERE ID_Telegram = '{ID_Telegram}';"
