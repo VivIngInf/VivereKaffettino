@@ -124,20 +124,17 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     if quantita <= 0:
         return {"Error" : "Quantità dell'item inferiore a 0"}
     
-    # Controllare se si ha abbastanza soldi per non andare fuori debito max
-    
-    saldo -= costo
+    # Calcola il totale del debito possibile
+    debitoMassimo = debito * costo
 
-    i = 0
-    debitoMax = 0
-    while(i > debito):
-        debitoMax += costo
+    # Calcola il totale disponibile (saldo + debito massimo)
+    totaleDisponibile = saldo + debitoMassimo
 
-    if saldo >= -debitoMax:
-        return{"Status" : "Approved"}
-
-    if saldo <= debitoMax:
-        return{"Status" : f"Indebitato di {saldo}€"}
+    # Verifica se l'utente può permettersi il prodotto
+    if totaleDisponibile >= costo:
+        print("L'utente può permettersi di acquistare il prodotto.")
+    else:
+        print("L'utente non può permettersi di acquistare il prodotto.")
 
     # TODO: Creare storico della transazione come "Non eseguita"
     # TODO: Decurtatre saldo
