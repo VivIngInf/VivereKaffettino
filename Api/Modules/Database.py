@@ -1,6 +1,8 @@
 from mysql.connector import cursor, connect, MySQLConnection
 from Modules.Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
+import datetime
+
 def TryConnect() -> MySQLConnection:    
     """DATABASE_HANDLER: Prova a connettersi al DB tramite i parametri, altrimenti da errore"""
 
@@ -106,6 +108,30 @@ def GetDebito(ID_Auletta : int) -> int:
 
     return debito
 
+def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, costo : int) -> None:
+    now : datetime.datetime = datetime.datetime.now()
+    
+    query = f"INSERT INTO Operazione (ID_Telegram, ID_Auletta, ID_Prodotto, DateTimeStamp, Costo) VALUES ('{ID_Telegram}', '{ID_Auletta}', '{ID_Prodotto}', '{now}', '{costo}');"
+    
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+    cnx.commit()
+
+    TryDisconnect(cnx=cnx, query=query)
+
+def DecurtaSaldo(ID_Telegram : str, saldo : float) -> None:
+    query = f"UPDATE Utente SET Saldo = '{saldo}' WHERE ID_Telegram = '{ID_Telegram}';"
+    
+    cnx : MySQLConnection = TryConnect()
+    crs : cursor.MySQLCursor = cnx.cursor()
+
+    crs.execute(query)
+    cnx.commit()
+
+    TryDisconnect(cnx=cnx, crs=crs)
+
 def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
@@ -131,12 +157,15 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     totaleDisponibile = saldo + debitoMassimo
 
     # Verifica se l'utente può permettersi il prodotto
-    if totaleDisponibile >= costo:
-        return "L'utente può permettersi di acquistare il prodotto."
-    else:
-        return "L'utente non può permettersi di acquistare il prodotto."
+    if totaleDisponibile < costo:
+        return { "Error" : "Saldo Insufficiente" }
 
-    # TODO: Creare storico della transazione come "Non eseguita"
-    # TODO: Decurtatre saldo
+    #Decurtatre saldo
+    DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
+
     # TODO: Scalare dal magazzino un unità di quel tipo
-    # TODO: Modificare storico della transazione come "Eseguito"
+    
+    # TODO: Creare storico della transazione come "Eseguito"
+    #CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto= ID_Prodotto, costo=costo)
+
+    return "L'utente può permettersi di acquistare il prodotto."
