@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"name": "SSH FS - kaffettino",
+			"uri": "ssh://kaffettino/"
+		}
+	],
+	"settings": {}
+}
