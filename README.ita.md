@@ -25,4 +25,4 @@ Si possono mettere in "magazzino" bottigliette d'acqua, snack e molto altro, **l
 
 ## Documentazione (WIP)
 
-Tutta la **documentazione, amministrativa ed utente** è sotto la cartella [Docs](./Docs/).
+Tutta la **documentazione, amministrativa ed utente** è sotto la cartella [Docs](/Docs).

@@ -26,4 +26,4 @@ The application was **created for coffee**, but that doesn't mean we have to **l
 
 ## Documentation (WIP)
 
-All the **administrative and user documentation** is located under the "Docs" folder. [Docs](./Docs/).
+All the **administrative and user documentation** is located under the [Docs](/Docs) folder.
