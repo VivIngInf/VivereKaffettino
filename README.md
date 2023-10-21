@@ -1,22 +1,29 @@
 # Vivere Kaffettino
 
-![Project's banner](./banner.png)
+![Project's banner](./Resources/Banner.png)
 
-## Buongiornissimo, KAFFÈÈÈ?!
+SELECT LANGUAGE [🇬🇧](./README.md) [🇮🇹](./README.ita.md)
 
-Vivere Kaffettino è un **applicativo telegram** che permette agli utenti dell'ateneo di Palermo, appartenenti all'associazione di Vivere Ingegneria, di **pagare il proprio caffé in modo facile, veloce ed intuitivo.**
+## Mornin' d'you ?!
 
-## Come funziona?
+Vivere Kaffettino is a **Telegram application** that allows the members of the University of Palermo, belonging to the Vivere Ingegneria association, to **pay for their coffee in an easy, fast, and intuitive way**.
 
-Un esp8266 scannerizza una **carta NFC** precedentemente assegnata ad un utente.
-Se il suo saldo è positivo (o di poco negativo) decurta il costo del caffé.
-La card verrà poi ricaricata da un gestore.
+## How does it work?
 
-## Gestione Magazzino
+An **ESP8266** scans an **NFC card** previously assigned to a user. If their balance is positive (or slightly negative), it deducts the cost of the coffee. The card is then recharged by an administrator.
 
-Qualora in magazzino non risultino più caffé, **manda una notifica al gestore**, non permettendo di accreditare altri caffé.
+## Warehouse Management
 
-## Non solo caffé!
+If there is no coffee left in the warehouse, **it sends a notification to the administrator**, preventing further coffee credits.
+Not just coffee!
+
+## Not just coffee!
 
 L'applicazione **è stata creata per i caffé**, ma **non** vuol dire che **dobbiamo limitarci solo ad essi**!
 Si possono mettere in "magazzino" bottigliette d'acqua, snack e molto altro, **l'unico limite è la tua fantasia**!
+
+The application was **created for coffee**, but that doesn't mean we have to **limit** ourselves to it! You can stock water bottles, snacks, and much more in the "warehouse." **The only limit is your imagination!**
+
+## Documentation (WIP)
+
+All the **administrative and user documentation** is located under the "Docs" folder. [Docs](./Docs/).
