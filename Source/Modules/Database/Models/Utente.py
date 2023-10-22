@@ -12,7 +12,7 @@ class Utente(Base):
     isAdmin = Column("IsAdmin", Boolean, default=False, nullable=False)
     isVerified = Column("IsVerified", Boolean, default=False, nullable=False)
 
-    def __init__(self, ID_Telegram, ID_Card, username, saldo, isAdmin, isVerified):
+    def __init__(self, ID_Telegram : str, ID_Card : int, username : str, saldo : Double, isAdmin : bool, isVerified : bool):
         self.ID_Telegram = ID_Telegram
         self.ID_Card = ID_Card
         self.username = username

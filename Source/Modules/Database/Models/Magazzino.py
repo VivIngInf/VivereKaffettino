@@ -11,7 +11,7 @@ class Magazzino(Base):
     quantita = Column("Quantità", Integer, nullable=False, default=0)
     costo = Column("Costo", Double, nullable=False, default=0.0)
 
-    def __init__(self, ID_Magazzino, ID_Prodotto, ID_Auletta, quantita, costo):
+    def __init__(self, ID_Magazzino : int, ID_Prodotto : int, ID_Auletta : int, quantita : int, costo : Double):
         self.ID_Magazzino = ID_Magazzino
         self.ID_Prodotto = ID_Prodotto
         self.ID_Auletta = ID_Auletta

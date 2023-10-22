@@ -10,7 +10,7 @@ class Ricarica(Base):
     amministratore = Column("Amministratore", CHAR(9), ForeignKey("Utente.ID_Telegram"), nullable=False)
     importo = Column("Importo", Double, nullable=False)    
 
-    def __init__(self, ID_Ricarica, beneficiario, amministratore, importo):
+    def __init__(self, ID_Ricarica : int, beneficiario : str, amministratore : str, importo : Double):
         self.ID_Ricarica = ID_Ricarica
         self.beneficiario = beneficiario
         self.amministratore = amministratore

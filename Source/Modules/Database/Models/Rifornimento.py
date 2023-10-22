@@ -5,7 +5,7 @@ from ..Models.Base import Base
 class Rifornimento(Base):
     __tablename__ = "Rifornimento"
 
-    ID_RifornimentoID_Rifornimento = Column("ID_Rifornimento", Integer, primary_key=True, nullable=False, autoincrement=True)
+    ID_Rifornimento = Column("ID_Rifornimento", Integer, primary_key=True, nullable=False, autoincrement=True)
     ID_Telegram = Column("ID_Telegram", CHAR(9), ForeignKey("Utente.ID_Telegram"), nullable=False)
     ID_Auletta = Column("ID_Auletta", Integer, ForeignKey("Auletta.ID_Auletta"), nullable=False)
     ID_Prodotto = Column("ID_Prodotto", Integer, ForeignKey("Prodotto.ID_Prodotto"), nullable=False)
@@ -13,7 +13,7 @@ class Rifornimento(Base):
     quantita = Column("Quantita", Integer, nullable=False)    
     costo = Column("Costo", Double, nullable=False)        
 
-    def __init__(self, ID_Rifornimento, ID_Telegram, ID_Auletta, ID_Prodotto, dataOraRifornimento, quantita, costo):
+    def __init__(self, ID_Rifornimento : int, ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, dataOraRifornimento : DateTime, quantita : int, costo : Double):
         self.ID_Rifornimento = ID_Rifornimento
         self.ID_Telegram = ID_Telegram
         self.ID_Auletta = ID_Auletta

@@ -8,7 +8,7 @@ class Prodotto(Base):
     ID_Prodotto = Column("ID_Prodotto", Integer, primary_key=True, nullable=False, autoincrement=True)
     descrizione = Column("Descrizione", CHAR(50), nullable=False)
 
-    def __init__(self, ID_Prodotto, descrizione):
+    def __init__(self, ID_Prodotto : int, descrizione : str):
         self.ID_Prodotto = ID_Prodotto
         self.descrizione = descrizione
 

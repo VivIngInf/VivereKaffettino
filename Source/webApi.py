@@ -12,12 +12,12 @@ class CoffeRequest(BaseModel):
     ID_Utente : int
     ID_Prodotto : int
 
-
 ######## EVENTI ########
 
 @app.on_event("startup")
 async def startup():
-    await LoadConfigs()
+    #await LoadConfigs()
+    pass
 
 @app.on_event("shutdown")
 async def shutdown():
