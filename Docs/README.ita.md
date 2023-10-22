@@ -1,6 +1,6 @@
 # Vivere Kaffettino
 
-![Project's banner](./Resources/Banner.png)
+![Project's banner](./Resources/Banner_ITA.png)
 
 SELEZIONA LINGUA [🇬🇧](./README.md) [🇮🇹](./README.ita.md)
 
