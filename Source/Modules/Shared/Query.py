@@ -4,7 +4,7 @@ from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 import os
 print(os.getcwd())
 
-from ..persisting import session
+from ...persisting import session
 from sqlalchemy import select
 
 from ..Database.Models.Auletta import Auletta
