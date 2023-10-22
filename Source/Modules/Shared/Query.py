@@ -15,6 +15,7 @@ from ..Database.Models.Utente import Utente
 import datetime
 
 # TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
+# TODO: Quando si effettua un pagamento, controllare la validità dei parametri passati (ES: Esiste l'auletta? Esiste un utente con quell'ID_Card?)
 
 #region User
 
