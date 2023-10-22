@@ -1,5 +1,16 @@
 from mysql.connector import cursor, connect, MySQLConnection
-from Modules.Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
+from Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
+
+from ...persisting import session
+from sqlalchemy import select
+
+from ..Database.Models.Auletta import Auletta
+from ..Database.Models.Magazzino import Magazzino
+from ..Database.Models.Operazione import Operazione
+from ..Database.Models.Prodotto import Prodotto
+from ..Database.Models.Ricarica import Ricarica
+from ..Database.Models.Rifornimento import Rifornimento
+from ..Database.Models.Utente import Utente
 
 import datetime
 
@@ -314,9 +325,15 @@ def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, cos
 
 # TODO: Sistemare notazione
 def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
+    
+    query = select(Utente)
+    result = session.scalar(query)
+
+    return result
+
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
-    quancosto : list = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
+"""    quancosto : list = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
     quantita : int = quancosto[0]
     costo : float = quancosto[1]
 
@@ -352,6 +369,8 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     # Creare storico della transazione come "Eseguito"
     CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto= ID_Prodotto, costo=costo)
 
-    return {"State" : "Comprato"}
+    return {"State" : "Comprato"}"""
+
+    
 
 #endregion
