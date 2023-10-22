@@ -8,4 +8,5 @@ from Modules.Database.Models.Utente import Utente
 from Modules.Database.Models.Base import Base
 from Modules.Database.connect import engine
 
-Base.metadata.drop_all(engine)
+def DropAll():
+    Base.metadata.drop_all(engine)

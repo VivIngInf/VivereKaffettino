@@ -11,5 +11,5 @@ from Modules.Database.connect import engine
 # Siccome tutti i modelli generano da Base,
 # possiamo invocare la generazione di base
 # e tutti i modelli verranno generati
-
-Base.metadata.create_all(bind=engine)
+def CreateAll():
+    Base.metadata.create_all(bind=engine)
