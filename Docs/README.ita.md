@@ -1,8 +1,8 @@
 # Vivere Kaffettino
 
-![Project's banner](./Resources/Banner_ITA.png)
+![Project's banner](../Resources/Banners/Banner_ITA.png)
 
-SELEZIONA LINGUA [🇬🇧](./README.md) [🇮🇹](./README.ita.md)
+SELEZIONA LINGUA [🇬🇧](../Resources/) [🇮🇹](./README.ita.md)
 
 ## Buongiornissimo, KAFFÈÈÈ?!
 
