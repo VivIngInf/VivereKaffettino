@@ -1,6 +1,9 @@
 from mysql.connector import cursor, connect, MySQLConnection
 from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
+import os
+print(os.getcwd())
+
 from ...persisting import session
 from sqlalchemy import select
 
