@@ -1,8 +1,6 @@
 from Modules.Database.Models.Utente import Utente
-from sqlalchemy.orm import Session  
+from Modules.Shared.Session import session
 from Modules.Database.connect import engine
-
-session = Session(bind=engine)
 
 daniele = Utente(
     ID_Telegram = "123456789",
