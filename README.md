@@ -2,7 +2,7 @@
 
 ![Project's banner](./Resources/Banner.png)
 
-SELECT LANGUAGE [🇬🇧](./README.md) [🇮🇹](./README.ita.md)
+SELECT LANGUAGE [🇬🇧](./README.md) [🇮🇹](./Docs/README.ita.md)
 
 ## Good mornin', COFFEEE!??!
 

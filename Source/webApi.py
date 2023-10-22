@@ -1,7 +1,7 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
 from Modules.Shared.Database import GetAulette, PayDB
-from pydantic import BaseModel
 
 app = FastAPI()
 
