@@ -5,7 +5,7 @@ from ..Models.Base import Base
 class Auletta(Base):
     __tablename__ = "Auletta"
 
-    ID_Auletta = Column("ID_Auletta", CHAR(9), primary_key=True, nullable=False)
+    ID_Auletta = Column("ID_Auletta", Integer, primary_key=True, nullable=False, autoincrement=True)
     Nome = Column("Nome", String, nullable=False)
     DebitoMax = Column("DebitoMax", Integer, nullable=False, default=0)
     ID_GruppoTelegram = Column("ID_GruppoTelegram", CHAR(13), nullable=True)
