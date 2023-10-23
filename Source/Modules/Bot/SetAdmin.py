@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
-from Modules.DatabaseHandler import GetIdTelegram, SetAdminDB, CheckUserExists, GetIsAdmin, GetIsVerified
+from ..Shared.Query import GetIdTelegram, SetAdminDB, CheckUserExists, GetIsAdmin, GetIsVerified
 
 USERNAME = range(1)
 

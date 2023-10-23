@@ -3,7 +3,7 @@ import random
 from datetime import datetime
 from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler
-from Modules.DatabaseHandler import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
+from ..Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
 
 def GiornoCorrente() -> str:
     """Funzione per ottenere il giorno della settimana attuale come stringa"""

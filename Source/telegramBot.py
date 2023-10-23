@@ -12,14 +12,14 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
 # un porcile nel file main
-from Modules.AddUser import CreateAddUserHandler
-from Modules.ShowBalance import ShowBalance
-from Modules.UserInfo import Info
-from Modules.LoadConfig import LoadConfigs, GetToken
-from Modules.SetAdmin import CreateSetAdminHandler, CreateUnsetAdminHandler
-from Modules.Nostalgia import Nostalgia
-from Modules.Start import Start
-from Modules.KeyboardsHandler import KeyBoardHandler
+from Modules.Bot.AddUser import CreateAddUserHandler
+from Modules.Bot.ShowBalance import ShowBalance
+from Modules.Bot.UserInfo import Info
+from Modules.Shared.Configs import LoadConfigs, GetToken
+from Modules.Bot.SetAdmin import CreateSetAdminHandler, CreateUnsetAdminHandler
+from Modules.Bot.Nostalgia import Nostalgia
+from Modules.Bot.Start import Start
+from Modules.Bot.KeyboardsHandler import KeyBoardHandler
 
 from telegram import BotCommand, Bot
 

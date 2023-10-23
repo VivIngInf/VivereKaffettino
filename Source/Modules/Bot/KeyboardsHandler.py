@@ -1,8 +1,8 @@
 from telegram import Update, CallbackQuery
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
-from Modules.AddUser import AddUserKeyboardHandler, CreateAddUserHandler
-from Modules.ShowBalance import ShowBalance
-from Modules.AddUser import AddUser
+from AddUser import AddUserKeyboardHandler, CreateAddUserHandler
+from ShowBalance import ShowBalance
+from AddUser import AddUser
 
 # TODO: SISTEMARE FATTO CHE RIMANE KEYBOARD
 

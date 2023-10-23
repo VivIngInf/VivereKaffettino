@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from Modules.DatabaseHandler import GetBalance, GetIsVerified
+from ..Shared.Query import GetBalance, GetIsVerified
 
 async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """SHOW_BALANCE: Manda come messaggio all'utente il suo saldo a partire dall'ID_Telegram"""
