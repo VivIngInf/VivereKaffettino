@@ -22,7 +22,8 @@ import datetime
 def CheckUserExists(idTelegram : str) -> bool:
     """DATABASE_HANDLER / ADD_USER: Controlla se l'utente esiste dato un ID_Telegram, ritorna un valore booleano"""
 
-    exists = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").exists()
+    query = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}")
+    exists = session.query(query.exists()).scalar()
 
     return bool(exists)
 

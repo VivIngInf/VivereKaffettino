@@ -84,8 +84,12 @@ def SendRandomImage() -> InputFile:
 
     # Ottieni il percorso completo della cartella selezionata
     modulePath = os.path.dirname(os.path.abspath(__file__)) # Otteniamo il percorso di questo file
-    folder_path = os.path.join(modulePath, "..", "Resources", "Images", selected_folder)
- 
+    
+    while os.path.basename(modulePath) != 'VivereKaffettino':
+        modulePath = os.path.dirname(modulePath)
+
+    folder_path = os.path.join(modulePath, "Resources", "Images", selected_folder)
+
     # Ottieni la lista dei file nella cartella selezionata
     image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
 

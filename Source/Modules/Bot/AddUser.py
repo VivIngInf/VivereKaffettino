@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler, MessageHandler, filters
 from dataclasses import dataclass
-from Modules.DatabaseHandler import GetAulette, CheckUserExists, GetAuletta, InsertUser, CheckUsernameExists
+from ..Shared.Query import GetAulette, CheckUserExists, GetAuletta, InsertUser, CheckUsernameExists
 import re # Importiamo le RegEx
 import os
 
