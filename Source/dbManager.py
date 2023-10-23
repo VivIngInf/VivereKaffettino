@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import vlc
+import simpleaudio as sa
 import curses
 import time
 import random
@@ -20,21 +20,10 @@ asciiArt = """
 
 try:
     # Specifica il percorso del tuo file MP3
-    file_path = '../Resources/Audio/BGMusic.mp3'
+    file_path = '../Resources/Audio/BGMusic.wav'
 
-    player = vlc.Instance()
-    
-    mediaList = player.media_list_new()
-    mediaPlayer = player.media_list_player_new()
-
-    media = player.media_new(file_path)
-    mediaList.add_media(media)
-    mediaPlayer.set_media_list(mediaList)
-
-    player.vlm_set_loop("BGMusic", True)
-    mediaPlayer.play()
-
-    player.play()
+    wave_obj = sa.WaveObject.from_wave_file(file_path)
+    play_obj = wave_obj.play()
 except:
     print("\033[91mIl tuo sistema non puo' mandare in output la musica. Sei in connessione SSH?\033[0m")
 
