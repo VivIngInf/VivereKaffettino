@@ -25,6 +25,10 @@ async def shutdown():
 
 ######## ROTTE ########
 
+@app.get("/aulette")
+async def aulette():
+    return GetAulette()
+
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
     return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Utente)
