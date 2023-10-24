@@ -13,7 +13,7 @@ def CreatePersistent():
         ID_Telegram = "000000000",
         ID_Card = 1,
         username = "guest",
-        saldo = 0.0,
+        saldo = 9999999.0,
         isAdmin = False,
         isVerified = True,
     )
