@@ -170,11 +170,20 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
 
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
-    magazzino : Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
-    quantita = magazzino.quantita
-    costo = magazzino.costo
+    try:
 
-    idTelegram : str = GetIDTelegram(idCard=ID_Card)
+        magazzino : Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
+        quantita = magazzino.quantita
+        costo = magazzino.costo
+
+    except:
+        return {"Error" : f"Prodotto con ID {ID_Prodotto} non è stato trovato nell'auletta con ID {ID_Auletta}. Oppure uno dei due non esiste completamente."}
+
+    try:
+        idTelegram : str = GetIDTelegram(idCard=ID_Card)
+    except:
+        return {"Error" : f"Utente con ID_CARD pari a {ID_Card} non trovato."}
+
 
     saldo : float = GetBalance(idTelegram=idTelegram)
 
@@ -203,8 +212,11 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     quantita -= 1
     DecurtaMagazzino(idProdotto=ID_Prodotto, idAuletta=ID_Auletta, quantita=quantita)
 
-    # Creare storico della transazione come "Eseguito"
-    CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
+    try:
+        # Creare storico della transazione come "Eseguito"
+        CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
+    except:
+        return {"Errore" : "Non è stato possibile creare lo storico dell'operazione avvenuta"} # TODO: Restituire soldi e non far partire il caffè
 
     return {"State" : "Comprato"}
 
