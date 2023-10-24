@@ -91,34 +91,12 @@ def GetBalance(idTelegram : str) -> float:
 def GetAulette() -> list:
     """DATABASE_HANDLER / ADD_USER: Prendiamo tutti gli id ed i nomi delle aulette"""
 
-    query = "SELECT ID_Auletta, Nome FROM Auletta;"
-
-    cnx : MySQLConnection = TryConnect()
-    crs : cursor.MySQLCursor = cnx.cursor()
-    
-    crs.execute(query)
-
-    rows = crs.fetchall()
-
-    TryDisconnect(cnx=cnx, crs=crs)
-
-    return rows
+    return session.query(Auletta).all()
 
 def GetAuletta(idAuletta : int) -> str:
     """DATABASE_HANDLER / ADD_USER: Dato l'ID di un'auletta, restituisce il suo nome"""
 
-    query = f"SELECT Nome From Auletta WHERE ID_Auletta = '{idAuletta}';"
-
-    cnx = TryConnect()
-    crs = cnx.cursor()
-
-    crs.execute(query)
-    nomeAuletta = crs.fetchone()[0]
-
-    crs.close()
-    cnx.close()
-
-    return str(nomeAuletta)
+    return session.query(Auletta).filter(Auletta.ID_Auletta == f"{idAuletta}").one().Nome
 
 #endregion
 
@@ -127,15 +105,10 @@ def SetAdminDB(idTelegram : str, state : bool) -> None:
     """DATABASE_HANDLER / ADD_ADMIN: Aggiorniamo l'utente con idTelegram passato come parametro impostando
     isAdmin ad 1"""
 
-    query = f"UPDATE Utente SET IsAdmin = {int(state)} WHERE ID_Telegram = '{idTelegram}';"
+    u : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    u.isAdmin = state
 
-    cnx : MySQLConnection = TryConnect()
-    crs : cursor.MySQLCursor = cnx.cursor()
-
-    crs.execute(query)
-    cnx.commit()
-
-    TryDisconnect(cnx, crs)
+    session.commit()
 
     return None
 #endregion
