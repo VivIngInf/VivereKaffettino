@@ -36,8 +36,8 @@ def CheckUsernameExists(username : str) -> bool:
 
 def GetUsername(idTelegram : str) -> str:
     """DATABASE_HANDLER / USER_INFO: Ritorna l'username partendo dall'ID_Telegram passato come parametro"""
-    username = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().username
-    return 
+    return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().username
+    
 
 def GetIdTelegram(username : str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'Username passato come parametro"""
