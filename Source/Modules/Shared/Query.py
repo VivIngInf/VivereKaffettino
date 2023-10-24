@@ -216,7 +216,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
         # Creare storico della transazione come "Eseguito"
         CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
     except:
-        return {"Errore" : "Non è stato possibile creare lo storico dell'operazione avvenuta"} # TODO: Restituire soldi e non far partire il caffè
+        return {"Error" : "Non è stato possibile creare lo storico dell'operazione avvenuta"} # TODO: Restituire soldi e non far partire il caffè
 
     return {"State" : "Comprato"}
 
