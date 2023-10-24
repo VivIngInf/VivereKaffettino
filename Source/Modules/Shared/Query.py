@@ -36,8 +36,8 @@ def CheckUsernameExists(username : str) -> bool:
 
 def GetUsername(idTelegram : str) -> str:
     """DATABASE_HANDLER / USER_INFO: Ritorna l'username partendo dall'ID_Telegram passato come parametro"""
-
-    return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    username = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().username
+    return 
 
 def GetIdTelegram(username : str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'Username passato come parametro"""
@@ -69,8 +69,8 @@ def GetIsAdmin(idTelegram : str) -> bool:
 
 def GetIsVerified(idTelegram : str) -> bool:
     """DATABASE_HANDLER: Ritorna se l'utente è stato approvato"""
-    
-    return bool(session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().isVerified)
+    user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").scalar()
+    return bool(user.isVerified)
 
 def DecurtaSaldo(ID_Telegram : str, saldo : float) -> None:    
     

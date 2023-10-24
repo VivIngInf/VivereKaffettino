@@ -4,6 +4,7 @@ from datetime import datetime
 from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler, CommandHandler
 from ..Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
+from Modules.Bot.States import *
 
 def GiornoCorrente() -> str:
     """Funzione per ottenere il giorno della settimana attuale come stringa"""
@@ -103,8 +104,8 @@ def SendRandomImage() -> InputFile:
         # Invia l'immagine all'utente
         return open(image_path, 'rb')
 
-async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    image : InputFile = SendRandomImage()
+async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
+    """image : InputFile = SendRandomImage()
 
     risposta = ""
     mainMenuKeyboard = []
@@ -137,7 +138,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([stop])
 
-    else: # Sei amministratores
+    else: # Sei amministratore
         username = GetUsername(idTelegram=update.effective_chat.id)
         risposta = f"Bentornato {username}, che vuoi fare?"
 
@@ -155,4 +156,48 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_photo(photo=image, caption=risposta, reply_markup=InlineKeyboardMarkup(mainMenuKeyboard))
 
-    return ConversationHandler.END
+    return ConversationHandler.END"""
+    
+    image : InputFile = SendRandomImage()
+    caption = "☕ Benvenuto su vivere kaffettino! ☕"
+    text = ""
+
+    if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
+        text = "👀 Hey, è la prima volta che visiti vivere kaffetino? 👀\n🔻 Registrati premendo il bottone sottostante! 🔻"
+
+    elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
+        text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRiceverai un messaggio appena la tua card sarà pronta!"
+
+    elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
+        username = GetUsername(idTelegram=update.effective_chat.id)        
+        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
+
+    else: # Sei amministratore
+        username = GetUsername(idTelegram=update.effective_chat.id)
+        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
+
+    buttons = [
+        [
+            InlineKeyboardButton(text="Add family member", callback_data=str(ADDING_MEMBER)),
+            InlineKeyboardButton(text="Add yourself", callback_data=str(ADDING_SELF)),
+        ],
+        [
+            InlineKeyboardButton(text="📈 SALDO 📉", callback_data=str(SHOWING)),
+            InlineKeyboardButton(text="Done", callback_data=str(END)),
+        ],
+    ]
+    keyboard = InlineKeyboardMarkup(buttons)
+
+    # If we're starting over we don't need to send a new message
+    if context.user_data.get(START_OVER):
+        await update.callback_query.answer()
+        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    else:
+        await update.message.reply_photo(
+            photo=image,
+            caption=caption
+        )
+        await update.message.reply_text(text=text, reply_markup=keyboard)
+
+    context.user_data[START_OVER] = False
+    return SELECTING_ACTION
