@@ -27,9 +27,20 @@ def CreatePersistent():
         isVerified=True
     )
 
+    daniele = Utente(
+        ID_Telegram="752154717",
+        ID_Card=1,
+        username="DanieleOrazio.Susino",
+        saldo=500.0,
+        isAdmin=True,
+        isVerified=True,
+    )
+
     session.add(guest)
 
     session.add(riccardo)
+
+    session.add(daniele)
 
     #endregion
 
