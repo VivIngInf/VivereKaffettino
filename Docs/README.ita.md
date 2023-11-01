@@ -26,3 +26,27 @@ Si possono mettere in "magazzino" bottigliette d'acqua, snack e molto altro, **l
 ## Documentazione (WIP)
 
 Tutta la **documentazione, amministrativa ed utente** è sotto la cartella [Docs](./Docs).
+
+## TEAM
+
+### Relazioni esterne e documentazione
+
+[Gabriele Fazzari](https://www.linkedin.com/in/gabriele-fazzari-0b79241bb/) - Project Supervisor, Technical Writer
+
+### Sviluppo
+
+[Alessandro Buffa](https://github.com/ExalFabu) - Senior Dev
+[Daniele Orazio Susino](https://www.linkedin.com/in/susinodaniele/) - Lead Dev
+[Salvatore Lucio Auria](https://www.linkedin.com/in/salvatore-lucio-auria-15a680210/https://www.linkedin.com/in/salvatore-lucio-auria-15a680210/) - System Admin
+[Giovanni Castelli](https://www.linkedin.com/in/giovanni-castelli02/) - Database Consultant
+
+### Elettronica
+
+[Riccardo Sciacca](https://www.linkedin.com/in/riccardo-sciacca-831357218/) - Esp32 Dev
+[Marco Costa](https://www.linkedin.com/in/marco-costa-599b91160/) - Electrical Engineer
+
+### Grafica
+
+[Giuseppe Ferro](https://www.linkedin.com/in/giuseppe-ferro2516/) - Lead Designer
+[Alessandro Palumbo](https://www.linkedin.com/in/alessandro-palumbo-719577226/) - Design Illustrator
+[Mariasole Di Lorenzo](https://www.linkedin.com/in/mariasoledilorenzo/) - Design Assistant
