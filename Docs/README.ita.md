@@ -2,11 +2,15 @@
 
 ![Project's banner](../Resources/Banners/Banner_ITA.png)
 
+![GitHub repo size](https://img.shields.io/github/repo-size/VivIngInf/VivereKaffettino)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/SQLAlchemy)
+![GitHub](https://img.shields.io/github/license/VivIngInf/VivereKaffettino)
+
 SELEZIONA LINGUA [🇬🇧](../Resources/) [🇮🇹](./README.ita.md)
 
 ## Buongiornissimo, KAFFÈÈÈ?!
 
-Vivere Kaffettino è un **applicativo telegram** che permette agli utenti dell'ateneo di Palermo, appartenenti all'associazione di Vivere Ingegneria, di **pagare il proprio caffé in modo facile, veloce ed intuitivo.**
+Vivere Kaffettino è un **applicativo telegram** che permette agli utenti dell'ateneo di Palermo, appartenenti all'associazione di **Vivere Ingegneria**, di **pagare il proprio caffé in modo facile, veloce ed intuitivo.**
 
 ## Come funziona?
 
