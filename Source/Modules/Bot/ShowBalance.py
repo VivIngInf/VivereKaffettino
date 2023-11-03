@@ -11,10 +11,6 @@ async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
 
     idTelegram = str(update.effective_chat.id)
 
-    # Se l'utente non è verificato allora ignora il comando
-    if (not GetIsVerified(idTelegram=idTelegram)):
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Il tuo account ancora non è stato verificato.\n Hai già avuto la tua carta? Se si contatta chi te l'ha data.")
-
     saldo = GetBalance(idTelegram) # Chiamata al DB per ottenere il saldo a partire dall'ID_Telegram
     text = f"Il tuo saldo è pari ad: {saldo}"
 
@@ -26,4 +22,4 @@ async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
 
     user_data[START_OVER] = True
 
-    return SHOWING
+    return MAINMENU

@@ -105,34 +105,39 @@ def SendRandomImage() -> InputFile:
         return open(image_path, 'rb')
 
 async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    """image : InputFile = SendRandomImage()
+    
+    image : InputFile = SendRandomImage()
+    caption = "☕ Benvenuto su vivere kaffettino! ☕"
 
-    risposta = ""
+    text = ""
     mainMenuKeyboard = []
 
+    # ----- BOTTONI -----
+    
+    register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data=str(REGISTER))
+    saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data=str(SHOWING))
+    addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 AGGIUNGI ADMIN 👩🏽‍🔧", callback_data="ADD")
+    remAdmin = InlineKeyboardButton(text="🚷 RIMUOVI ADMIN 🚷", callback_data="REM")
+    info = InlineKeyboardButton(text="❓ INFO ❓", callback_data=str(INFO))
+    stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data=str(END))
+
+    # -------------------
+
     if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
-        risposta = "Hey, è la prima volta che visiti vivere kaffetino?\nRegistrati premendo il bottone sottostante!"
-        
-        register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="REG")
+        text = "👀 Hey, è la prima volta che visiti vivere kaffetino? 👀\n🔻 Registrati premendo il bottone sottostante! 🔻"
 
         mainMenuKeyboard.append([register])
+        mainMenuKeyboard.append([stop])
 
     elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
-        risposta = "Ancora non ti è stato attivato l'account!\nRiceverai un messaggio appena la tua card sarà pronta!"
-
-        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
-        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
+        text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRiceverai un messaggio appena la tua card sarà pronta!"
 
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([stop])
 
     elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)        
-        risposta = f"Bentornato {username}, che vuoi fare?"
-
-        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="SAL")
-        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
-        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
+        username = GetUsername(idTelegram=update.effective_chat.id)               
+        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
         mainMenuKeyboard.append([saldo])
         mainMenuKeyboard.append([info])
@@ -140,13 +145,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
     else: # Sei amministratore
         username = GetUsername(idTelegram=update.effective_chat.id)
-        risposta = f"Bentornato {username}, che vuoi fare?"
-
-        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="SAL")
-        addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 AGGIUNGI ADMIN 👩🏽‍🔧", callback_data="ADD")
-        remAdmin = InlineKeyboardButton(text="🚷 RIMUOVI ADMIN 🚷", callback_data="REM")
-        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="INFO")
-        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="STOP")
+        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
         mainMenuKeyboard.append([saldo])
         mainMenuKeyboard.append([addAdmin])
@@ -154,39 +153,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([stop])
 
-    await update.message.reply_photo(photo=image, caption=risposta, reply_markup=InlineKeyboardMarkup(mainMenuKeyboard))
-
-    return ConversationHandler.END"""
-    
-    image : InputFile = SendRandomImage()
-    caption = "☕ Benvenuto su vivere kaffettino! ☕"
-    text = ""
-
-    if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
-        text = "👀 Hey, è la prima volta che visiti vivere kaffetino? 👀\n🔻 Registrati premendo il bottone sottostante! 🔻"
-
-    elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
-        text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRiceverai un messaggio appena la tua card sarà pronta!"
-
-    elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)        
-        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
-
-    else: # Sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)
-        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
-
-    buttons = [
-        [
-            InlineKeyboardButton(text="Add family member", callback_data=str(ADDING_MEMBER)),
-            InlineKeyboardButton(text="Add yourself", callback_data=str(ADDING_SELF)),
-        ],
-        [
-            InlineKeyboardButton(text="📈 SALDO 📉", callback_data=str(SHOWING)),
-            InlineKeyboardButton(text="Done", callback_data=str(END)),
-        ],
-    ]
-    keyboard = InlineKeyboardMarkup(buttons)
+    keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
 
     # If we're starting over we don't need to send a new message
     if context.user_data.get(START_OVER):
