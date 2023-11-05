@@ -55,6 +55,10 @@ def InsertUser(idTelegram : str, username : str) -> None:
     utente = Utente(
         ID_Telegram=idTelegram,
         username=username,
+        ID_Card=None,
+        saldo=0.0,
+        isAdmin=False,
+        isVerified=False,
     )
 
     session.add(utente)

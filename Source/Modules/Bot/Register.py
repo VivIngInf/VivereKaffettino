@@ -3,6 +3,9 @@ from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, Call
 from Modules.Bot.States import *
 from Modules.Bot.Stop import Stop
 from Modules.Bot.Start import Start
+from Modules.Shared.Query import InsertUser, GetAulette
+
+# TODO: SISTEMARE BOTTONI, FARE ARRIVARE CALLBACK DELL'AULETTA SCELTA
 
 async def Register(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
@@ -35,23 +38,28 @@ async def select_feature(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     if USERNAME not in userData[FEATURES]:
         buttons.append([username])
-    elif AULETTA not in userData[AULETTA]:
-        buttons.appenda([auletta])
+    elif AULETTA not in userData[FEATURES]:
+        # Mettiamo le aulette in riga
+        aulette = GetAulette()
+        for auletta in aulette:
+            auletta = str(auletta).split()
+            button = InlineKeyboardButton(text=auletta[1], callback_data=str(AULETTA))
+            buttons.append([button])
+
     else:
         buttons.append([end])
-
 
     keyboard = InlineKeyboardMarkup(buttons)
 
     # If we collect features for a new person, clear the cache and save the gender
     if not context.user_data.get(START_OVER):
-        text = "Please select a feature to update."
+        text = "Inserisci l'username."
 
         await update.callback_query.answer()
         await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     # But after we do that, we need to send a new message
     else:
-        text = f"Got it! Please select a feature to update. {context.user_data[FEATURES]}"
+        text = f"Scegli l'auletta."
 
         await update.message.reply_text(text=text, reply_markup=keyboard)
 
@@ -62,7 +70,7 @@ async def select_feature(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def ask_for_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Prompt user to input data for selected feature."""
     context.user_data[CURRENT_FEATURE] = update.callback_query.data
-    text = "Okay, tell me."
+    text = "Ti ascolto."
 
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(text=text)
@@ -83,13 +91,10 @@ async def save_input(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 async def end_describing(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """End gathering of features and return to parent conversation."""
 
-    if USERNAME not in context.user_data[FEATURES]:
-        print("Non hai inserito l'username!")
-
-    if AULETTA not in context.user_data[FEATURES]:
-        print("Non hai inserito l'auletta!") 
-
     user_data = context.user_data
+
+    InsertUser(idTelegram=update.effective_chat.id, username=user_data[FEATURES][USERNAME])
+
     level = user_data[CURRENT_LEVEL]
     if not user_data.get(level):
         user_data[level] = []

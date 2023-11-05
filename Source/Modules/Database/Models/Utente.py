@@ -8,9 +8,9 @@ class Utente(Base):
     ID_Telegram = Column("ID_Telegram", CHAR(9), primary_key=True, nullable=False)
     ID_Card = Column("ID_Card", Integer, nullable=True)
     username = Column("Username", String, nullable=False)
-    saldo = Column("Saldo", Double, default=0.0, nullable=False)
-    isAdmin = Column("IsAdmin", Boolean, default=False, nullable=False)
-    isVerified = Column("IsVerified", Boolean, default=False, nullable=False)
+    saldo = Column("Saldo", Double, default=0.0, nullable=True)
+    isAdmin = Column("IsAdmin", Boolean, default=False, nullable=True)
+    isVerified = Column("IsVerified", Boolean, default=False, nullable=True)
 
     def __init__(self, ID_Telegram : str, ID_Card : int, username : str, saldo : Double, isAdmin : bool, isVerified : bool):
         self.ID_Telegram = ID_Telegram
