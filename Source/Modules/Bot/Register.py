@@ -5,7 +5,7 @@ from Modules.Bot.Stop import Stop
 from Modules.Bot.Start import Start
 from Modules.Shared.Query import InsertUser, GetAulette
 
-# TODO: SISTEMARE BOTTONI, FARE ARRIVARE CALLBACK DELL'AULETTA SCELTA
+# TODO: SISTEMARE BOTTONI, FARE ARRIVARE CALLBACK DELL'AULETTA SCELTA, FILTRO USERNAME, FILTRO PAROLACCE
 
 async def Register(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
