@@ -140,7 +140,7 @@ def GetProdotti(idAuletta : int) -> str:
 
     arr = []
 
-    res2 = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
+    res2 = session.query(Prodotto, Magazzino).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
 
     print(res2)
     
