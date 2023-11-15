@@ -146,12 +146,12 @@ def GetProdotti(idAuletta : int) -> str:
     print(res)
 
     for r in res:
-       return res[0]
+        print(r)
+        arr.append(r)
     
     print (arr)
     
     print(res2)
-
     
 
 
