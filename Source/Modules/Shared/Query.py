@@ -143,8 +143,14 @@ def GetProdotti(idAuletta : int) -> str:
     res2 = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
 
     print(res2)
+    
+    for r in res2:
+        for rr in r:
+            arr.append(rr)
 
-    return res2
+    print(arr)
+
+    return arr
 
     """print(arr)
 
