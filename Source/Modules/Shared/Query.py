@@ -140,11 +140,11 @@ def GetProdotti(idAuletta : int) -> str:
 
     arr = []
 
-    res2 = session.query(Magazzino).join(Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").filter(Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).all()
+    res2 = session.query(Prodotto).join(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").filter(Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).all()
 
     print(res2)
     
-    for r in res2:
+"""    for r in res2:
         for rr in r:
             arr.append(rr)
 
@@ -152,7 +152,7 @@ def GetProdotti(idAuletta : int) -> str:
 
     return arr
 
-    """    class Risposta:
+    class Risposta:
         ID_Magazzino : int
         ID_Auletta : int
         ID_Prodotto : str
