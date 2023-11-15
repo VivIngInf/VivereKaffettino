@@ -44,7 +44,7 @@ def GetIdTelegram(username : str) -> str:
 
     return session.query(Utente).filter(Utente.username == f"{username}").one().ID_Telegram
 
-def GetIDTelegram(idCard : int) -> str:
+def GetIDTelegram(idCard : str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'ID della carta passato come parametro"""
 
     return session.query(Utente).filter(Utente.ID_Card == f"{idCard}").one().ID_Telegram
@@ -134,6 +134,11 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
 
     session.commit()
 
+def GetProdotti(idAuletta : int) -> str:
+    """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
+
+    return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
+
 #endregion
 
 #region Auletta
@@ -166,7 +171,7 @@ def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, cos
 #region Wemos
 
 # TODO: Sistemare notazione
-def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
+def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> list:
     
     """users = session.query(Utente).all()
 
@@ -181,12 +186,12 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
         costo = magazzino.costo
 
     except:
-        return {"Error" : f"Prodotto con ID {ID_Prodotto} non è stato trovato nell'auletta con ID {ID_Auletta}. Oppure uno dei due non esiste completamente."}
+        return 3 # Prodotto con ID {ID_Prodotto} non è stato trovato nell'auletta con ID {ID_Auletta}. Oppure uno dei due non esiste completamente.
 
     try:
         idTelegram : str = GetIDTelegram(idCard=ID_Card)
     except:
-        return {"Error" : f"Utente con ID_CARD pari a {ID_Card} non trovato."}
+        return 2 # Utente con idCard
 
 
     saldo : float = GetBalance(idTelegram=idTelegram)
@@ -196,7 +201,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
     # Controllare se quantità disponibile
 
     if magazzino.quantita <= 0:
-        return {"Error" : "Quantità dell'item inferiore a 0"}
+        return 4 # Quantità dell'item inferiore a 0
     
     # Calcola il totale del debito possibile
     debitoMassimo = debito * costo
@@ -206,7 +211,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
 
     # Verifica se l'utente può permettersi il prodotto
     if totaleDisponibile < costo:
-        return { "Error" : "Saldo Insufficiente" }
+        return 1 # Saldo non sufficiente
 
     # Decurtatre saldo
     saldo -= costo
@@ -220,7 +225,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : int) -> list:
         # Creare storico della transazione come "Eseguito"
         CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
     except:
-        return {"Error" : "Non è stato possibile creare lo storico dell'operazione avvenuta"} # TODO: Restituire soldi e non far partire il caffè
+        return 5 # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
     return {"State" : "Comprato"}
 
