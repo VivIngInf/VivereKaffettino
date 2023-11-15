@@ -157,9 +157,7 @@ def GetProdotti(idAuletta : int) -> str:
         p.descrizione = r[1]
         p.costo = r[2]
 
-        return p
-
-    print(arr)
+        arr.append(p)
 
     return arr
 
