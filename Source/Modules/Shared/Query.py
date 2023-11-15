@@ -150,6 +150,8 @@ def GetProdotti(idAuletta : int) -> str:
 
     print(arr)
 
+    return arr
+
     """    class Risposta:
         ID_Magazzino : int
         ID_Auletta : int
