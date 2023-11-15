@@ -142,7 +142,9 @@ def GetProdotti(idAuletta : int) -> str:
     res =  session.query(Magazzino, Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").filter(Magazzino.ID_Prodotto == Prodotto.ID_Prodotto).all()
 
     for r in res:
-        print(r)
+        arr.append(r)
+    
+    print (arr)
 
 
 #endregion
