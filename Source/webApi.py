@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Response
-from fastapi.responses import PlainTextResponse, UJSONResponse
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
 from Modules.Shared.Query import GetAulette, PayDB, GetProdotti
@@ -33,7 +32,7 @@ async def shutdown():
 async def aulette():
     return GetAulette()
 
-@app.post("/prodotti", response_class=UJSONResponse)
+@app.post("/prodotti")
 async def prodotti(pRequest: ProdottiRequest):
     return GetProdotti(pRequest.ID_Auletta)
 
