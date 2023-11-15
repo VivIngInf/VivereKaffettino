@@ -148,7 +148,7 @@ def GetProdotti(idAuletta : int) -> str:
         for rr in r:
             arr.append(rr)
 
-    print(rr)
+    print(arr)
 
     """    class Risposta:
         ID_Magazzino : int
