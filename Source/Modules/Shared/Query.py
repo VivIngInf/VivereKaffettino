@@ -140,13 +140,24 @@ def GetProdotti(idAuletta : int) -> str:
 
     arr = []
 
-    res2 = session.query(Prodotto, Magazzino).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
+    class Prodotti:
+        idProdotto : int
+        descrizione : str
+        costo : float
+
+    res2 = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
+
 
     print(res2)
     
-    for r in res2:
-        for rr in r:
-            arr.append(rr)
+    for r in res2:        
+        p = Prodotti()
+        
+        p.idProdotto = r[0]
+        p.descrizione = r[1]
+        p.costo = r[2]
+
+        return p
 
     print(arr)
 
