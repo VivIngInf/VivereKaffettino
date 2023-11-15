@@ -137,19 +137,19 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
 
 def GetProdotti(idAuletta : int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
-    arr = []
+    #arr = []
 
-    res =  session.query(Magazzino, Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").filter(Magazzino.ID_Prodotto == Prodotto.ID_Prodotto).all()
+    #res =  session.query(Magazzino.ID_Auletta).filter(Magazzino.ID_Auletta == f"{idAuletta}").filter(Magazzino.ID_Prodotto == Prodotto.ID_Prodotto).all()
 
-    res2 = session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
+    res2 = session.query(Magazzino.ID_Auletta, Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
-    print(res)
+    #print(res)
 
-    for r in res:
-        print(r)
-        arr.append(r)
+    #for r in res:
+        #print(r)
+        #arr.append(r)
     
-    print (arr)
+    #print (arr)
     
     print(res2)
     
