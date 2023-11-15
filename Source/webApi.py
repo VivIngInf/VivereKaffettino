@@ -33,11 +33,10 @@ async def shutdown():
 async def aulette():
     return GetAulette()
 
-@app.post("/prodotti")
+@app.post("/prodotti", response_class=PlainTextResponse)
 async def prodotti(pRequest: ProdottiRequest):
     return GetProdotti(pRequest.ID_Auletta)
 
-@app.post("/pay", response_class=PlainTextResponse)
+@app.post("/pay")
 async def pay(cRequest: CoffeRequest):
-    data = PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Utente)
-    return data
+    return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Utente)
