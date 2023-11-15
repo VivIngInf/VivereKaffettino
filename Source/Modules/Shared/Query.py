@@ -3,6 +3,7 @@ from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 from .Session import session
 from sqlalchemy import select
+from sqlalchemy.orm import aliased
 
 from ..Database.Models.Auletta import Auletta
 from ..Database.Models.Magazzino import Magazzino
@@ -136,8 +137,11 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
 
 def GetProdotti(idAuletta : int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
-    prodotti = []
-    return session.query(Magazzino).join(Magazzino, Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
+    
+    mAlias = aliased(Magazzino)
+    pAlias = aliased(Prodotto)
+
+    return session.query(Magazzino, Prodotto).join(pAlias, Magazzino.ID_Prodotto == pAlias.ID_Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
 
 #endregion
