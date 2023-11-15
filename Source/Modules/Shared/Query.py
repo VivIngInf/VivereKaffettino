@@ -141,46 +141,22 @@ def GetProdotti(idAuletta : int) -> str:
     arr = []
 
     class Prodotti:
-        idProdotto : int
+        ID_Prodotto : int
         descrizione : str
         costo : float
 
-    res2 = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
-
-
-    print(res2)
+    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
     
-    for r in res2:        
+    for r in res:        
         p = Prodotti()
         
-        p.idProdotto = r[0]
+        p.ID_Prodotto = r[0]
         p.descrizione = r[1]
         p.costo = r[2]
 
         arr.append(p)
 
     return arr
-
-    """print(arr)
-
-    return arr
-
-    class Risposta:
-        ID_Magazzino : int
-        ID_Auletta : int
-        ID_Prodotto : str
-        Descrizione : int
-        Costo : str
-
-    mag =  session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
-    prod = session.query(Prodotto).filter(Prodotto.ID_Prodotto == )
-
-    for m in mag:
-        ris = Risposta()
-        ris.ID_Magazzino = m.ID_Magazzino
-        ris.ID_Auletta = m.ID_Auletta
-        ris.ID_Prodotto = m.ID_Prodotto
-        ris.Descrizione = """
 
 
 #endregion
