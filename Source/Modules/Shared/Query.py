@@ -152,6 +152,7 @@ def GetProdotti(idAuletta : int) -> str:
     #print (arr)
     
     print(res2)
+    return res2
     
 
 
