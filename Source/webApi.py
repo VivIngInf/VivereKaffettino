@@ -1,4 +1,5 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
+from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
 from Modules.Shared.Query import GetAulette, PayDB, GetProdotti
@@ -36,6 +37,7 @@ async def aulette():
 async def prodotti(pRequest: ProdottiRequest):
     return GetProdotti(pRequest.ID_Auletta)
 
-@app.post("/pay")
+@app.post("/pay", response_class=PlainTextResponse)
 async def pay(cRequest: CoffeRequest):
-    return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Utente)
+    data = PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Utente)
+    return data
