@@ -153,6 +153,8 @@ def GetProdotti(idAuletta : int) -> str:
     
     print(res2)
 
+    return res[0]
+
 
 
 #endregion
