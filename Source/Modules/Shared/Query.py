@@ -138,10 +138,7 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
 def GetProdotti(idAuletta : int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
     
-    mAlias = aliased(Magazzino)
-    pAlias = aliased(Prodotto)
-
-    return session.query(Magazzino, Prodotto).join(pAlias, Magazzino.ID_Prodotto == pAlias.ID_Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
+    return session.query(Magazzino, Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
 
 #endregion
