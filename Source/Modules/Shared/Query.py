@@ -141,6 +141,8 @@ def GetProdotti(idAuletta : int) -> str:
 
     res =  session.query(Magazzino, Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").filter(Magazzino.ID_Prodotto == Prodotto.ID_Prodotto).all()
 
+    res2 = session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
+
     print(res)
 
     for r in res:
@@ -148,9 +150,8 @@ def GetProdotti(idAuletta : int) -> str:
         arr.append(r)
     
     print (arr)
-    return arr
-
-    #return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
+    
+    print(res2)
 
 
 
