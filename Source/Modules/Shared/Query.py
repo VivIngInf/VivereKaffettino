@@ -137,12 +137,7 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
 def GetProdotti(idAuletta : int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
     prodotti = []
-    #return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
-    statement = select(Magazzino).join(Prodotto.ID_Prodotto).where(
-        Magazzino.ID_Auletta == f"{idAuletta}"
-    )
-
-    return session.scalar(statement).one()
+    return session.query(Magazzino).join(Prodotto).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
 
 #endregion
