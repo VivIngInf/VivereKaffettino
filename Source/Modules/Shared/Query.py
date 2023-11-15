@@ -149,7 +149,7 @@ def GetProdotti(idAuletta : int) -> str:
     
     print (arr)"""
 
-    print(session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all())
+    return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
 
 
