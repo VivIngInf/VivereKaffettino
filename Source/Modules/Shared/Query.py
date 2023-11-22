@@ -211,7 +211,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> list:
     try:
         idTelegram : str = GetIDTelegram(idCard=ID_Card)
     except:
-        return 2 # Utente con idCard
+        return 2 # Utente con idCard {ID_Card} non esistente
 
 
     saldo : float = GetBalance(idTelegram=idTelegram)
@@ -247,7 +247,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> list:
     except:
         return 5 # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
-    return {"State" : "Comprato"}
+    return 0 # Comprato
 
     
 
