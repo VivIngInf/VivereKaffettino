@@ -9,7 +9,7 @@ app = FastAPI()
 
 class CoffeRequest(BaseModel):
     ID_Auletta : int
-    ID_Utente : str
+    ID_Card : str
     ID_Prodotto : int
 
 class ProdottiRequest(BaseModel):
@@ -38,4 +38,4 @@ async def prodotti(pRequest: ProdottiRequest):
 
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
-    return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Utente)
+    return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Card)
