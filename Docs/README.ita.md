@@ -43,7 +43,7 @@ Tutta la **documentazione, amministrativa ed utente** è sotto la cartella [Docs
 
 [Daniele Orazio Susino](https://www.linkedin.com/in/susinodaniele/) - Lead Dev
 
-[Salvatore Lucio Auria](https://www.linkedin.com/in/salvatore-lucio-auria-15a680210/https://www.linkedin.com/in/salvatore-lucio-auria-15a680210/) - System Admin
+[Salvatore Lucio Auria](https://www.linkedin.com/in/salvatore-lucio-auria-15a680210/) - System Admin
 
 [Giovanni Castelli](https://www.linkedin.com/in/giovanni-castelli02/) - Database Consultant
 
