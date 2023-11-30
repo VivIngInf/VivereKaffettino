@@ -124,8 +124,6 @@ def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> Magazzino:
     """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
 
     result = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{ID_Prodotto}", Magazzino.ID_Auletta == f"{ID_Auletta}").one()
-    
-    print(result)
 
     return result
 
