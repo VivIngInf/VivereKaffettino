@@ -125,6 +125,8 @@ def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> Magazzino:
 
     result = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{ID_Prodotto}", Magazzino.ID_Auletta == f"{ID_Auletta}").one()
     
+    print(result)
+
     return result
 
 def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
