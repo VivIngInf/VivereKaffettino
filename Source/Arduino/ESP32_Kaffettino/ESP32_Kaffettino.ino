@@ -14,11 +14,21 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
 
 */
 
+#include <Arduino.h>
+
 //Lib lettore
   #include <SPI.h>
   #include <MFRC522.h>
 
+//Lib wifi
+  #include "WiFi.h"
+  #include "esp_wpa2.h"
 
+//Lib http
+  #include <HTTPClient.h> // Basilare con Esp32
+  #include <ArduinoJson.h> // Arduinojson by Benoit Blanchon
+  #include <LinkedList.h> //LinkedList by Ivan Seidel
+  
 //Lib Oled
   #include <Wire.h>
   #include <Adafruit_GFX.h>
@@ -28,34 +38,66 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   #include <Arduino.h>
   #include "DFRobotDFPlayerMini.h"
 
-//PERIFERICHE  
-  #define green 27
-  #define yellow 26 
-  #define red 12
-  #define GND 14
-  #define GND2 35
-  #define VCC 17
-  
-  #define buzzer 16
+//Credenziali wifi
+  #define EAP_IDENTITY "username" // Es: mario.rossi03
+  #define EAP_PASSWORD "password"
+  #define EAP_USERNAME "username" // Stesso di EAP_IDENTITY
+  const char* ssid = "eduroam"; // SSID WiFi
 
+//Rotte
+  const char* serverAddressPay = "http://129.152.11.76:8000/pay";
+  const char* serverAddressProdotti = "http://129.152.11.76:8000/prodotti";
+  WiFiClient wifiClient;
+
+//Gestione prodotti
+  class Prodotto{
+    public:
+      String id;
+      String nome;
+      String prezzo;
+  };
+
+  LinkedList<Prodotto*> listaProdotti = LinkedList<Prodotto*>(); // Array dei prodotti disponibili
+
+  int pointer=0;
+  int IDProdotto=1;
+
+  JsonArray products;
+
+// Codici di stampa per la funzione stampaOled()
+  #define PAGATO 0 // Il pagamento è andato a buon fine
+  #define NOSALDO 1 // Non hai abbastanza saldo nella carta per quel determinato prodotto
+  #define NOCARD 2 // Non esiste la carta nel database
+  #define NOPROD 3 // Non esiste il prodotto nel database (cosa che non dovrebbe comunque succedere)
+  #define NOC 11 // Non c'è connessione
+  #define VIV 10 // Codice di stampa vivere kaffettino
+
+// Periferiche  
+  #define green 27 // Led verde
+  #define yellow 26  // Led Giallo
+  #define red 12 // Led rosso
+  #define GND 14 // Ground
+  #define GND2 35 // 2° Ground
+  #define VCC 17 // VCC
+  #define buzzer 16 // Buzzer signal
 
 //Impostazione schermo
   #define SCREEN_WIDTH 128 // OLED display width, in pixels
   #define SCREEN_HEIGHT 64 // OLED display height, in pixels
   #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-  #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
+  #define SCREEN_ADDRESS 0x3C // See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
   #define VIV 6
   #define PAG 0
+
 //Creazione "oggetto" display  
   Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
   void stampaoled(int i);
 
-
 //Impostazione lettore
-  constexpr uint8_t RST_PIN =  34;         //Pin di reset
+  constexpr uint8_t RST_PIN =  34;         // Pin di reset
   constexpr uint8_t SS_PIN =  5;         // Pin dati
   int controllo[12]={195,227,250,166};    // Codice UID di un tag
-  int verify = 0;                         //variabile di controllo della differenza tra UID letto e salvato
+  int verify = 0;                         // Variabile di controllo della differenza tra UID letto e salvato
   MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
 
 //Impostazione audio
@@ -71,7 +113,6 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
 //Pulsante-Interrupt
   #define butt 25
   int state = 0; //0=caffe' 1=acqua
-
 
 void setup() {
 
@@ -106,6 +147,8 @@ void setup() {
     Serial.println(F("SSD1306 allocation failed"));
     for(;;); // Don't proceed, loop forever
   }
+
+  connettiWifi(); // ci connettiamo al wifi
 
   stampaoled(VIV);    //Inizia la stampa continua
   digitalWrite(green, HIGH);  //impostazione iniziale led
@@ -214,6 +257,35 @@ void loop() {
 
 }
 
+void connettiWifi()
+{
+  WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
+  while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
+  {
+    Serial.println("Connessione WiFi in corso...");
+    Serial.println(flag);
+    
+    digitalWrite(green, LOW); 
+    digitalWrite(red, LOW); // Accendiamo solo il LED rosso
+    digitalWrite(yellow, LOW);
+
+    delay(1000);
+    digitalWrite(yellow, HIGH);
+    delay(1000);
+
+    stampaoled(NOC); // Stampiamo che non c'è connessione
+    
+    if(flag==1)
+    {
+      flag=0;
+    }
+  }
+
+  flag=1;
+
+  Serial.println("Connesso alla rete WiFi");
+}
+
 // Helper routine to dump a byte array as hex values to Serial
 void dump_byte_array(byte *buffer, byte bufferSize) {
 
@@ -231,6 +303,7 @@ void ButtRoutine()
    state ^= 1;  //varia da 0 a 1 e da 1 a 0 per ogni richiamo della routine
    stampaoled(state + 7); //7 per avere un offset rispetto alle stampe di pagato ed errori 6 in tot
 }
+
 void stampaoled(int i) 
 {
   switch (i)
@@ -341,7 +414,33 @@ void stampaoled(int i)
       display.print("ACQUA");
       display.display();      
       break;
-    }        
+    }
+    case NOC:
+    {
+      display.stopscroll();
+      display.clearDisplay();
+      display.setTextSize(2); // Draw 2X-scale text
+      display.setTextColor(SSD1306_WHITE);
+
+      display.setCursor(5, 17);
+      display.print("CONNECTING");
+      display.display();      // Show text
+
+      display.setCursor(46, 40);
+      display.print(".");
+      delay(200);
+      display.display();      // Show text
+
+      display.print(".");
+      delay(200);
+      display.display();      // Show text
+
+      display.print(".");
+      delay(200);
+      display.display();      // Show initial text
+
+      break;
+    } 
   }
 }
 
