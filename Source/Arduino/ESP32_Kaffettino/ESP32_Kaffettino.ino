@@ -1,20 +1,17 @@
-/**
-SPI-LETTORE:
-RST  - 34
-MISO - 19
-MOSI - 23
-SCK  - 18
-SDA  - 5
-Installare MFRC522 by Community
+/*
+  SPI-LETTORE:
+  RST  - 34
+  MISO - 19
+  MOSI - 23
+  SCK  - 18
+  SDA  - 5
+  Installare MFRC522 by Community
 
-I2C-SCHERMO:
-SCL - 22
-SDA - 21
-Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
-
+  I2C-SCHERMO:
+  SCL - 22
+  SDA - 21
+  Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
 */
-
-#include <Arduino.h>
 
 // Lib lettore
   #include <SPI.h>
@@ -71,9 +68,12 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   #define NOSALDO 1 // Non hai abbastanza saldo nella carta per quel determinato prodotto
   #define NOCARD 2 // Non esiste la carta nel database
   #define NOPROD 3 // Non esiste il prodotto nel database (cosa che non dovrebbe comunque succedere)
-  #define CONNECTING 12 // Ci stiamo connettendo
-  #define NOC 11 // Non c'è connessione
+  #define STAMPAPROD 7 // Stampa il prodotto con id == currentProdotto
   #define VIV 10 // Codice di stampa vivere kaffettino
+  #define NOC 11 // Non c'è connessione
+  #define CONNECTING 12 // Ci stiamo connettendo
+  #define HTTPERR 13 // C'è satto un errore nella richiesta http
+
 
 // Periferiche  
   #define green 27 // Led verde
@@ -113,9 +113,10 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   #define attesa 3000
 
 // Pulsante-Interrupt
-  #define butt 15
+  #define butt 15 // Attenzione a questo pin, siccome il wifi è acceso alcuni pin non diventano disponibili. Questo è uno dei pin che rimane disponibile.
 
-void setup() {
+void setup() 
+{
 
   mySoftwareSerial.begin(9600 , SERIAL_8N1, 32, 33);  // speed, type, RX, TX
   Serial.begin(115200);   // Initialize serial communications with the PC
@@ -163,7 +164,27 @@ void setup() {
 
 }
 
-void loop() {
+void loop() 
+{
+  // Se non siamo connessi allora blocca tutto
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    Serial.println("Connessione WiFi mancante, riprovo a connettermi...");
+    stampaoled(NOC);
+
+    digitalWrite(green, LOW);
+    digitalWrite(yellow, LOW);
+
+    digitalWrite(red, HIGH);
+    delay(1000);
+    digitalWrite(red, LOW);
+    delay(1000);
+
+    t = millis();
+    flag = 0;
+    
+    return;
+  }
 
   if(millis()==(t+attesa))  //Vero solo se dall'ultimo tag è passato più di "attesa"
   {
@@ -171,7 +192,7 @@ void loop() {
     stampaoled(VIV);
   }
 
-  if(!digitalRead(butt))  //leggo il pulsante e richiamo la sua routine QUESTA FUNZIONE NON FUNZIONA (LOL) PERCHE' IL PULSANTE RISULTA PREMUTO ANCHE QUANDO NON LO E'
+  if(!digitalRead(butt))  //leggo il pulsante e richiamo la sua routine
   {
     buttRoutine();
     delay(500);
@@ -179,63 +200,61 @@ void loop() {
 
   if(flag == true)  //riattiva la lettura delle carte
   {
-    {//Reset led
-      digitalWrite(green, HIGH);  //reset led
-      digitalWrite(yellow, LOW);
-      digitalWrite(red, LOW);
-    }
-
-  
-    if ( ! mfrc522.PICC_IsNewCardPresent()) //ricerca carta
+    
+    //reset led
+    digitalWrite(green, HIGH);  
+    digitalWrite(yellow, LOW);
+    digitalWrite(red, LOW);
+    
+    // Se non rileva la card o la card non ha un numero seriale
+    if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
     {
-      return;               //se non rileva card ritorna all'inizio del loop
-    }
-    if ( ! mfrc522.PICC_ReadCardSerial()) {  // Select one of the cards
-      return;               //se non rileva lo UID della card ritorna all'inizio del loop
+      return; // Ritorna all'inizio del loop
     }
 
     verify=0; //reset variabile di controllo, il valore deve essere il ritorno del server
 
-    // Show some details of the PICC (that is: the tag/card)
-    Serial.print(F("Card UID:")); 
-    dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);//stampa lo uid sul monitor seriale
-    Serial.println();
-    Serial.println(verify);   //stampa di controllo dell'errore
+    logCard(); // Siccome è stata riconosciuta una card, logghiamo le sue caratteristiche.
 
+    pay();
 
-    if(verify==0) //se 0 pagato, altrimenti manda l'errore con il rispettivo numero
+    currentProdotto = 0; // Resettiamo il prodottoCorrente al primo della lista.
+    flag = false; // Reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
+    t = millis(); // Reset t perché è stata letta una carta
+
+    if(verify != 0) // Se il codice di ritorno non è 0 questo vuol dire che c'è stato un errore.
     {
-      stampaoled(PAG);
-      myDFPlayer.play(1);  //Play the first mp3
-      Serial.println("Play caffettino");
-      digitalWrite(green, LOW);
-      digitalWrite(yellow, HIGH);  
-
-      digitalWrite(buzzer, 1);
-      delay(500);
-      digitalWrite(buzzer, 0);
-      delay(100);
-      digitalWrite(buzzer, 1);    
-      delay(1000);
-      digitalWrite(buzzer, 0);
-   
-      t = millis();
-      flag = false; //reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
-    }  
-    else //come sopra, ma per gli errori
-    {
-      stampaoled(verify); 
+      stampaoled(verify); // Mandiamo a schermo l'errore
+      
       digitalWrite(green, LOW);
       digitalWrite(yellow, LOW);
-      digitalWrite(red, HIGH);  
+      digitalWrite(red, HIGH);  // Led rosso simboleggia errore
 
+      // Segnale acustico
       digitalWrite(buzzer, 1);
       delay(300);
       digitalWrite(buzzer, 0);
+      
       t = millis();
-      flag = false;
+
+      return;
     }
-    currentProdotto = 0;
+
+    // Se è stato pagato
+
+    stampaoled(PAG);
+    myDFPlayer.play(1);  //Play the first mp3
+    Serial.println("Play caffettino");
+    digitalWrite(green, LOW);
+    digitalWrite(yellow, HIGH);  
+
+    digitalWrite(buzzer, 1);
+    delay(500);
+    digitalWrite(buzzer, 0);
+    delay(100);
+    digitalWrite(buzzer, 1);    
+    delay(1000);
+    digitalWrite(buzzer, 0);
   }
 
 }
@@ -280,6 +299,15 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
     if(controllo[i]!=buffer[i]) verify++; //verifica dello UID sostituire con invio al server
   }  
  
+}
+
+void logCard()
+{
+    // Show some details of the PICC (that is: the tag/card)
+    Serial.print(F("Card UID:")); 
+    dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size);//stampa lo uid sul monitor seriale
+    Serial.println();
+    Serial.println(verify);   //stampa di controllo dell'errore
 }
 
 void buttRoutine()
@@ -403,6 +431,57 @@ void getProdotti()
   }
 }
 
+void pay()
+{
+  const size_t bufferSize = JSON_OBJECT_SIZE(1);
+  DynamicJsonDocument doc(bufferSize);
+
+  // ID_Card che manderemo al server
+  String ID_Card = "";
+  for (int i = 0; i < mfrc522.uid.size; i++) 
+  {
+    ID_Card += String(mfrc522.uid.uidByte[i]);
+  }
+
+  // Passiamo alla richiesta POST i parametri
+  doc["ID_Card"] = ID_Card;
+  doc["ID_Auletta"] = ID_AULETTA;
+  doc["ID_Prodotto"] = currentProdotto;
+
+  // Formattiamo i parametri in json
+  String jsonString;
+  serializeJson(doc, jsonString);
+
+  // Avviamo la richiesta HTTP
+  HTTPClient http;
+  http.begin(wifiClient, serverAddressPay);
+  http.addHeader("Content-Type", "application/json");
+  int httpResponseCode = http.POST(jsonString); // Passiamo come body il json
+
+  Serial.print("HTTP Response code: ");
+  Serial.println(httpResponseCode); // Stampiamo il codice di risposta
+  String response;
+
+  // Se il codice di risposta è maggiore di 0 vuol dire che è stato un successo e possiamo mostrare la response
+  if (httpResponseCode > 0) 
+  {
+    response = http.getString();
+    
+    Serial.print("Response Body: ");
+    Serial.println(response);
+
+    verify = response.toInt(); // Settiamo verify a response perché così possiamo gestire i vari casi della risposta
+  } 
+  else 
+  {
+    Serial.println("Errore nella richiesta HTTP");
+    verify = HTTPERR;
+  }
+
+  // Free resources
+  http.end();
+}
+
 void stampaoled(int i) 
 {
   switch (i)
@@ -420,7 +499,7 @@ void stampaoled(int i)
       display.display();      //Attiva il testo 
       break;
     }
-    case 1:
+    case NOSALDO:
     {
       display.stopscroll();
       display.clearDisplay();
@@ -428,11 +507,11 @@ void stampaoled(int i)
       display.setTextSize(3); 
       display.setTextColor(SSD1306_WHITE);
       display.setCursor(0, 22);
-      display.print("ERRORE\n\t1");
+      display.print("NO\n\tSALDO");
       display.display();      
       break;
     }
-    case 2:
+    case NOCARD:
     {
       display.stopscroll();
       display.clearDisplay();
@@ -440,11 +519,11 @@ void stampaoled(int i)
       display.setTextSize(3); 
       display.setTextColor(SSD1306_WHITE);
       display.setCursor(0, 22);
-      display.print("ERRORE\n\t2");
+      display.print("NO\n\tCARD");
       display.display();      
       break;
     }
-    case 3:
+    case NOPROD:
     {
       display.stopscroll();
       display.clearDisplay();
@@ -452,31 +531,7 @@ void stampaoled(int i)
       display.setTextSize(3); 
       display.setTextColor(SSD1306_WHITE);
       display.setCursor(0, 22);
-      display.print("ERRORE\n\t3");
-      display.display();      
-      break;
-    }
-    case 4:
-    {
-      display.stopscroll();
-      display.clearDisplay();
-      delay(10);
-      display.setTextSize(3); 
-      display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("ERRORE\n\t4");
-      display.display();      
-      break;
-    }
-    case 5:
-    {
-      display.stopscroll();
-      display.clearDisplay();
-      delay(10);
-      display.setTextSize(3); 
-      display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("ERRORE\n\t5");
+      display.print("NO\n\tPRODOTTO");
       display.display();      
       break;
     }
@@ -492,7 +547,7 @@ void stampaoled(int i)
       display.startscrollleft(0x00, 0x0F);  //riattiva lo spostamento del testo con le coordinate di inizio e fine
       break;
     }    
-    case 7:
+    case STAMPAPROD:
     {
       Prodotto *p = listaProdotti.get(currentProdotto);
       display.stopscroll();
@@ -533,6 +588,24 @@ void stampaoled(int i)
 
       break;
     } 
+    case HTTPERR:
+    {
+      display.stopscroll();
+      display.clearDisplay();
+      display.setTextSize(2); // Draw 2X-scale text
+      display.setTextColor(SSD1306_WHITE);
+
+      display.setCursor(5, 10);
+      display.print("SERVER ERROR");
+      display.display();      // Show text
+
+      display.setCursor(46, 10);
+      display.print("CONT. AMDMIN");
+      delay(200);
+      display.display();      // Show text
+
+      break;
+    }
   }
 }
 
