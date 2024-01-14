@@ -16,40 +16,41 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
 
 #include <Arduino.h>
 
-//Lib lettore
+// Lib lettore
   #include <SPI.h>
   #include <MFRC522.h>
 
-//Lib wifi
+// Lib wifi
   #include "WiFi.h"
   #include "esp_wpa2.h"
 
-//Lib http
+// Lib http
   #include <HTTPClient.h> // Basilare con Esp32
   #include <ArduinoJson.h> // Arduinojson by Benoit Blanchon
   #include <LinkedList.h> //LinkedList by Ivan Seidel
   
-//Lib Oled
+// Lib Oled
   #include <Wire.h>
   #include <Adafruit_GFX.h>
   #include <Adafruit_SSD1306.h>
 
-//Lib audio
+// Lib audio
   #include <Arduino.h>
   #include "DFRobotDFPlayerMini.h"
 
-//Credenziali wifi
+// Credenziali wifi
   #define EAP_IDENTITY "username" // Es: mario.rossi03
   #define EAP_PASSWORD "password"
   #define EAP_USERNAME "username" // Stesso di EAP_IDENTITY
   const char* ssid = "eduroam"; // SSID WiFi
 
-//Rotte
+// Rotte
   const char* serverAddressPay = "http://129.152.11.76:8000/pay";
   const char* serverAddressProdotti = "http://129.152.11.76:8000/prodotti";
   WiFiClient wifiClient;
 
-//Gestione prodotti
+// Gestione prodotti
+  #define ID_AULETTA 1
   class Prodotto{
     public:
       String id;
@@ -58,6 +59,7 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   };
 
   LinkedList<Prodotto*> listaProdotti = LinkedList<Prodotto*>(); // Array dei prodotti disponibili
+  int currentProdotto = 0;
 
   int pointer=0;
   int IDProdotto=1;
@@ -69,6 +71,7 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   #define NOSALDO 1 // Non hai abbastanza saldo nella carta per quel determinato prodotto
   #define NOCARD 2 // Non esiste la carta nel database
   #define NOPROD 3 // Non esiste il prodotto nel database (cosa che non dovrebbe comunque succedere)
+  #define CONNECTING 12 // Ci stiamo connettendo
   #define NOC 11 // Non c'è connessione
   #define VIV 10 // Codice di stampa vivere kaffettino
 
@@ -81,7 +84,7 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   #define VCC 17 // VCC
   #define buzzer 16 // Buzzer signal
 
-//Impostazione schermo
+// Impostazione schermo
   #define SCREEN_WIDTH 128 // OLED display width, in pixels
   #define SCREEN_HEIGHT 64 // OLED display height, in pixels
   #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
@@ -89,30 +92,28 @@ Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
   #define VIV 6
   #define PAG 0
 
-//Creazione "oggetto" display  
+// Creazione "oggetto" display  
   Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
   void stampaoled(int i);
 
-//Impostazione lettore
+// Impostazione lettore
   constexpr uint8_t RST_PIN =  34;         // Pin di reset
   constexpr uint8_t SS_PIN =  5;         // Pin dati
   int controllo[12]={195,227,250,166};    // Codice UID di un tag
   int verify = 0;                         // Variabile di controllo della differenza tra UID letto e salvato
   MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
 
-//Impostazione audio
+// Impostazione audio
   HardwareSerial mySoftwareSerial(1);
   DFRobotDFPlayerMini myDFPlayer;
 
-//Gestione temporale
+// Gestione temporale
   long long int t;
-//  long long int t2;
   bool flag = true;
   #define attesa 3000
 
-//Pulsante-Interrupt
-  #define butt 25
-  int state = 0; //0=caffe' 1=acqua
+// Pulsante-Interrupt
+  #define butt 15
 
 void setup() {
 
@@ -140,43 +141,25 @@ void setup() {
   mfrc522.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
   Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 
-  delay(1000);
-
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) 
   {
     Serial.println(F("SSD1306 allocation failed"));
-    for(;;); // Don't proceed, loop forever
+    while(true) // non procedere, cicla all'infinito
+    {
+      delay(1000);
+      digitalWrite(red, HIGH);
+      delay(1000);
+      digitalWrite(red, LOW);
+    }
   }
 
-  connettiWifi(); // ci connettiamo al wifi
+  connettiWifi(); // Ci connettiamo al wifi
 
-  stampaoled(VIV);    //Inizia la stampa continua
-  digitalWrite(green, HIGH);  //impostazione iniziale led
-  digitalWrite(yellow, LOW);
-  digitalWrite(red, LOW);
-  t=millis();
-  Serial.println("Setup done");
-//Setup audio
-  Serial.println(F("DFRobot DFPlayer Mini Demo"));
-  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
-  
-  if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with mp3.
-    
-    Serial.println(myDFPlayer.readType(),HEX);
-    Serial.println(F("Unable to begin:"));
-    Serial.println(F("1.Please recheck the connection!"));
-    Serial.println(F("2.Please insert the SD card!"));
-    while(true);
-  }
-  Serial.println(F("DFPlayer Mini online."));
-  myDFPlayer.setTimeOut(500); //Set serial communictaion time out 500ms
-  
-  //----Set volume----
-  myDFPlayer.volume(25);  //Set volume value (0~30).
-  myDFPlayer.volumeUp(); //Volume Up
-  myDFPlayer.volumeDown(); //Volume Down
-  myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
+  setupDisplay(); // Stato di default del display
 
+  setupAudio(); // Setup modulo sd audio
+
+  getProdotti(); // Chiediamo al server di mandarci i prodotti dell'auletta
 
 }
 
@@ -188,10 +171,10 @@ void loop() {
     stampaoled(VIV);
   }
 
-  if(!digitalRead(butt))  //leggo il pulsante e richiamo la sua routine
+  if(!digitalRead(butt))  //leggo il pulsante e richiamo la sua routine QUESTA FUNZIONE NON FUNZIONA (LOL) PERCHE' IL PULSANTE RISULTA PREMUTO ANCHE QUANDO NON LO E'
   {
-    ButtRoutine();
-    delay(300);
+    buttRoutine();
+    delay(500);
   }
 
   if(flag == true)  //riattiva la lettura delle carte
@@ -252,18 +235,18 @@ void loop() {
       t = millis();
       flag = false;
     }
-    state = 0;
+    currentProdotto = 0;
   }
 
 }
 
 void connettiWifi()
 {
-  WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
+  //WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
+  WiFi.begin("xxx", "xxx"); // Passiamo le credenziali e istanziamo una nuova connessione
   while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
   {
     Serial.println("Connessione WiFi in corso...");
-    Serial.println(flag);
     
     digitalWrite(green, LOW); 
     digitalWrite(red, LOW); // Accendiamo solo il LED rosso
@@ -273,7 +256,7 @@ void connettiWifi()
     digitalWrite(yellow, HIGH);
     delay(1000);
 
-    stampaoled(NOC); // Stampiamo che non c'è connessione
+    stampaoled(CONNECTING); // Stampiamo che non c'è connessione
     
     if(flag==1)
     {
@@ -289,7 +272,8 @@ void connettiWifi()
 // Helper routine to dump a byte array as hex values to Serial
 void dump_byte_array(byte *buffer, byte bufferSize) {
 
-  for (byte i = 0; i < bufferSize; i++) {
+  for (byte i = 0; i < bufferSize; i++) 
+  {
     Serial.print(buffer[i]);      //stampo in decimale
     Serial.print("  ");
 
@@ -298,10 +282,125 @@ void dump_byte_array(byte *buffer, byte bufferSize) {
  
 }
 
-void ButtRoutine()
+void buttRoutine()
 {
-   state ^= 1;  //varia da 0 a 1 e da 1 a 0 per ogni richiamo della routine
-   stampaoled(state + 7); //7 per avere un offset rispetto alle stampe di pagato ed errori 6 in tot
+  currentProdotto++;
+
+  if(currentProdotto >= listaProdotti.size())
+    currentProdotto = 0;
+
+  stampaoled(7); //7 per avere un offset rispetto alle stampe di pagato ed errori 6 in tot
+}
+
+void setupAudio() // Funzione che inizializza il playermp3
+{
+  Serial.println(F("DFRobot DFPlayer Mini Demo"));
+  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
+  
+  if (!myDFPlayer.begin(mySoftwareSerial)) {  //Use softwareSerial to communicate with mp3.
+    
+    Serial.println(myDFPlayer.readType(),HEX);
+    Serial.println(F("Unable to begin:"));
+    Serial.println(F("1.Please recheck the connection!"));
+    Serial.println(F("2.Please insert the SD card!"));
+    while(true);
+  }
+  
+  Serial.println(F("DFPlayer Mini online."));
+  myDFPlayer.setTimeOut(500); //Set serial communictaion time out 500ms
+  
+  //----Set volume----
+  myDFPlayer.volume(25);  //Set volume value (0~30).
+  myDFPlayer.volumeUp(); //Volume Up
+  myDFPlayer.volumeDown(); //Volume Down
+  myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
+}
+
+void setupDisplay()
+{
+  stampaoled(VIV);    //Inizia la stampa continua
+  digitalWrite(green, HIGH);  //impostazione iniziale led
+  digitalWrite(yellow, LOW);
+  digitalWrite(red, LOW);
+  t=millis();
+  Serial.println("Setup done");
+}
+
+void getProdotti()
+{
+  const size_t bufferSize = JSON_OBJECT_SIZE(1);
+  DynamicJsonDocument doc(bufferSize);
+
+  // Passiamo alla richiesta get il parametro ID_AULETTA
+  doc["ID_Auletta"] = ID_AULETTA;
+
+  // Formattiamo il parametro in json
+  String jsonString;
+  serializeJson(doc, jsonString);
+
+  // Avviamo la richiesta HTTP
+  HTTPClient http;
+  http.begin(wifiClient, serverAddressProdotti);
+  http.addHeader("Content-Type", "application/json");
+  int httpResponseCode = http.POST(jsonString); // Passiamo come body il json
+
+  Serial.print("HTTP Response code: ");
+  Serial.println(httpResponseCode); // Stampiamo il codice di risposta
+  String response;
+
+  // Se il codice di risposta è maggiore di 0 vuol dire che è stato un successo e possiamo mostrare la response
+  if (httpResponseCode > 0) 
+  {
+    response = http.getString();
+    Serial.print("Response Body: ");
+    Serial.println(response);
+  } 
+  else 
+  {
+    Serial.println("Errore nella richiesta HTTP");
+    // TODO: GESTIRE ERRORE RICHIESTA HTTP
+  }
+
+  // Free resources
+  http.end();
+
+  // Trasformiamo in json la rispsota che ci ha dato il server
+  DynamicJsonDocument docResponse(1024);
+  DeserializationError error = deserializeJson(docResponse, response);
+
+  // Se c'è stato un errore nel deserializzare la risposta ritorniamo
+  if (error) 
+  {
+    Serial.print("deserializeJson() failed: ");
+    Serial.println(error.f_str());
+    return;
+  }
+  
+  // La risposta in json la trasformiamo in un array
+  products = docResponse.as<JsonArray>();
+
+  // Per ogni prodotto nella lista di json objects ne creiamo uno con la nostra struct Prodotto
+  for (JsonObject product : products) 
+  {
+    Prodotto *prodotto = new Prodotto();
+    prodotto->id = product["ID_Prodotto"].as<String>().c_str();
+    prodotto->nome = product["descrizione"].as<String>().c_str();
+    prodotto->prezzo = product["costo"].as<String>().c_str();
+    
+    listaProdotti.add(prodotto);
+  }
+
+  // Stampiamo in seriale i prodotti che questa auletta vende
+  for(int i = 0; i < listaProdotti.size(); i++)
+  {
+    Prodotto *p = listaProdotti.get(i);
+    Serial.print(p->id);
+    Serial.print("\t");
+    Serial.print(p->nome);
+    Serial.print("\t");
+    Serial.print(p->prezzo);
+    Serial.println("");
+  }
 }
 
 void stampaoled(int i) 
@@ -388,34 +487,27 @@ void stampaoled(int i)
       display.setTextSize(2); 
       display.setTextColor(SSD1306_WHITE);
       display.setCursor(1, 17);
-      display.print("  VIVERE\nCAFFETTINO");
+      display.print("  VIVERE\nKAFFETTINO");
       display.display();      
       display.startscrollleft(0x00, 0x0F);  //riattiva lo spostamento del testo con le coordinate di inizio e fine
       break;
     }    
     case 7:
     {
+      Prodotto *p = listaProdotti.get(currentProdotto);
       display.stopscroll();
       display.clearDisplay();
+      delay(10);
       display.setTextSize(2); 
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("CAFFE'");
-      display.display();      
-      break;
+      display.setCursor(35, 20);
+      display.print(p->nome);
+      display.setCursor(45, 40);
+      display.print(p->prezzo);
+      display.display(); 
+      break;  
     }
-    case 8:
-    {
-      display.stopscroll();
-      display.clearDisplay();
-      display.setTextSize(2); 
-      display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("ACQUA");
-      display.display();      
-      break;
-    }
-    case NOC:
+    case CONNECTING:
     {
       display.stopscroll();
       display.clearDisplay();
