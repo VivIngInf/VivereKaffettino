@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri
 
 app = FastAPI()
 
@@ -39,3 +39,7 @@ async def prodotti(pRequest: ProdottiRequest):
 @app.post("/pay")
 async def pay(cRequest: CoffeRequest):
     return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Card)
+
+@app.get("/caffeGiornalieri")
+async def caffeGiornalieri():
+    return getCaffeGiornalieri()
