@@ -119,7 +119,7 @@ def SetAdminDB(idTelegram : str, state : bool) -> None:
 
 def getCaffeGiornalieri() -> int:
     """ADMIN: Ritorna il numero dei caffé fatti in questo giorno"""
-    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()    
+    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).count()
 
 #endregion
 
