@@ -2,7 +2,7 @@ from mysql.connector import cursor, connect, MySQLConnection
 from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 from .Session import session
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.orm import aliased
 
 from ..Database.Models.Auletta import Auletta
@@ -108,7 +108,7 @@ def GetAuletta(idAuletta : int) -> str:
 #region Admin
 def SetAdminDB(idTelegram : str, state : bool) -> None:
     """DATABASE_HANDLER / ADD_ADMIN: Aggiorniamo l'utente con idTelegram passato come parametro impostando
-    isAdmin ad 1"""
+    isAdmin"""
 
     u : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
     u.isAdmin = state
@@ -116,6 +116,11 @@ def SetAdminDB(idTelegram : str, state : bool) -> None:
     session.commit()
 
     return None
+
+def getCaffeGiornalieri() -> int:
+    """ADMIN: Ritorna il numero dei caffé fatti in questo giorno"""
+    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()    
+
 #endregion
 
 #region Magazzino
@@ -191,11 +196,11 @@ def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, cos
 #region Wemos
 
 # TODO: Sistemare notazione
-def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> list:
+def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
     
     """users = session.query(Utente).all()
 
-    return users"""
+    return statecode"""
 
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
@@ -248,7 +253,5 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> list:
         return 5 # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
     return 0 # Comprato
-
-    
 
 #endregion
