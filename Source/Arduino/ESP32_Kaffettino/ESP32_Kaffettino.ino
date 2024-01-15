@@ -35,6 +35,9 @@
   #include <Arduino.h>
   #include "DFRobotDFPlayerMini.h"
 
+// Lib bottone premuto
+  #include <Bounce2.h>
+
 // Credenziali wifi
   #define EAP_IDENTITY "username" // Es: mario.rossi03
   #define EAP_PASSWORD "password"
@@ -73,7 +76,7 @@
   #define NOC 11 // Non c'è connessione
   #define CONNECTING 12 // Ci stiamo connettendo
   #define HTTPERR 13 // C'è satto un errore nella richiesta http
-
+  int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 
 // Periferiche  
   #define green 27 // Led verde
@@ -111,9 +114,16 @@
   long long int t;
   bool flag = true;
   #define attesa 3000
+  bool firstBoot = true;
 
 // Pulsante-Interrupt
   #define butt 15 // Attenzione a questo pin, siccome il wifi è acceso alcuni pin non diventano disponibili. Questo è uno dei pin che rimane disponibile.
+  Bounce debouncer = Bounce();  // Oggetto debounce
+
+  int buttonState = 0;  // Variabile per memorizzare lo stato del pulsante
+  int lastButtonState = 0;  // Variabile per memorizzare l'ultimo stato del pulsante
+  unsigned long lastDebounceTime = 0;  // Variabile per memorizzare l'ultimo tempo di debounce
+  unsigned long pressStartTime = 0;  // Variabile per memorizzare il tempo di inizio del press
 
 void setup() 
 {
@@ -136,6 +146,9 @@ void setup()
   digitalWrite(buzzer, LOW); digitalWrite(4, LOW);  //pin 14 usato temporaneamente come ground
   Serial.println("Buzzer Test...");
 
+  debouncer.attach(butt);
+  debouncer.interval(10);
+
   while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
   SPI.begin();      // Init SPI bus
   mfrc522.PCD_Init();   // Init MFRC522
@@ -156,11 +169,11 @@ void setup()
 
   connettiWifi(); // Ci connettiamo al wifi
 
-  setupDisplay(); // Stato di default del display
-
   setupAudio(); // Setup modulo sd audio
 
   getProdotti(); // Chiediamo al server di mandarci i prodotti dell'auletta
+
+  setupDisplay(); // Stato di default del display
 
 }
 
@@ -186,17 +199,58 @@ void loop()
     return;
   }
 
+  // Se non siamo riusciti a connetterci al server ma il wifi c'è vuol dire che c'è stato un problema al server
+  while(verify == HTTPERR)
+  {
+    flag = 0; // Disabilitiamo tutto
+
+    if(!digitalRead(butt))  // Se il pulsante è premuto riproviamo
+    {
+      digitalWrite(buzzer, 1);
+      delay(1000);
+      digitalWrite(buzzer, 0);
+      delay(500);
+      getProdotti(); // Chiediamo al server di mandarci i prodotti dell'auletta
+    }
+
+    if(verify == HTTPERR && alreadyPrint == 0)
+    {
+      digitalWrite(green, LOW);
+      digitalWrite(yellow, LOW);
+      digitalWrite(red, HIGH);
+
+      stampaoled(HTTPERR);
+      alreadyPrint = 1;
+
+      Serial.println("ERRORE HTTP!!!");
+    }
+    else if(verify != HTTPERR)
+    {
+      Serial.println("ABEMUS PRODOTTI!!!");
+      flag = 1;
+      stampaoled(VIV);
+      delay(2000);
+      break;
+    }
+
+  }
+
+  if(!firstBoot)
+    checkButtonPressed();
+    
+  if(firstBoot == true)
+  {
+    stampaoled(VIV);
+    firstBoot = false;
+  }
+
   if(millis()==(t+attesa))  //Vero solo se dall'ultimo tag è passato più di "attesa"
   {
     flag = true;
     stampaoled(VIV);
   }
 
-  if(!digitalRead(butt))  //leggo il pulsante e richiamo la sua routine
-  {
-    buttRoutine();
-    delay(500);
-  }
+
 
   if(flag == true)  //riattiva la lettura delle carte
   {
@@ -243,8 +297,6 @@ void loop()
     // Se è stato pagato
 
     stampaoled(PAG);
-    myDFPlayer.play(1);  //Play the first mp3
-    Serial.println("Play caffettino");
     digitalWrite(green, LOW);
     digitalWrite(yellow, HIGH);  
 
@@ -262,7 +314,7 @@ void loop()
 void connettiWifi()
 {
   //WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
-  WiFi.begin("xxx", "xxx"); // Passiamo le credenziali e istanziamo una nuova connessione
+  WiFi.begin("WiFi S - Repeater", "wifiSusino1000gb"); // Passiamo le credenziali e istanziamo una nuova connessione
   while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
   {
     Serial.println("Connessione WiFi in corso...");
@@ -310,6 +362,64 @@ void logCard()
     Serial.println(verify);   //stampa di controllo dell'errore
 }
 
+void checkButtonPressed()
+{
+  debouncer.update();  // Aggiorna lo stato del pulsante
+
+  int reading = debouncer.read();  // Leggi lo stato del pulsante
+  if (reading != lastButtonState) {
+    lastDebounceTime = millis();
+  }
+
+  if ((millis() - lastDebounceTime) > 50) {
+    // Se è trascorso abbastanza tempo dal debounce
+    if (reading != buttonState) 
+    {
+      buttonState = reading;
+
+      if (buttonState == HIGH) 
+      {
+        // Se il pulsante è stato rilasciato
+        unsigned long pressDuration = millis() - pressStartTime;
+
+        if (pressDuration >= 4000 && pressDuration < 10000) 
+        {
+          // Se il pulsante è stato tenuto premuto per almeno 4 secondi
+          Serial.println("Pulsante tenuto premuto per 4 secondi");
+          myDFPlayer.play(1);  //Play the first mp3
+          Serial.println("Play caffettino");
+        }
+        else if(pressDuration >= 10000 && pressDuration < 15000) 
+        {
+          // Se il pulsante è stato tenuto premuto per almeno 10 secondi
+          Serial.println("Pulsante tenuto premuto per 10 secondi");
+          myDFPlayer.play(3);  //Play the first mp3
+          Serial.println("Play bella ciao");
+        }
+        else if(pressDuration >= 15000) 
+        {
+          // Se il pulsante è stato tenuto premuto per almeno 15 secondi
+          Serial.println("Pulsante tenuto premuto per 15 secondi");
+          myDFPlayer.play(2);  //Play the first mp3
+          Serial.println("Play faccetta nera");
+        }
+        else 
+        {
+          // Altrimenti è stato eseguito solo un click
+          Serial.println("Click del pulsante");
+          buttRoutine(); // Il pulsante è solo stato clicckato
+        }
+      } 
+      else
+      {        
+        pressStartTime = millis();
+      }
+    }
+  }
+
+  lastButtonState = reading;
+}
+
 void buttRoutine()
 {
   currentProdotto++;
@@ -346,7 +456,6 @@ void setupAudio() // Funzione che inizializza il playermp3
 
 void setupDisplay()
 {
-  stampaoled(VIV);    //Inizia la stampa continua
   digitalWrite(green, HIGH);  //impostazione iniziale led
   digitalWrite(yellow, LOW);
   digitalWrite(red, LOW);
@@ -382,15 +491,19 @@ void getProdotti()
     response = http.getString();
     Serial.print("Response Body: ");
     Serial.println(response);
+    verify = 0; // resettiamo verify
   } 
   else 
   {
     Serial.println("Errore nella richiesta HTTP");
-    // TODO: GESTIRE ERRORE RICHIESTA HTTP
+    verify = HTTPERR;
   }
 
   // Free resources
   http.end();
+
+  if(verify == HTTPERR)
+    return;
 
   // Trasformiamo in json la rispsota che ci ha dato il server
   DynamicJsonDocument docResponse(1024);
@@ -446,7 +559,7 @@ void pay()
   // Passiamo alla richiesta POST i parametri
   doc["ID_Card"] = ID_Card;
   doc["ID_Auletta"] = ID_AULETTA;
-  doc["ID_Prodotto"] = currentProdotto;
+  doc["ID_Prodotto"] = listaProdotti.get(currentProdotto)->id;
 
   // Formattiamo i parametri in json
   String jsonString;
@@ -492,9 +605,9 @@ void stampaoled(int i)
       display.stopscroll(); //ferma lo spostamento del testo
       display.clearDisplay(); //elimina la scritta
       delay(10);
-      display.setTextSize(3); //Dimeensione font
+      display.setTextSize(3); //Dimensione font
       display.setTextColor(SSD1306_WHITE);  //colore, ma il nostro è monocromo (le prima righe gialle)
-      display.setCursor(0, 22); //inizio del testo, pixel in alto a sinista, serve per centrare
+      display.setCursor(13, 22); //inizio del testo, pixel in alto a sinista, serve per centrare
       display.print("PAGATO");
       display.display();      //Attiva il testo 
       break;
@@ -504,10 +617,12 @@ void stampaoled(int i)
       display.stopscroll();
       display.clearDisplay();
       delay(10);
-      display.setTextSize(3); 
+      display.setTextSize(2); 
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("NO\n\tSALDO");
+      display.setCursor(20, 12);
+      display.print("SALDO NON");
+      display.setCursor(10, 35);
+      display.print("SUFF.");
       display.display();      
       break;
     }
@@ -516,10 +631,12 @@ void stampaoled(int i)
       display.stopscroll();
       display.clearDisplay();
       delay(10);
-      display.setTextSize(3); 
+      display.setTextSize(2); 
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("NO\n\tCARD");
+      display.setCursor(17, 15);
+      display.print("CARD NON");
+      display.setCursor(10, 35);
+      display.print("ESISTENTE");
       display.display();      
       break;
     }
@@ -528,10 +645,12 @@ void stampaoled(int i)
       display.stopscroll();
       display.clearDisplay();
       delay(10);
-      display.setTextSize(3); 
+      display.setTextSize(2); 
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(0, 22);
-      display.print("NO\n\tPRODOTTO");
+      display.setCursor(20, 15);
+      display.print("PROD NON");
+      display.setCursor(10, 35);
+      display.print("ESISTENTE");
       display.display();      
       break;
     }
@@ -555,9 +674,9 @@ void stampaoled(int i)
       delay(10);
       display.setTextSize(2); 
       display.setTextColor(SSD1306_WHITE);
-      display.setCursor(35, 20);
+      display.setCursor(35, 15);
       display.print(p->nome);
-      display.setCursor(45, 40);
+      display.setCursor(45, 35);
       display.print(p->prezzo);
       display.display(); 
       break;  
@@ -595,12 +714,14 @@ void stampaoled(int i)
       display.setTextSize(2); // Draw 2X-scale text
       display.setTextColor(SSD1306_WHITE);
 
-      display.setCursor(5, 10);
-      display.print("SERVER ERROR");
+      display.setCursor(5, 5);
+      display.print("SERV ERROR");
       display.display();      // Show text
 
-      display.setCursor(46, 10);
-      display.print("CONT. AMDMIN");
+      display.setCursor(17, 25);
+      display.print("CONTATTA");
+      display.setCursor(35, 45);
+      display.print("ADMIN");
       delay(200);
       display.display();      // Show text
 
