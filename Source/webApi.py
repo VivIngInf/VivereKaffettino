@@ -44,6 +44,6 @@ async def pay(cRequest: CoffeRequest):
 async def caffeGiornalieri():
     return getCaffeGiornalieri()
 
-@app.get("/caffeGiornalieri")
+@app.get("/operazioniGiornaliere")
 async def operazioniGiornaliere():
     return getOperazioniGiornaliere()
