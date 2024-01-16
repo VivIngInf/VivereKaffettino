@@ -125,6 +125,16 @@ def getOperazioniGiornaliere() -> list:
     """ADMIN: Ritorna tutte le operazioni giornaliere"""
     return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()
 
+def incrementaSaldo(ID_Telegram : str, ricarica : float) -> None:
+    """ADMIN: Incrementa il saldo in base alla ricarica passata come parametro"""
+    user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
+    
+    user.saldo = round(user.saldo + ricarica, 2)
+
+    session.commit()
+    
+    return None
+
 #endregion
 
 #region Magazzino
