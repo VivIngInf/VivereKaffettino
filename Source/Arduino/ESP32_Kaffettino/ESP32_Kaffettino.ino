@@ -5,17 +5,15 @@
   MOSI - 23
   SCK  - 18
   SDA  - 5
-  Installare MFRC522 by Community
 
   I2C-SCHERMO:
   SCL - 22
   SDA - 21
-  Installare Adafruit SSD1306 by Adafruit (Con dipendenze)
 */
 
 // Lib lettore
   #include <SPI.h>
-  #include <MFRC522.h>
+  #include <MFRC522.h> // MFRC522 by Github Community
 
 // Lib wifi
   #include "WiFi.h"
@@ -24,24 +22,24 @@
 // Lib http
   #include <HTTPClient.h> // Basilare con Esp32
   #include <ArduinoJson.h> // Arduinojson by Benoit Blanchon
-  #include <LinkedList.h> //LinkedList by Ivan Seidel
+  #include <LinkedList.h> // LinkedList by Ivan Seidel
   
 // Lib Oled
   #include <Wire.h>
   #include <Adafruit_GFX.h>
-  #include <Adafruit_SSD1306.h>
+  #include <Adafruit_SSD1306.h> // Adafruit SSD1306 by Adafruit (Con dipendenze)
 
 // Lib audio
   #include <Arduino.h>
-  #include "DFRobotDFPlayerMini.h"
+  #include "DFRobotDFPlayerMini.h" // DFRobotDFPlayerMini by DFRobot
 
 // Lib bottone premuto
-  #include <Bounce2.h>
+  #include <Bounce2.h> // Bounce 2 By Thomas O
 
 // Credenziali wifi
-  #define EAP_IDENTITY "username" // Es: mario.rossi03
-  #define EAP_PASSWORD "password"
-  #define EAP_USERNAME "username" // Stesso di EAP_IDENTITY
+  #define EAP_IDENTITY "nome.cognome" // Es: mario.rossi03
+  #define EAP_PASSWORD "pwd"
+  #define EAP_USERNAME "nome.cognome" // Stesso di EAP_IDENTITY
   const char* ssid = "eduroam"; // SSID WiFi
 
 // Rotte
@@ -313,8 +311,7 @@ void loop()
 
 void connettiWifi()
 {
-  //WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
-  WiFi.begin("WiFi S - Repeater", "wifiSusino1000gb"); // Passiamo le credenziali e istanziamo una nuova connessione
+  WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
   while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
   {
     Serial.println("Connessione WiFi in corso...");
@@ -560,7 +557,7 @@ void pay()
   doc["ID_Card"] = ID_Card;
   doc["ID_Auletta"] = ID_AULETTA;
   doc["ID_Prodotto"] = listaProdotti.get(currentProdotto)->id;
-
+  
   // Formattiamo i parametri in json
   String jsonString;
   serializeJson(doc, jsonString);
