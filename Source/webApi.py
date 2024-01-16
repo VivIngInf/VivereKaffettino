@@ -53,7 +53,7 @@ async def incrementaS(incRequest: IncrementaSaldoRequest):
 
 @app.post("/storicoPersonale")
 async def storicoPersonale(storicoRequest: StoricoPersonaleRequest):
-    return getStoricoPersonale(StoricoPersonaleRequest.ID_Telegram)
+    return getStoricoPersonale(storicoRequest.ID_Telegram)
 
 @app.get("/caffeGiornalieri")
 async def caffeGiornalieri():
