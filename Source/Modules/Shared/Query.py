@@ -188,7 +188,7 @@ def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, cos
     )
 
     session.add(operazione)
-    session.commit    
+    session.commit()    
 
 
 #endregion
