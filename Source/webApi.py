@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale
 
 app = FastAPI()
 
@@ -18,6 +18,9 @@ class ProdottiRequest(BaseModel):
 class IncrementaSaldoRequest(BaseModel):
     Username : str
     Ricarica : float
+
+class StoricoPersonaleRequest(BaseModel):
+    ID_Telegram : str
 
 ######## EVENTI ########
 
@@ -45,8 +48,12 @@ async def pay(cRequest: CoffeRequest):
     return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Card)
 
 @app.post("/incrementaSaldo")
-async def pay(incRequest: IncrementaSaldoRequest):
+async def incrementaS(incRequest: IncrementaSaldoRequest):
     return incrementaSaldo(username=incRequest.Username, ricarica=incRequest.Ricarica)
+
+@app.post("/storicoPersonale")
+async def storicoPersonale(storicoRequest: StoricoPersonaleRequest):
+    return getStoricoPersonale(StoricoPersonaleRequest.ID_Telegram)
 
 @app.get("/caffeGiornalieri")
 async def caffeGiornalieri():

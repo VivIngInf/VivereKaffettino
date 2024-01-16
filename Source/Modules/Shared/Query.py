@@ -88,6 +88,12 @@ def GetBalance(idTelegram : str) -> float:
     """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
     return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().saldo
 
+def getStoricoPersonale(idTelegram : str) -> list:
+    """
+        USER: Ritorna tuto lo storico personale
+    """
+    return session.query(Operazione).filter(Operazione.ID_Telegram == f"{idTelegram}").all()
+
 #endregion
 
 #region Aulette
