@@ -38,7 +38,6 @@ def CheckUsernameExists(username : str) -> bool:
 def GetUsername(idTelegram : str) -> str:
     """DATABASE_HANDLER / USER_INFO: Ritorna l'username partendo dall'ID_Telegram passato come parametro"""
     return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().username
-    
 
 def GetIdTelegram(username : str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'Username passato come parametro"""
@@ -125,15 +124,37 @@ def getOperazioniGiornaliere() -> list:
     """ADMIN: Ritorna tutte le operazioni giornaliere"""
     return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()
 
-def incrementaSaldo(ID_Telegram : str, ricarica : float) -> None:
-    """ADMIN: Incrementa il saldo in base alla ricarica passata come parametro"""
+def incrementaSaldo(username : str, ricarica : float) -> int:
+    """
+        ADMIN: Incrementa il saldo in base alla ricarica passata come parametro
+        
+        Parameters:
+            - username: l'username dell'utente alla quale aumentare il saldo
+            - ricarica: di quanto incrementare il saldo dell'utente
+
+        Returns:
+            - 0 se l'utente non esiste
+            - 1 se il saldo è stato incrementato correttamente
+    """
+    
+    if not CheckUserExists():
+        return 0
+
+    ID_Telegram = GetIdTelegram(username=username)
+
     user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
     
     user.saldo = round(user.saldo + ricarica, 2)
 
     session.commit()
-    
-    return None
+
+    return 1
+
+def getUsers() -> list:
+    """
+        ADMIN: Ritorna tutti gli utenti
+    """
+    return session.query(Utente).all()
 
 #endregion
 
