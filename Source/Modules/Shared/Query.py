@@ -123,7 +123,7 @@ def getCaffeGiornalieri() -> int:
 
 def getOperazioniGiornaliere() -> list:
     """ADMIN: Ritorna tutte le operazioni giornaliere"""
-    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today())
+    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()
 
 #endregion
 
