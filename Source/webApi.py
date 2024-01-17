@@ -31,7 +31,7 @@ class RicaricaMagazzinoRequest(BaseModel):
     Ricarica : int
 
 class DeleteUserRequest(BaseModel):
-    ID_Utente : str
+    ID_Telegram : str
 
 ######## EVENTI ########
 
@@ -76,7 +76,7 @@ async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
 
 @app.post("/rimuoviUtente")
 async def rimuoviUtente(deleteUserRequest : DeleteUserRequest):
-    return removeUser(deleteUserRequest.ID_Utente)
+    return removeUser(deleteUserRequest.ID_Telegram)
 
 @app.get("/caffeGiornalieri")
 async def caffeGiornalieri():
