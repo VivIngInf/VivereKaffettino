@@ -22,6 +22,9 @@ class IncrementaSaldoRequest(BaseModel):
 class StoricoPersonaleRequest(BaseModel):
     ID_Telegram : str
 
+class MagazzinoRequest(BaseModel):
+    ID_Auletta : str
+
 ######## EVENTI ########
 
 @app.on_event("startup")
@@ -64,8 +67,8 @@ async def operazioniGiornaliere():
     return getOperazioniGiornaliere()
 
 @app.get("/visualizzaMagazzino")
-async def visualizzaMagazzino():
-    return getMagazzino()
+async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
+    return getMagazzino(magazzinoRequest.ID_Auletta)
 
 @app.get("/getUsers")
 async def users():
