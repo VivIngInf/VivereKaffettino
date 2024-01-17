@@ -185,13 +185,15 @@ def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> Magazzino:
 
     return result
 
-def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
+def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int) -> dict:
 
     magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}", Magazzino.ID_Auletta == f"{idAuletta}").one()
     
     magazzino.quantita -= quantita
 
     session.commit()
+
+    return {"State" : "Done"}
 
 def GetProdotti(idAuletta : int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
