@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser
 
 app = FastAPI()
 
@@ -29,6 +29,9 @@ class RicaricaMagazzinoRequest(BaseModel):
     ID_Auletta : str
     ID_Prodotto : int
     Ricarica : int
+
+class DeleteUserRequest(BaseModel):
+    ID_Utente : str
 
 ######## EVENTI ########
 
@@ -71,9 +74,13 @@ async def ricaricaM(magazzinoRequest: RicaricaMagazzinoRequest):
 async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
     return getMagazzino(magazzinoRequest.ID_Auletta)
 
+@app.post("/rimuoviUtente")
+async def rimuoviUtente(magazzinoRequest: MagazzinoRequest):
+    return removeUser(magazzinoRequest.ID_Auletta)
+
 @app.get("/caffeGiornalieri")
-async def caffeGiornalieri():
-    return getCaffeGiornalieri()
+async def caffeGiornalieri(deleteUserRequest : DeleteUserRequest):
+    return getCaffeGiornalieri(deleteUserRequest.ID_Utente)
 
 @app.get("/operazioniGiornaliere")
 async def operazioniGiornaliere():

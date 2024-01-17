@@ -162,6 +162,18 @@ def getUsers() -> list:
     """
     return session.query(Utente).all()
 
+def removeUser(idTelegram : str) -> dict:
+    """
+        ADMIN: Rimuove l'utente con ID_Telegram idTelegram
+    """
+    if not CheckUserExists(idTelegram=idTelegram):
+        return {"Error" : "Utente non esistente"}
+    
+    session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").delete()
+    session.commit()
+
+    return {"State" : f"Utente con ID_Telegram: '{idTelegram}' cancellato!"}
+
 #endregion
 
 #region Magazzino
