@@ -204,6 +204,11 @@ def GetProdotti(idAuletta : int) -> str:
 
     return arr
 
+def getMagazzino(idAuletta : int) -> list:
+    """
+        MAGAZZINO: Ritorna tutti i prodotti e la quantità in magazzino dell'auletta con id idAuletta
+    """
+    return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
 #endregion
 

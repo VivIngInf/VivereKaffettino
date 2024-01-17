@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino
 
 app = FastAPI()
 
@@ -62,6 +62,10 @@ async def caffeGiornalieri():
 @app.get("/operazioniGiornaliere")
 async def operazioniGiornaliere():
     return getOperazioniGiornaliere()
+
+@app.get("/visualizzaMagazzino")
+async def visualizzaMagazzino():
+    return getMagazzino()
 
 @app.get("/getUsers")
 async def users():
