@@ -172,7 +172,7 @@ def removeUser(idTelegram : str) -> dict:
     session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").delete()
     session.commit()
 
-    return {"State" : f"Utente con ID_Telegram: '{idTelegram}' cancellato!"}
+    return {"State" : "Utente con ID_Telegram: '{idTelegram}' cancellato!"}
 
 #endregion
 
@@ -189,7 +189,7 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int):
 
     magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}", Magazzino.ID_Auletta == f"{idAuletta}").one()
     
-    magazzino.quantita = quantita
+    magazzino.quantita -= quantita
 
     session.commit()
 
@@ -287,7 +287,6 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
     try:
 
         magazzino : Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
-        quantita = magazzino.quantita
         costo = magazzino.costo
 
     except:
@@ -323,8 +322,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
     DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
 
     # Scalare dal magazzino un unità di quel tipo
-    quantita -= 1
-    DecurtaMagazzino(idProdotto=ID_Prodotto, idAuletta=ID_Auletta, quantita=quantita)
+    DecurtaMagazzino(idProdotto=ID_Prodotto, idAuletta=ID_Auletta, quantita=1)
 
     try:
         # Creare storico della transazione come "Eseguito"

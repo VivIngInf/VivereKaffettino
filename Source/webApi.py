@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino
 
 app = FastAPI()
 
@@ -25,7 +25,7 @@ class StoricoPersonaleRequest(BaseModel):
 class MagazzinoRequest(BaseModel):
     ID_Auletta : str
 
-class RicaricaMagazzinoRequest(BaseModel):
+class ModificaMagazzinoRequest(BaseModel):
     ID_Auletta : str
     ID_Prodotto : int
     Ricarica : int
@@ -67,8 +67,12 @@ async def storicoPersonale(storicoRequest: StoricoPersonaleRequest):
     return getStoricoPersonale(storicoRequest.ID_Telegram)
 
 @app.post("/ricaricaMagazzino")
-async def ricaricaM(magazzinoRequest: RicaricaMagazzinoRequest):
+async def ricaricaM(magazzinoRequest: ModificaMagazzinoRequest):
     return ricaricaMagazzino(magazzinoRequest.ID_Auletta, magazzinoRequest.ID_Prodotto, magazzinoRequest.Ricarica)
+
+@app.post("/decurtaMagazzino")
+async def decurtaM(magazzinoRequest: ModificaMagazzinoRequest):
+    return DecurtaMagazzino(idProdotto=magazzinoRequest.ID_Prodotto, idAuletta=magazzinoRequest.ID_Auletta, quantita=magazzinoRequest.Ricarica)
 
 @app.post("/visualizzaMagazzino")
 async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
