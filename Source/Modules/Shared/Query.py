@@ -210,6 +210,28 @@ def getMagazzino(idAuletta : int) -> list:
     """
     return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
+def ricaricaMagazzino(idAuletta : str, idProdotto : int, quantitaRicaricata : int) -> int:
+    """
+        MAGAZZINO: Ricarica di una quantità pari a quantitaRicaricata il prodotto con id idProdotto nell'auletta con id idAuletta.
+        RITORNA:
+            - 0 se tutto andato a buon fine
+            - 1 se auletta non esiste
+            - 2 se idProdotto non esiste
+            - 3 se quantità ricaricata è <= 0
+    """
+    # TODO: Implementare auletta non esistente e prodotto non esistente
+
+    if quantitaRicaricata <= 0:
+        return {"Error" : "Quantità ricaricata non positiva"}
+    
+    magazzino = session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}", Magazzino.ID_Prodotto == f"{idProdotto}").one()
+    
+    magazzino.quantita = round(magazzino.quantita + quantitaRicaricata, 2)
+
+    session.commit()
+
+    return {"State" : "Done"}
+
 #endregion
 
 #region Auletta

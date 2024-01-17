@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino
 
 app = FastAPI()
 
@@ -24,6 +24,11 @@ class StoricoPersonaleRequest(BaseModel):
 
 class MagazzinoRequest(BaseModel):
     ID_Auletta : str
+
+class RicaricaMagazzinoRequest(BaseModel):
+    ID_Auletta : str
+    ID_Prodotto : int
+    Ricarica : int
 
 ######## EVENTI ########
 
@@ -58,6 +63,14 @@ async def incrementaS(incRequest: IncrementaSaldoRequest):
 async def storicoPersonale(storicoRequest: StoricoPersonaleRequest):
     return getStoricoPersonale(storicoRequest.ID_Telegram)
 
+@app.post("/ricaricaMagazzino")
+async def ricaricaM(magazzinoRequest: RicaricaMagazzinoRequest):
+    return ricaricaMagazzino(magazzinoRequest.ID_Auletta, magazzinoRequest.ID_Prodotto, magazzinoRequest.Ricarica)
+
+@app.post("/visualizzaMagazzino")
+async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
+    return getMagazzino(magazzinoRequest.ID_Auletta)
+
 @app.get("/caffeGiornalieri")
 async def caffeGiornalieri():
     return getCaffeGiornalieri()
@@ -65,10 +78,6 @@ async def caffeGiornalieri():
 @app.get("/operazioniGiornaliere")
 async def operazioniGiornaliere():
     return getOperazioniGiornaliere()
-
-@app.get("/visualizzaMagazzino")
-async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
-    return getMagazzino(magazzinoRequest.ID_Auletta)
 
 @app.get("/getUsers")
 async def users():
