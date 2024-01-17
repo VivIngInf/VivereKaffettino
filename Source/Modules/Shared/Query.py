@@ -189,6 +189,9 @@ def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int) -> dict:
 
     magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}", Magazzino.ID_Auletta == f"{idAuletta}").one()
     
+    if magazzino.quantita - quantita < 0:
+        return {"Error" : "La quantità rimanente non può essere negativa!"}
+
     magazzino.quantita -= quantita
 
     session.commit()
