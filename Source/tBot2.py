@@ -88,7 +88,7 @@ def main() -> None:
     application.add_handler(conv_handler)
 
     job_queue = application.job_queue
-    job_queue.run_daily(SendResoconto, time=datetime.time(hour=13, minute=53, second=0, tzinfo=pytz.timezone('Europe/Rome')))
+    job_queue.run_daily(SendResoconto, time=datetime.time(hour=14, minute=30, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)

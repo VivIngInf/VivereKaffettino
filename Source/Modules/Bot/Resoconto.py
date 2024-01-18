@@ -12,11 +12,22 @@ async def SendResoconto(context: CallbackContext):
     rows = getOperazioniGiornaliere()
     rowsDataframe = []
 
-    for row in rows:
-        valori = str(row).split(" ")
-        rowsDataframe.append(valori)
+    print(rows)
 
-    print(rowsDataframe)
+    for row in rows:
+        tempArr = []
+        dTime = ""
+        valori = str(row).split(" ")
+        for v in valori:
+            if str(v).find("-") != -1:
+                dTime += v
+                continue
+            elif str(v).find(":") != -1:
+                dTime += v
+                tempArr.append(dTime)
+            else:
+                tempArr.append(v)
+        rowsDataframe.append(tempArr)
 
     # Creazione del DataFrame
     df = pandas.DataFrame(rowsDataframe, columns=columns)
