@@ -45,6 +45,8 @@ from telegram.ext import (
     filters,
 )
 
+# Bisogna installare openpyxl, pandas e python-telegram-bot[job-queue]
+
 # endregion
 
 # Configurazione di logging base
@@ -86,7 +88,7 @@ def main() -> None:
     application.add_handler(conv_handler)
 
     job_queue = application.job_queue
-    job_queue.run_daily(SendResoconto, time=datetime.time(hour=2, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
+    job_queue.run_daily(SendResoconto, time=datetime.time(hour=3, minute=39, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)

@@ -1,2 +1,2 @@
 .env
-./Source/database.sqlite
+Source/database.sqlite

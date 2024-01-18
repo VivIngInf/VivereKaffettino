@@ -19,4 +19,4 @@ async def SendResoconto(context: CallbackContext):
     df.to_excel(excel_buffer, index=False)
     excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
 
-    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename='operazioni_excel.xlsx', caption=f"Resoconto del {datetime.date()} inviato!")
+    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
