@@ -9,6 +9,7 @@ import atexit # Libreria che ci permette di creare un metodo per quando il codic
 
 # Librerie Telegram
 import logging
+import pytz
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
 
@@ -24,8 +25,12 @@ from Modules.Bot.End import End
 from Modules.Bot.Stop import Stop
 from Modules.Bot.AddUser import registration_conv, start_registration
 from Modules.Bot.Register import *
+from Modules.Bot.Resoconto import SendResoconto
 
 from Modules.Bot.States import *
+
+import datetime
+import time
 
 import logging
 
@@ -79,6 +84,9 @@ def main() -> None:
     )
 
     application.add_handler(conv_handler)
+
+    job_queue = application.job_queue
+    job_queue.run_daily(SendResoconto, time=datetime.time(hour=2, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
