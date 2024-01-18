@@ -10,10 +10,16 @@ async def SendResoconto(context: CallbackContext):
     columns = ['ID_Operazione', 'ID_Telegram', 'ID_Auletta', 'ID_Prodotto', 'DateTimeOperazione', 'Costo']
 
     rows = getOperazioniGiornaliere()
-    print(rows)
+    rowsDataframe = []
+
+    for row in rows:
+        valori = str(row).split(" ")
+        rowsDataframe.append(valori)
+
+    print(rowsDataframe)
 
     # Creazione del DataFrame
-    df = pandas.DataFrame(rows, columns=columns)
+    df = pandas.DataFrame(rowsDataframe, columns=columns)
 
     excel_buffer = BytesIO()
     df.to_excel(excel_buffer, index=False)

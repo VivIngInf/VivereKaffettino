@@ -142,11 +142,11 @@ def incrementaSaldo(username : str, ricarica : float) -> int:
             - 0 se l'utente non esiste
             - 1 se il saldo è stato incrementato correttamente
     """
-    
-    if not CheckUserExists():
-        return 0
 
     ID_Telegram = GetIdTelegram(username=username)
+
+    if not CheckUserExists():
+        return 0
 
     user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
     
