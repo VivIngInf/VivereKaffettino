@@ -172,7 +172,7 @@ def removeUser(idTelegram : str) -> dict:
     session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").delete()
     session.commit()
 
-    return {"State" : "Utente con ID_Telegram: '{idTelegram}' cancellato!"}
+    return {"State" : f"Utente con ID_Telegram: '{idTelegram}' cancellato!"}
 
 #endregion
 
