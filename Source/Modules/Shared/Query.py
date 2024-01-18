@@ -145,7 +145,7 @@ def incrementaSaldo(username : str, ricarica : float) -> int:
 
     ID_Telegram = GetIdTelegram(username=username)
 
-    if not CheckUserExists():
+    if not CheckUserExists(idTelegram=ID_Telegram):
         return 0
 
     user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
