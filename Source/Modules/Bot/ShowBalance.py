@@ -12,7 +12,7 @@ async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
     idTelegram = str(update.effective_chat.id)
 
     saldo = GetBalance(idTelegram) # Chiamata al DB per ottenere il saldo a partire dall'ID_Telegram
-    text = f"Il tuo saldo è pari ad: {saldo}"
+    text = f"Il tuo saldo è pari ad: {saldo}€"
 
     buttons = [[InlineKeyboardButton(text="Back", callback_data=str(END))]]
     keyboard = InlineKeyboardMarkup(buttons)
