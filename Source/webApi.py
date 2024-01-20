@@ -19,6 +19,10 @@ class SaldoRequest(BaseModel):
     Username : str
     Ricarica : float
 
+class ImpostaSaldoRequest(BaseModel):
+    ID_Telegram : str
+    Saldo : float
+
 class StoricoPersonaleRequest(BaseModel):
     ID_Telegram : str
 
@@ -63,8 +67,8 @@ async def incrementaS(incRequest: SaldoRequest):
     return incrementaSaldo(username=incRequest.Username, ricarica=incRequest.Ricarica)
 
 @app.post("/impostaSaldo")
-async def impostS(impRequest: SaldoRequest):
-    return DecurtaSaldo(username=impRequest.Username, ricarica=impRequest.Ricarica)
+async def impostS(impRequest: ImpostaSaldoRequest):
+    return DecurtaSaldo(ID_Telegram=impRequest.ID_Telegram, saldo=impRequest.Saldo)
 
 @app.post("/storicoPersonale")
 async def storicoPersonale(storicoRequest: StoricoPersonaleRequest):
