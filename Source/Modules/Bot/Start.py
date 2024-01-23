@@ -50,7 +50,6 @@ def calcola_pasqua(anno) -> datetime:
 
     return data_pasqua
 
-
 def SendRandomImage() -> InputFile:
     """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
 
@@ -115,7 +114,8 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     # ----- BOTTONI -----
     
     register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data=str(REGISTER))
-    saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data=str(SHOWING))
+    saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data=str(SALDO))
+    ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data=str(RICARICA))
     addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 AGGIUNGI ADMIN 👩🏽‍🔧", callback_data="ADD")
     remAdmin = InlineKeyboardButton(text="🚷 RIMUOVI ADMIN 🚷", callback_data="REM")
     info = InlineKeyboardButton(text="❓ INFO ❓", callback_data=str(INFO))
@@ -148,6 +148,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
         mainMenuKeyboard.append([saldo])
+        mainMenuKeyboard.append([ricarica])
         mainMenuKeyboard.append([addAdmin])
         mainMenuKeyboard.append([remAdmin])
         mainMenuKeyboard.append([info])

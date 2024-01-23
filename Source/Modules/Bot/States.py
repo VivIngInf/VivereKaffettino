@@ -4,16 +4,16 @@ from telegram.ext import ConversationHandler
 
 
 # State definitions for top level conversation
-MAINMENU, SELECTING_ACTION, REGISTER, SHOWING, = map(chr, range(4))
+MAINMENU, SELECTING_ACTION, REGISTER, SALDO, RICARICA = map(chr, range(5))
 
 # State definitions for second level conversation
-SELECTING_LEVEL, SELECTING_GENDER = map(chr, range(4, 6))
+SELECTING_LEVEL, SELECTING_GENDER = map(chr, range(5, 7))
 
 # State definitions for descriptions conversation
-SELECTING_FEATURE, TYPING = map(chr, range(6, 8))
+SELECTING_FEATURE, TYPING = map(chr, range(7, 9))
 
 # Meta states
-STOPPING = map(chr, range(8, 10))
+STOPPING = map(chr, range(9, 11))
 
 # Shortcut for ConversationHandler.END
 END = ConversationHandler.END

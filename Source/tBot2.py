@@ -65,7 +65,7 @@ def main() -> None:
     # Because the states of the third level conversation map to the ones of the second level
     # conversation, we need to make sure the top level conversation can also handle them
     selection_handlers = [
-        CallbackQueryHandler(ShowBalance, pattern="^" + str(SHOWING) + "$"),
+        CallbackQueryHandler(ShowBalance, pattern="^" + str(SALDO) + "$"),
         CallbackQueryHandler(Info, pattern="^" + str(INFO) + "$"),
         CallbackQueryHandler(Register, pattern="^" + str(REGISTER) + "$"),
         CallbackQueryHandler(End, pattern="^" + str(END) + "$"),
