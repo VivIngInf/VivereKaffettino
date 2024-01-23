@@ -76,6 +76,18 @@ def GetIsVerified(idTelegram : str) -> bool:
     user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").scalar()
     return bool(user.isVerified)
 
+def SetIsVerified(idTelegram : str) -> int:
+    """DATABASE_HANDLER: Se l'utente esiste lo setta come verificato"""
+
+    if not CheckUserExists(idTelegram=idTelegram):
+        return 1
+
+    user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    user.isVerified = True
+    session.commit()
+
+    return 0
+
 def DecurtaSaldo(ID_Telegram : str, saldo : float) -> None:    
     
     user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
@@ -173,6 +185,17 @@ def removeUser(idTelegram : str) -> dict:
     session.commit()
 
     return {"State" : f"Utente con ID_Telegram: '{idTelegram}' cancellato!"}
+
+def assignCard(idTelegram : str, idCard : str) -> int:
+    
+    if SetIsVerified(idTelegram=idTelegram) == 1:
+        return 1 # l'utente non esiste
+    
+    # Assegnamo la card
+
+    user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    user.ID_Card = idCard
+    session.commit()
 
 #endregion
 

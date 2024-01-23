@@ -1,43 +1,11 @@
-from fastapi import FastAPI, Response
-from pydantic import BaseModel
+from fastapi import FastAPI
 from Modules.Shared.Configs import LoadConfigs
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard
+from Modules.Api.requests import CoffeRequest, SaldoRequest, ProdottiRequest, MagazzinoRequest, DeleteUserRequest, ImpostaSaldoRequest, StoricoPersonaleRequest, ModificaMagazzinoRequest, AssignCardRequest
 
 app = FastAPI()
 
-######## CLASSI ########
-
-class CoffeRequest(BaseModel):
-    ID_Auletta : int
-    ID_Card : str
-    ID_Prodotto : int
-
-class ProdottiRequest(BaseModel):
-    ID_Auletta : int
-
-class SaldoRequest(BaseModel):
-    Username : str
-    Ricarica : float
-
-class ImpostaSaldoRequest(BaseModel):
-    ID_Telegram : str
-    Saldo : float
-
-class StoricoPersonaleRequest(BaseModel):
-    ID_Telegram : str
-
-class MagazzinoRequest(BaseModel):
-    ID_Auletta : str
-
-class ModificaMagazzinoRequest(BaseModel):
-    ID_Auletta : str
-    ID_Prodotto : int
-    Ricarica : int
-
-class DeleteUserRequest(BaseModel):
-    ID_Telegram : str
-
-######## EVENTI ########
+#region Events
 
 @app.on_event("startup")
 async def startup():
@@ -48,47 +16,13 @@ async def startup():
 async def shutdown():
     pass
 
-######## ROTTE ########
+#endregion
+
+#region Get Routes
 
 @app.get("/aulette")
 async def aulette():
     return GetAulette()
-
-@app.post("/prodotti")
-async def prodotti(pRequest: ProdottiRequest):
-    return GetProdotti(pRequest.ID_Auletta)
-
-@app.post("/pay")
-async def pay(cRequest: CoffeRequest):
-    return PayDB(ID_Prodotto=cRequest.ID_Prodotto, ID_Auletta=cRequest.ID_Auletta, ID_Card=cRequest.ID_Card)
-
-@app.post("/incrementaSaldo")
-async def incrementaS(incRequest: SaldoRequest):
-    return incrementaSaldo(username=incRequest.Username, ricarica=incRequest.Ricarica)
-
-@app.post("/impostaSaldo")
-async def impostS(impRequest: ImpostaSaldoRequest):
-    return DecurtaSaldo(ID_Telegram=impRequest.ID_Telegram, saldo=impRequest.Saldo)
-
-@app.post("/storicoPersonale")
-async def storicoPersonale(storicoRequest: StoricoPersonaleRequest):
-    return getStoricoPersonale(storicoRequest.ID_Telegram)
-
-@app.post("/ricaricaMagazzino")
-async def ricaricaM(magazzinoRequest: ModificaMagazzinoRequest):
-    return ricaricaMagazzino(magazzinoRequest.ID_Auletta, magazzinoRequest.ID_Prodotto, magazzinoRequest.Ricarica)
-
-@app.post("/decurtaMagazzino")
-async def decurtaM(magazzinoRequest: ModificaMagazzinoRequest):
-    return DecurtaMagazzino(idProdotto=magazzinoRequest.ID_Prodotto, idAuletta=magazzinoRequest.ID_Auletta, quantita=magazzinoRequest.Ricarica)
-
-@app.post("/visualizzaMagazzino")
-async def visualizzaMagazzino(magazzinoRequest: MagazzinoRequest):
-    return getMagazzino(magazzinoRequest.ID_Auletta)
-
-@app.post("/rimuoviUtente")
-async def rimuoviUtente(deleteUserRequest : DeleteUserRequest):
-    return removeUser(deleteUserRequest.ID_Telegram)
 
 @app.get("/caffeGiornalieri")
 async def caffeGiornalieri():
@@ -101,3 +35,49 @@ async def operazioniGiornaliere():
 @app.get("/getUsers")
 async def users():
     return getUsers()
+
+#endregion routes
+
+#region Post Routes
+
+@app.post("/prodotti")
+async def prodotti(request: ProdottiRequest):
+    return GetProdotti(request.ID_Auletta)
+
+@app.post("/pay")
+async def pay(request: CoffeRequest):
+    return PayDB(ID_Prodotto=request.ID_Prodotto, ID_Auletta=request.ID_Auletta, ID_Card=request.ID_Card)
+
+@app.post("/incrementaSaldo")
+async def incrementaS(request: SaldoRequest):
+    return incrementaSaldo(username=request.Username, ricarica=request.Ricarica)
+
+@app.post("/impostaSaldo")
+async def impostS(request: ImpostaSaldoRequest):
+    return DecurtaSaldo(ID_Telegram=request.ID_Telegram, saldo=request.Saldo)
+
+@app.post("/storicoPersonale")
+async def storicoPersonale(request: StoricoPersonaleRequest):
+    return getStoricoPersonale(request.ID_Telegram)
+
+@app.post("/ricaricaMagazzino")
+async def ricaricaM(request: ModificaMagazzinoRequest):
+    return ricaricaMagazzino(request.ID_Auletta, request.ID_Prodotto, request.Ricarica)
+
+@app.post("/decurtaMagazzino")
+async def decurtaM(request: ModificaMagazzinoRequest):
+    return DecurtaMagazzino(idProdotto=request.ID_Prodotto, idAuletta=request.ID_Auletta, quantita=request.Ricarica)
+
+@app.post("/visualizzaMagazzino")
+async def visualizzaMagazzino(request: MagazzinoRequest):
+    return getMagazzino(request.ID_Auletta)
+
+@app.post("/rimuoviUtente")
+async def rimuoviUtente(request : DeleteUserRequest):
+    return removeUser(request.ID_Telegram)
+
+@app.post("/assegnaCard")
+async def assegnaCard(request : AssignCardRequest):
+    return assignCard(request.ID_Telegram, request.ID_Card)
+
+#endregion
