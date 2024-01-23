@@ -196,6 +196,8 @@ def assignCard(idTelegram : str, idCard : str) -> int:
     user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
     user.ID_Card = idCard
     session.commit()
+    
+    return 0
 
 #endregion
 
