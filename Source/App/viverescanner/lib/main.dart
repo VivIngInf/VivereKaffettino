@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
       NFCTag tag = await FlutterNfcKit.poll(androidCheckNDEF: false);
 
       setState(() {
-        _tagId = tag.id.toString();
+        _tagId = int.parse(tag.id.toString(), radix: 16).toString();
         desc = "L'ID della card è:";
       });
 

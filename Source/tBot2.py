@@ -26,6 +26,7 @@ from Modules.Bot.Stop import Stop
 from Modules.Bot.AddUser import registration_conv, start_registration
 from Modules.Bot.Register import *
 from Modules.Bot.Resoconto import SendResoconto
+from Modules.Bot.RicaricaSoldi import RicaricaSoldi, ricaricaConv
 
 from Modules.Bot.States import *
 
@@ -66,6 +67,7 @@ def main() -> None:
     # conversation, we need to make sure the top level conversation can also handle them
     selection_handlers = [
         CallbackQueryHandler(ShowBalance, pattern="^" + str(SALDO) + "$"),
+        CallbackQueryHandler(RicaricaSoldi, pattern="^" + str(RICARICA) + "$"),
         CallbackQueryHandler(Info, pattern="^" + str(INFO) + "$"),
         CallbackQueryHandler(Register, pattern="^" + str(REGISTER) + "$"),
         CallbackQueryHandler(End, pattern="^" + str(END) + "$"),
@@ -79,6 +81,7 @@ def main() -> None:
             MAINMENU: [CallbackQueryHandler(Start, pattern="^" + str(END) + "$")],
             SELECTING_ACTION: selection_handlers,
             SELECTING_LEVEL: selection_handlers,
+            RICARICA: [ricaricaConv],
             REGISTER: [registerConv],
             STOPPING: [CommandHandler("start", Start)],
         },
