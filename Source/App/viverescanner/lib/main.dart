@@ -43,6 +43,19 @@ class _MyHomePageState extends State<MyHomePage> {
     _startNFCReader();
   }
 
+  String calculateID(String id) {
+    String converted = "";
+
+    for (int i = 0; i < id.length; i++) {
+      if ((i - 1) % 2 == 0) {
+        String number = id[i - 1] + "" + id[i];
+        converted += int.parse(number, radix: 16).toString();
+      }
+    }
+
+    return converted;
+  }
+
   Future<void> _startNFCReader() async {
     try {
       var availability = await FlutterNfcKit.nfcAvailability;
@@ -54,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
       NFCTag tag = await FlutterNfcKit.poll(androidCheckNDEF: false);
 
       setState(() {
-        _tagId = int.parse(tag.id.toString(), radix: 16).toString();
+        _tagId = calculateID(tag.id.toString());
         desc = "L'ID della card è:";
       });
 
