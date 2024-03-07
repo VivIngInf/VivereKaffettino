@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from ..Shared.Query import GetBalance, GetIsVerified
+from ..Shared.Query import GetBalance, GetIsVerified, GetUsername
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from ..Bot.States import *
 
@@ -12,14 +12,10 @@ async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str
     idTelegram = str(update.effective_chat.id)
 
     saldo = GetBalance(idTelegram) # Chiamata al DB per ottenere il saldo a partire dall'ID_Telegram
-    text = f"Il tuo saldo è pari ad: {saldo}€"
+    text = f"Car* {GetUsername(idTelegram)}, il tuo saldo è pari ad: {saldo}€"
 
-    buttons = [[InlineKeyboardButton(text="Back", callback_data=str(END))]]
+    buttons = [[InlineKeyboardButton("Ritorna al menu principale", callback_data='back_main_menu')]]
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.callback_query.answer()
     await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-
-    user_data[START_OVER] = True
-
-    return MAINMENU

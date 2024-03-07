@@ -1,24 +1,25 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
+from telegram.ext import ContextTypes, ConversationHandler, MessageHandler, filters
 from Modules.Bot.States import *
-from Modules.Bot.Stop import Stop
-from Modules.Bot.Start import Start
+from Modules.Bot.Cancel import cancel
 from Modules.Shared.Query import InsertUser, GetAulette
+from Modules.Bot.NavMenu import button_callbacks
+
 
 # TODO: SISTEMARE BOTTONI, FARE ARRIVARE CALLBACK DELL'AULETTA SCELTA, FILTRO USERNAME, FILTRO PAROLACCE
 
 async def RicaricaSoldi(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     """Add information about yourself."""
-    context.user_data[CURRENT_LEVEL] = SELF
-    text = "Ottimo, iniziamo! 😁"
+    # button = InlineKeyboardButton(text="Daje", callback_data=str(SUCA))
+    # keyboard = InlineKeyboardMarkup.from_button(button)
 
-    button = InlineKeyboardButton(text="Daje", callback_data=str(SUCA))
-    keyboard = InlineKeyboardMarkup.from_button(button)
+    # await update.callback_query.answer()
+    # await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    # text = "Inserisci il nome dell'utente"
+    # context.user_data["conversation"] = REGISTER
+    # await update.callback_query.edit_message_text(text=text)
 
-    await update.callback_query.answer()
-    await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
-
-    return REGISTER
+    return RICARICA
 
 # -------------------
 
@@ -53,9 +54,9 @@ async def select_feature(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # If we collect features for a new person, clear the cache and save the gender
     if not context.user_data.get(START_OVER):
-        text = "Inserisci l'username."
+        text = "Inserisci l'username :)"
 
-        await update.callback_query.answer()
+        # await update.callback_query.answer()
         await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
     # But after we do that, we need to send a new message
     else:
@@ -107,28 +108,6 @@ async def end_describing(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     return END
 
-# ------------
 
-ricaricaConv =  ConversationHandler(
-        entry_points=[
-            CallbackQueryHandler(
-                select_feature, pattern="^" + str(SUCA) + "$"
-            )
-        ],
-        states={
-            SELECTING_FEATURE: [
-                CallbackQueryHandler(ask_for_input, pattern="^(?!" + str(END) + ").*$")
-            ],
-            TYPING: [MessageHandler(filters.TEXT & ~filters.COMMAND, save_input)],
-        },
-        fallbacks=[
-            CallbackQueryHandler(end_describing, pattern="^" + str(END) + "$"),
-            CommandHandler("stop", Stop),
-        ],
-        map_to_parent={
-            # Return to second level menu
-            END: SELECTING_LEVEL,
-            # End conversation altogether
-            STOPPING: STOPPING,
-        },
-    )
+
+

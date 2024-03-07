@@ -10,7 +10,6 @@ import atexit # Libreria che ci permette di creare un metodo per quando il codic
 # Librerie Telegram
 import logging
 import pytz
-from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
@@ -23,11 +22,12 @@ from Modules.Bot.Nostalgia import Nostalgia
 from Modules.Bot.Start import Start
 from Modules.Bot.End import End
 from Modules.Bot.Stop import Stop
-from Modules.Bot.AddUser import registration_conv, start_registration
-from Modules.Bot.Register import *
+# from Modules.Bot.AddUser import registration_conv, start_registration
+# from Modules.Bot.Register import *
 from Modules.Bot.Resoconto import SendResoconto
-from Modules.Bot.RicaricaSoldi import RicaricaSoldi, ricaricaConv
-
+# from Modules.Bot.RicaricaSoldi import RicaricaSoldi, ricaricaquerystop, ricaricainput
+# from Modules.Bot.ProcessUserInput import ProcessUserInput
+from Modules.Bot.NavMenu import button_callbacks, handle_messages
 from Modules.Bot.States import *
 
 import datetime
@@ -65,36 +65,41 @@ def main() -> None:
     # Set up top level ConversationHandler (selecting action)
     # Because the states of the third level conversation map to the ones of the second level
     # conversation, we need to make sure the top level conversation can also handle them
-    selection_handlers = [
-        CallbackQueryHandler(ShowBalance, pattern="^" + str(SALDO) + "$"),
-        CallbackQueryHandler(RicaricaSoldi, pattern="^" + str(RICARICA) + "$"),
-        CallbackQueryHandler(Info, pattern="^" + str(INFO) + "$"),
-        CallbackQueryHandler(Register, pattern="^" + str(REGISTER) + "$"),
-        CallbackQueryHandler(End, pattern="^" + str(END) + "$"),
-    ]
+    # selection_handlers = [
+    #     CallbackQueryHandler(ShowBalance, pattern="^" + str(SALDO) + "$"),
+    #     CallbackQueryHandler(RicaricaSoldi, pattern="^" + str(RICARICA) + "$"),
+    #     CallbackQueryHandler(Info, pattern="^" + str(INFO) + "$"),
+    #     CallbackQueryHandler(Register, pattern="^" + str(REGISTER) + "$"),
+    #     CallbackQueryHandler(End, pattern="^" + str(END) + "$"),
+    # ]
 
     # DANIELE: ENTRYPOINT BOT
 
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", Start)],
-        states={
-            MAINMENU: [CallbackQueryHandler(Start, pattern="^" + str(END) + "$")],
-            SELECTING_ACTION: selection_handlers,
-            SELECTING_LEVEL: selection_handlers,
-            RICARICA: [ricaricaConv],
-            REGISTER: [registerConv],
-            STOPPING: [CommandHandler("start", Start)],
-        },
-        fallbacks=[CommandHandler("stop", Stop)],
-    )
+    # conv_handler = ConversationHandler(
+    #     entry_points=[CommandHandler("start", Start)],
+    #     states={
+    #         MAINMENU: [CallbackQueryHandler(Start, pattern="^" + str(END) + "$")],
+    #         SELECTING_ACTION: selection_handlers,
+    #         SELECTING_LEVEL: selection_handlers,
+    #         RICARICA: [ricaricaquerystop],
+    #         TYPING: [ricaricainput],
+    #         REGISTER: [registerConv],
+    #         STOPPING: [CommandHandler("start", Start)],
+    #     },
+    #     fallbacks=[CommandHandler("stop", Stop)],
+    # )
 
-    application.add_handler(conv_handler)
+    # application.add_handler(conv_handler)
+    application.add_handler(CommandHandler("start", Start))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_messages))
+    application.add_handler(CallbackQueryHandler(button_callbacks))
 
     job_queue = application.job_queue
     job_queue.run_daily(SendResoconto, time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
+
 
 if __name__ == "__main__":
     main()

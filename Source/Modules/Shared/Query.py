@@ -41,8 +41,10 @@ def GetUsername(idTelegram : str) -> str:
 
 def GetIdTelegram(username : str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'Username passato come parametro"""
-
-    return session.query(Utente).filter(Utente.username == f"{username}").one().ID_Telegram
+    try:
+        return session.query(Utente).filter(Utente.username == f"{username}").one().ID_Telegram
+    except:
+        return "None"
 
 def GetIDTelegram(idCard : str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'ID della carta passato come parametro"""

@@ -52,7 +52,7 @@ async def InsertUsernameDemote(update: Update, context: ContextTypes.DEFAULT_TYP
     idTelegram = GetIdTelegram(username=username)
     
     if(not CheckUserExists(idTelegram=idTelegram)):
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Non esiste un utente con username: {username}\nRiprova oppure fai \cancel")
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Non esiste un utente con username: {username}\nRiprova oppure fai /cancel")
         return USERNAME
 
     # Se già l'utente non ha i permessi, allora dai errore e annulla
