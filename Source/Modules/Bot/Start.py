@@ -104,7 +104,6 @@ def SendRandomImage() -> InputFile:
         return open(image_path, 'rb')
 
 async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    
     image : InputFile = SendRandomImage()
     caption = "☕ Benvenuto su vivere kaffettino! ☕"
 
@@ -112,11 +111,12 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     mainMenuKeyboard = []
 
     # ----- BOTTONI -----
-    
+
     register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="registra")
     saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="saldo")
     ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="ricarica")
-    addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
+    admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
+    storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
     info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
     stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="stop")
 
@@ -135,7 +135,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         mainMenuKeyboard.append([stop])
 
     elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)               
+        username = GetUsername(idTelegram=update.effective_chat.id)
         text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
         mainMenuKeyboard.append([saldo])
@@ -148,13 +148,12 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
         mainMenuKeyboard.append([saldo])
         mainMenuKeyboard.append([ricarica])
-        mainMenuKeyboard.append([addAdmin])
+        mainMenuKeyboard.append([admin])
+        mainMenuKeyboard.append([storage])
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([stop])
 
     keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
-
-    context.user_data['state'] = MAIN_MENU
 
     # Verifico se è il primo avvio o meno
     if list(context.user_data.keys()).count("first_start") == 0:
@@ -167,8 +166,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             photo=image,
             caption=caption
         )
-        await update.message.reply_text(text=text, reply_markup=keyboard)
+        message = await update.message.reply_text(text=text, reply_markup=keyboard)
         context.user_data['first_start'] = True
     else:
-        # await update.callback_query.answer()
         await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
