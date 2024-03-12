@@ -15,12 +15,13 @@ from ..Database.Models.Utente import Utente
 
 import datetime
 
+
 # TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
 # TODO: Quando si effettua un pagamento, controllare la validità dei parametri passati (ES: Esiste l'auletta? Esiste un utente con quell'ID_Card?)
 
-#region User
+# region User
 
-def CheckUserExists(idTelegram : str) -> bool:
+def CheckUserExists(idTelegram: str) -> bool:
     """DATABASE_HANDLER / ADD_USER: Controlla se l'utente esiste dato un ID_Telegram, ritorna un valore booleano"""
 
     query = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}")
@@ -28,28 +29,35 @@ def CheckUserExists(idTelegram : str) -> bool:
 
     return bool(exists)
 
-def CheckUsernameExists(username : str) -> bool:
+
+def CheckUsernameExists(username: str) -> bool:
     """DATABASE_HANDLER: Controlla se l'username è già stato preso"""
 
     exists = session.query(Utente).filter(Utente.username == f"{username}").exists()
 
     return bool(exists)
 
-def GetUsername(idTelegram : str) -> str:
+
+def GetUsername(idTelegram: str) -> str:
     """DATABASE_HANDLER / USER_INFO: Ritorna l'username partendo dall'ID_Telegram passato come parametro"""
     return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().username
 
-def GetIdTelegram(username : str) -> str:
+
+def GetIdTelegram(username: str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'Username passato come parametro"""
+    try:
+        return session.query(Utente).filter(Utente.username == f"{username}").one().ID_Telegram
+    except:
+        return "None"
 
-    return session.query(Utente).filter(Utente.username == f"{username}").one().ID_Telegram
 
-def GetIDTelegram(idCard : str) -> str:
+def GetIDTelegram(idCard: str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'ID della carta passato come parametro"""
 
     return session.query(Utente).filter(Utente.ID_Card == f"{idCard}").one().ID_Telegram
 
-def InsertUser(idTelegram : str, username : str) -> None: 
+
+def InsertUser(idTelegram: str, username: str) -> None:
     """DATABASE_HANDLER / ADD_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
 
     utente = Utente(
@@ -66,83 +74,95 @@ def InsertUser(idTelegram : str, username : str) -> None:
 
     return None
 
-def GetIsAdmin(idTelegram : str) -> bool:
+
+def GetIsAdmin(idTelegram: str) -> bool:
     """DATABASE_HANDLER: Ritorna il ruolo dell'utente"""
 
     return bool(session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().isAdmin)
 
-def GetIsVerified(idTelegram : str) -> bool:
+
+def GetIsVerified(idTelegram: str) -> bool:
     """DATABASE_HANDLER: Ritorna se l'utente è stato approvato"""
-    user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").scalar()
+    user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").scalar()
     return bool(user.isVerified)
 
-def SetIsVerified(idTelegram : str) -> int:
+
+def SetIsVerified(idTelegram: str) -> int:
     """DATABASE_HANDLER: Se l'utente esiste lo setta come verificato"""
 
     if not CheckUserExists(idTelegram=idTelegram):
         return 1
 
-    user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
     user.isVerified = True
     session.commit()
 
     return 0
 
-def DecurtaSaldo(ID_Telegram : str, saldo : float) -> None:    
-    
+
+def DecurtaSaldo(ID_Telegram: str, saldo: float) -> None:
     user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
-    
+
     user.saldo = round(saldo, 2)
 
     session.commit()
 
-def GetBalance(idTelegram : str) -> float:
+
+def GetBalance(idTelegram: str) -> float:
     """DATABASE_HANDLER / SHOW_BALANCE: Prende il saldo dell'utente con ID_Telegram passato come parametro"""
     return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().saldo
 
-def getStoricoPersonale(idTelegram : str) -> list:
+
+def getStoricoPersonale(idTelegram: str) -> list:
     """
         USER: Ritorna tuto lo storico personale
     """
     return session.query(Operazione).filter(Operazione.ID_Telegram == f"{idTelegram}").all()
 
-#endregion
 
-#region Aulette
+# endregion
+
+# region Aulette
 
 def GetAulette() -> list:
     """DATABASE_HANDLER / ADD_USER: Prendiamo tutti gli id ed i nomi delle aulette"""
 
     return session.query(Auletta).all()
 
-def GetAuletta(idAuletta : int) -> str:
+
+def GetAuletta(idAuletta: int) -> str:
     """DATABASE_HANDLER / ADD_USER: Dato l'ID di un'auletta, restituisce il suo nome"""
 
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{idAuletta}").one().Nome
 
-#endregion
 
-#region Admin
-def SetAdminDB(idTelegram : str, state : bool) -> None:
+# endregion
+
+# region Admin
+def SetAdminDB(idTelegram: str, state: bool) -> None:
     """DATABASE_HANDLER / ADD_ADMIN: Aggiorniamo l'utente con idTelegram passato come parametro impostando
     isAdmin"""
 
-    u : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    u: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
     u.isAdmin = state
 
     session.commit()
 
     return None
 
+
 def getCaffeGiornalieri() -> int:
     """ADMIN: Ritorna il numero dei caffé fatti in questo giorno"""
-    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today(), Operazione.ID_Prodotto == 1).count()
+    return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today(),
+                                            Operazione.ID_Prodotto == 1).count()
+
 
 def getOperazioniGiornaliere() -> list:
     """ADMIN: Ritorna tutte le operazioni giornaliere"""
     return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()
 
-def incrementaSaldo(username : str, ricarica : float) -> int:
+
+def incrementaSaldo(username: str, ricarica: float) -> int:
     """
         ADMIN: Incrementa il saldo in base alla ricarica passata come parametro
         
@@ -161,12 +181,13 @@ def incrementaSaldo(username : str, ricarica : float) -> int:
         return 0
 
     user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
-    
+
     user.saldo = round(user.saldo + ricarica, 2)
 
     session.commit()
 
     return 1
+
 
 def getUsers() -> list:
     """
@@ -174,70 +195,77 @@ def getUsers() -> list:
     """
     return session.query(Utente).all()
 
-def removeUser(idTelegram : str) -> dict:
+
+def removeUser(idTelegram: str) -> dict:
     """
         ADMIN: Rimuove l'utente con ID_Telegram idTelegram
     """
     if not CheckUserExists(idTelegram=idTelegram):
-        return {"Error" : "Utente non esistente"}
-    
+        return {"Error": "Utente non esistente"}
+
     session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").delete()
     session.commit()
 
-    return {"State" : f"Utente con ID_Telegram: '{idTelegram}' cancellato!"}
+    return {"State": f"Utente con ID_Telegram: '{idTelegram}' cancellato!"}
 
-def assignCard(idTelegram : str, idCard : str) -> int:
-    
+
+def assignCard(idTelegram: str, idCard: str) -> int:
     if SetIsVerified(idTelegram=idTelegram) == 1:
-        return 1 # l'utente non esiste
-    
+        return 1  # l'utente non esiste
+
     # Assegnamo la card
 
-    user : Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
     user.ID_Card = idCard
     session.commit()
-    
+
     return 0
 
-#endregion
 
-#region Magazzino
+# endregion
 
-def QuantitaECosto(ID_Prodotto : int, ID_Auletta : int) -> Magazzino:
+# region Magazzino
+
+def QuantitaECosto(ID_Prodotto: int, ID_Auletta: int) -> Magazzino:
     """ Controllare quanto costa un elemento in una determinata auletta e controllare se esiste almeno un unità in vendita """
 
-    result = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{ID_Prodotto}", Magazzino.ID_Auletta == f"{ID_Auletta}").one()
+    result = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{ID_Prodotto}",
+                                             Magazzino.ID_Auletta == f"{ID_Auletta}").one()
 
     return result
 
-def DecurtaMagazzino(idProdotto : int, idAuletta : int, quantita : int) -> dict:
 
-    magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}", Magazzino.ID_Auletta == f"{idAuletta}").one()
-    
+def DecurtaMagazzino(idProdotto: int, idAuletta: int, quantita: int) -> dict:
+    magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}",
+                                                Magazzino.ID_Auletta == f"{idAuletta}").one()
+
     if magazzino.quantita - quantita < 0:
-        return {"Error" : "La quantità rimanente non può essere negativa!"}
+        return {"Error": "La quantità rimanente non può essere negativa!"}
 
     magazzino.quantita -= quantita
 
     session.commit()
 
-    return {"State" : "Done"}
+    return {"State": "Done"}
 
-def GetProdotti(idAuletta : int) -> str:
+
+def GetProdotti(idAuletta: int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
 
     arr = []
 
     class Prodotti:
-        ID_Prodotto : int
-        descrizione : str
-        costo : float
+        ID_Prodotto: int
+        descrizione: str
+        costo: float
 
-    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(Magazzino.ID_Auletta == idAuletta).all()
-    
-    for r in res:        
+    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto,
+                                                                                          Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(
+        Magazzino.ID_Auletta == idAuletta).all()
+
+    for r in res:
         p = Prodotti()
-        
+
         p.ID_Prodotto = r[0]
         p.descrizione = r[1]
         p.costo = r[2]
@@ -246,13 +274,15 @@ def GetProdotti(idAuletta : int) -> str:
 
     return arr
 
-def getMagazzino(idAuletta : int) -> list:
+
+def getMagazzino(idAuletta: int) -> list:
     """
         MAGAZZINO: Ritorna tutti i prodotti e la quantità in magazzino dell'auletta con id idAuletta
     """
     return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
 
-def ricaricaMagazzino(idAuletta : str, idProdotto : int, quantitaRicaricata : int) -> int:
+
+def ricaricaMagazzino(idAuletta: str, idProdotto: int, quantitaRicaricata: int) -> int:
     """
         MAGAZZINO: Ricarica di una quantità pari a quantitaRicaricata il prodotto con id idProdotto nell'auletta con id idAuletta.
         RITORNA:
@@ -264,33 +294,36 @@ def ricaricaMagazzino(idAuletta : str, idProdotto : int, quantitaRicaricata : in
     # TODO: Implementare auletta non esistente e prodotto non esistente
 
     if quantitaRicaricata <= 0:
-        return {"Error" : "Quantità ricaricata non positiva"}
-    
-    magazzino = session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}", Magazzino.ID_Prodotto == f"{idProdotto}").one()
-    
+        return {"Error": "Quantità ricaricata non positiva"}
+
+    magazzino = session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}",
+                                                Magazzino.ID_Prodotto == f"{idProdotto}").one()
+
     magazzino.quantita = round(magazzino.quantita + quantitaRicaricata, 2)
 
     session.commit()
 
-    return {"State" : "Done"}
+    return {"State": "Done"}
 
-#endregion
 
-#region Auletta
+# endregion
 
-def GetDebito(ID_Auletta : int) -> int:
+# region Auletta
+
+def GetDebito(ID_Auletta: int) -> int:
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().DebitoMax
 
-#endregion
 
-#region Operazione
+# endregion
 
-def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, costo : int) -> None:
-    now : datetime.datetime = datetime.datetime.now()
-    
+# region Operazione
+
+def CreateOperazione(ID_Telegram: str, ID_Auletta: int, ID_Prodotto: int, costo: int) -> None:
+    now: datetime.datetime = datetime.datetime.now()
+
     operazione = Operazione(
         ID_Operazione=None,
-        ID_Telegram= ID_Telegram,
+        ID_Telegram=ID_Telegram,
         ID_Auletta=ID_Auletta,
         ID_Prodotto=ID_Prodotto,
         dateTimeOperazione=now,
@@ -298,16 +331,15 @@ def CreateOperazione(ID_Telegram : str, ID_Auletta : int, ID_Prodotto : int, cos
     )
 
     session.add(operazione)
-    session.commit()    
+    session.commit()
 
 
-#endregion
+# endregion
 
-#region Wemos
+# region Wemos
 
 # TODO: Sistemare notazione
-def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
-    
+def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
     """users = session.query(Utente).all()
 
     return statecode"""
@@ -316,27 +348,26 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
 
     try:
 
-        magazzino : Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
+        magazzino: Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
         costo = magazzino.costo
 
     except:
-        return 3 # Prodotto con ID {ID_Prodotto} non è stato trovato nell'auletta con ID {ID_Auletta}. Oppure uno dei due non esiste completamente.
+        return 3  # Prodotto con ID {ID_Prodotto} non è stato trovato nell'auletta con ID {ID_Auletta}. Oppure uno dei due non esiste completamente.
 
     try:
-        idTelegram : str = GetIDTelegram(idCard=ID_Card)
+        idTelegram: str = GetIDTelegram(idCard=ID_Card)
     except:
-        return 2 # Utente con idCard {ID_Card} non esistente
+        return 2  # Utente con idCard {ID_Card} non esistente
 
+    saldo: float = GetBalance(idTelegram=idTelegram)
 
-    saldo : float = GetBalance(idTelegram=idTelegram)
-
-    debito : float = GetDebito(ID_Auletta=ID_Auletta)
+    debito: float = GetDebito(ID_Auletta=ID_Auletta)
 
     # Controllare se quantità disponibile
 
     if magazzino.quantita <= 0:
-        return 4 # Quantità dell'item inferiore a 0
-    
+        return 4  # Quantità dell'item inferiore a 0
+
     # Calcola il totale del debito possibile
     debitoMassimo = debito * costo
 
@@ -345,7 +376,7 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
 
     # Verifica se l'utente può permettersi il prodotto
     if totaleDisponibile < costo:
-        return 1 # Saldo non sufficiente
+        return 1  # Saldo non sufficiente
 
     # Decurtatre saldo
     saldo -= costo
@@ -358,8 +389,8 @@ def PayDB(ID_Prodotto : int, ID_Auletta : int, ID_Card : str) -> int:
         # Creare storico della transazione come "Eseguito"
         CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
     except:
-        return 5 # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
+        return 5  # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
-    return 0 # Comprato
+    return 0  # Comprato
 
-#endregion
+# endregion

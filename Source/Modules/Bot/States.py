@@ -1,35 +1,7 @@
-from telegram.ext import ConversationHandler
 
-# SELECTING_ACTION, REGISTER, BALANCE, ADD_ADMIN, REMOVE_ADMIN, INFO, STOP = map(chr, range(4))
+# Azioni attive durante le conversazioni
+ACTIONS = ["typing_username_registra", "selecting_auletta_registra",
+           "typing_username_ricarica", "typing_amount_ricarica",
+           "typing_add_admin", "typing_verify_user", "typing_card",
+           "username", "username_id"]
 
-
-# State definitions for top level conversation
-MAINMENU, SELECTING_ACTION, REGISTER, SALDO, RICARICA = map(chr, range(5))
-
-# State definitions for second level conversation
-SELECTING_LEVEL, SELECTING_GENDER = map(chr, range(5, 7))
-
-# State definitions for descriptions conversation
-SELECTING_FEATURE, TYPING = map(chr, range(7, 9))
-
-# Meta states
-STOPPING = map(chr, range(9, 11))
-
-# Shortcut for ConversationHandler.END
-END = ConversationHandler.END
-
-# Different constants for this example
-(
-    SUCA,
-    INFO,
-    CHILDREN,
-    SELF,
-    MALE,
-    FEMALE,
-    AULETTA,
-    USERNAME,
-    START_OVER,
-    FEATURES,
-    CURRENT_FEATURE,
-    CURRENT_LEVEL,
-) = map(chr, range(10, 22))

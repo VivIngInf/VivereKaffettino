@@ -2,7 +2,7 @@ import os
 import random
 from datetime import datetime
 from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ContextTypes, ConversationHandler, CommandHandler
+from telegram.ext import ContextTypes
 from ..Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
 from Modules.Bot.States import *
 
@@ -104,7 +104,6 @@ def SendRandomImage() -> InputFile:
         return open(image_path, 'rb')
 
 async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    
     image : InputFile = SendRandomImage()
     caption = "☕ Benvenuto su vivere kaffettino! ☕"
 
@@ -112,14 +111,14 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     mainMenuKeyboard = []
 
     # ----- BOTTONI -----
-    
-    register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data=str(REGISTER))
-    saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data=str(SALDO))
-    ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data=str(RICARICA))
-    addAdmin = InlineKeyboardButton(text="👨🏽‍🔧 AGGIUNGI ADMIN 👩🏽‍🔧", callback_data="ADD")
-    remAdmin = InlineKeyboardButton(text="🚷 RIMUOVI ADMIN 🚷", callback_data="REM")
-    info = InlineKeyboardButton(text="❓ INFO ❓", callback_data=str(INFO))
-    stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data=str(END))
+
+    register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="registra")
+    saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="saldo")
+    ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="ricarica")
+    admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
+    storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
+    info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
+    stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="stop")
 
     # -------------------
 
@@ -136,7 +135,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         mainMenuKeyboard.append([stop])
 
     elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)               
+        username = GetUsername(idTelegram=update.effective_chat.id)
         text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
         mainMenuKeyboard.append([saldo])
@@ -149,23 +148,26 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
         mainMenuKeyboard.append([saldo])
         mainMenuKeyboard.append([ricarica])
-        mainMenuKeyboard.append([addAdmin])
-        mainMenuKeyboard.append([remAdmin])
+        mainMenuKeyboard.append([admin])
+        mainMenuKeyboard.append([storage])
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([stop])
 
     keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
 
-    # If we're starting over we don't need to send a new message
-    if context.user_data.get(START_OVER):
-        await update.callback_query.answer()
-        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+    # Verifico se è il primo avvio o meno
+    if list(context.user_data.keys()).count("first_start") == 0:
+        FIRST_START = True
     else:
+        FIRST_START = False
+
+    if FIRST_START:
         await update.message.reply_photo(
             photo=image,
             caption=caption
         )
-        await update.message.reply_text(text=text, reply_markup=keyboard)
-
-    context.user_data[START_OVER] = False
-    return SELECTING_ACTION
+        initial_message = await update.message.reply_text(text=text, reply_markup=keyboard)
+        context.user_data['first_start'] = True
+        context.user_data['initial_message'] = initial_message
+    else:
+        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
