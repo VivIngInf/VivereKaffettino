@@ -74,9 +74,9 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(f"Digita l'username", reply_markup=keyboard)
 
     elif query.data == "admin":
-        buttons = [[InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
+        buttons = [[InlineKeyboardButton("Verifica Utente ☑", callback_data='verify_user')],
+                   [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
                    [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
-                   [InlineKeyboardButton("Verifica Utente ☑", callback_data='verify_user')],
                    [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(f"Scegli cosa fare :)", reply_markup=keyboard)
@@ -214,7 +214,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
         query = context.user_data["typing_remove_admin"]
         if GetIdTelegram(username=username) != "None":
-            SetAdminDB(update.message.chat_id, False)
+            SetAdminDB(GetIdTelegram(username=username), False)
             buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(text=f"Ok, l'utente {username} è stato tolto dagli Admin",
@@ -236,16 +236,13 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         [InlineKeyboardButton("❌ Annulla", callback_data='verify_user')]]
             keyboard = InlineKeyboardMarkup(buttons)
             context.user_data["username"] = username
-            await query.edit_message_text(text="Sicuro di voler confermare?", reply_markup=keyboard)
+            await query.edit_message_text(text=f"Sicuro di voler confermare {username}?", reply_markup=keyboard)
             context.user_data.pop("typing_verify_user")
         else:
             buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(text="Utente non trovato, riprova o ritorna al menu principale",
                                           reply_markup=keyboard)
-
-        # if exists go for card, ask for id then query
-        # isdigit + conferma alla fine
 
     elif list(context.user_data.keys()).count("typing_card") > 0:
         idCard = update.message.text
