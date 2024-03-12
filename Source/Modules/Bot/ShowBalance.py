@@ -1,7 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from ..Shared.Query import GetBalance, GetIsVerified, GetUsername
-from ..Bot.States import *
+from ..Shared.Query import GetBalance, GetUsername
 
 
 async def ShowBalance(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:

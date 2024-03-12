@@ -20,7 +20,7 @@ from Modules.Bot.UserInfo import Info
 from Modules.Shared.Configs import LoadConfigs, GetToken
 from Modules.Bot.Nostalgia import Nostalgia
 from Modules.Bot.Start import Start
-from Modules.Bot.Stop import Stop
+from Modules.Bot.Stop import Stop_command
 from Modules.Bot.Resoconto import SendResoconto
 from Modules.Bot.NavMenu import button_callbacks, handle_messages
 from Modules.Bot.States import *
@@ -59,6 +59,7 @@ def main() -> None:
     application = Application.builder().token(GetToken()).build()
 
     application.add_handler(CommandHandler("start", Start))
+    application.add_handler(CommandHandler("stop", Stop_command))
     # Tengo traccia di ogni messaggio e bottone premuto
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_messages))
     application.add_handler(CallbackQueryHandler(button_callbacks))

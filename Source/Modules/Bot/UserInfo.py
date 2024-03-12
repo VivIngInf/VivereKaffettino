@@ -20,7 +20,7 @@ async def Info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
     text = f"""ID Telegram: {telegramID}\nUsername: {username}\nStato: {state}, Ruolo: {role}\n"""
 
-    buttons = [[InlineKeyboardButton("Ritorna al menu principale", callback_data='back_main_menu')]]
+    buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
     keyboard = InlineKeyboardMarkup(buttons)
 
     await update.callback_query.answer()

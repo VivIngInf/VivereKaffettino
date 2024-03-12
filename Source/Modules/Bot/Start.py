@@ -166,7 +166,8 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
             photo=image,
             caption=caption
         )
-        message = await update.message.reply_text(text=text, reply_markup=keyboard)
+        initial_message = await update.message.reply_text(text=text, reply_markup=keyboard)
         context.user_data['first_start'] = True
+        context.user_data['initial_message'] = initial_message
     else:
         await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
