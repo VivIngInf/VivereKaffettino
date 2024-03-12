@@ -198,7 +198,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                               reply_markup=keyboard)
                 context.user_data.pop("typing_add_admin")
             else:
-                SetAdminDB(update.message.chat_id, True)
+                SetAdminDB(GetIdTelegram(username=username), True)
                 buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
                 keyboard = InlineKeyboardMarkup(buttons)
                 await query.edit_message_text(text=f"Ok, l'utente {username} è stato promosso ad Admin", reply_markup=keyboard)
