@@ -1,4 +1,3 @@
-import re
 
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
@@ -41,6 +40,31 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await query.edit_message_text(f"Digita l'username rispettando lo stardard Unipa con iniziali grandi.\nEs: Massimo.Midiri03",
                                       reply_markup=keyboard)
 
+    elif query.data == "typing_age":
+        context.user_data["typing_age"] = query
+        buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        await query.edit_message_text(f"Digita la tua data di nascita rispettando il formato dell'esempio per favore.\nEs: 11/09/2001",
+                                      reply_markup=keyboard)
+
+    elif query.data == "selecting_gender":
+        buttons = [[InlineKeyboardButton("Donna", callback_data='donna')],
+                   [InlineKeyboardButton("Uomo", callback_data='uomo')],
+                   [InlineKeyboardButton("Altro", callback_data='altro')],
+                   [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+
+        await query.edit_message_text(text=f"Adesso seleziona il tuo genere per favore",
+                                      reply_markup=keyboard)
+
+    elif query.data in ("donna", "uomo", "altro"):
+        buttons = [[InlineKeyboardButton("Confermi?", callback_data='selecting_auletta_registra')],
+                   [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        context.user_data["gender"] = query.data
+        await query.edit_message_text(text=f"Hai selezionato {query.data.upper()}, confermi?",
+                                      reply_markup=keyboard)
+
     elif query.data == "selecting_auletta_registra":
         buttons = []
         for auletta in GetAulette():
@@ -48,21 +72,23 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             button = InlineKeyboardButton(text=auletta[1], callback_data=auletta[1])
             buttons.append([button])
 
-        buttons.append([InlineKeyboardButton("❌ Annulla", callback_data='registra')])
+        buttons.append([InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')])
         keyboard = InlineKeyboardMarkup(buttons)
 
-        await query.edit_message_text(text=f"Car* {context.user_data['username']} seleziona la tua Auletta di appartenenza",
+        await query.edit_message_text(text=f"Car{GENDER_DICT[context.user_data['gender']]} {context.user_data['username']} seleziona la tua Auletta di appartenenza",
                                       reply_markup=keyboard)
 
     elif query.data in [str(auletta).split()[1] for auletta in GetAulette()]:
+        # TODO: Mettere il genere nel DB che è memorizzato nella varibile context.user_data['gender']] e può essere donna, uomo, altro
         InsertUser(context.user_data["username_id"], context.user_data["username"])
         buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(
-            text=f"Carissim* {context.user_data['username']} benvenuto in Vivere Kaffettino! ✌",
+            text=f"Carissim{GENDER_DICT[context.user_data['gender']]} {context.user_data['username']} benvenuto in Vivere Kaffettino! ✌",
             reply_markup=keyboard)
         context.user_data.pop("username")
         context.user_data.pop("username_id")
+        context.user_data.pop("gender")
 
     elif query.data == 'saldo':
         await ShowBalance(update, context)
@@ -124,13 +150,12 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if list(context.user_data.keys()).count("typing_username_registra") > 0:
         username = update.message.text
-        if check_regex(username):
+        if check_regex_username(username):
             await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
-            buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='selecting_auletta_registra')],
-                        [InlineKeyboardButton("❌ Annulla", callback_data='registra')]]
+            buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='typing_age')],
+                        [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             query = context.user_data["typing_username_registra"]
-            context.user_data["selecting_auletta_registra"] = query
             context.user_data["username"] = username
             context.user_data["username_id"] = update.message.chat_id
             await query.edit_message_text(text=f"Hai scritto {username}, confermi?", reply_markup=keyboard)
@@ -142,6 +167,25 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Hai digitato un username che non rispetta lo stardard Unipa, riprova.\nEs: Massimo.Midiri03",
                                           reply_markup=keyboard)
+
+    elif list(context.user_data.keys()).count("typing_age") > 0:
+        age = update.message.text
+        if check_regex_age(age):
+            await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+            buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='selecting_gender')],
+                       [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            query = context.user_data["typing_age"]
+            await query.edit_message_text(text=f"Hai scritto {age}, confermi?", reply_markup=keyboard)
+            context.user_data.pop("typing_age")
+        else:
+            await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+            query = context.user_data["typing_age"]
+            buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(
+                f"Hai digitato un'età che non rispetta lo stardard proposto, riprova.\nEs: 11/09/2001",
+                reply_markup=keyboard)
 
     elif list(context.user_data.keys()).count("typing_username_ricarica") > 0:
         username = update.message.text
@@ -255,6 +299,8 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             assignCard(GetIdTelegram(context.user_data['username']), idCard)
             await query.edit_message_text(text=f"L'utente {context.user_data['username']} è stato verificato correttamente!",
                                           reply_markup=keyboard)
+            await context.bot.send_message(chat_id=GetIdTelegram(context.user_data['username']),
+                                           text=f"Carissim{GENDER_DICT[context.user_data['gender']]} {context.user_data['username']}, sei stato abilitato ad ussare Vivere Kaffettino. Premi /start per iniziare e goditi i tuoi caffè! :)")
             context.user_data.pop("typing_card")
             context.user_data.pop("username")
         else:
@@ -268,8 +314,13 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-def check_regex(username: str) -> bool:
+def check_regex_username(username: str) -> bool:
     """Controlla se l'username dell'utente rispetta lo standard Unipa 'Nome.Cognome{int}{int}' """
     pattern = r"^[A-Z][a-z-A-Z]+\.[A-Z][a-z-A-Z]+(([1-9][1-9])|0[1-9]|[1-9]0)?$"
     return re.match(pattern, username)
 
+
+def check_regex_age(age: str) -> bool:
+    """Controlla se l'età inserita ha il formato corretto"""
+    pattern = r"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/((19|20)\d\d)$"
+    return re.match(pattern, age)
