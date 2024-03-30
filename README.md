@@ -44,6 +44,8 @@ All the **administrative and user documentation** is located under the [Docs](./
 
 [Giovanni Castelli](https://www.linkedin.com/in/giovanni-castelli02/) - Database Consultant
 
+[Gabriele Lo Cascio](https://www.linkedin.com/in/gabriele-locascio/) - Telegram Dev
+
 ### Electronics
 
 [Riccardo Sciacca](https://www.linkedin.com/in/riccardo-sciacca-831357218/) - Esp32 Dev

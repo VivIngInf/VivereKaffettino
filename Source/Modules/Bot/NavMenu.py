@@ -48,9 +48,9 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=keyboard)
 
     elif query.data == "selecting_gender":
-        buttons = [[InlineKeyboardButton("Donna", callback_data='donna')],
-                   [InlineKeyboardButton("Uomo", callback_data='uomo')],
-                   [InlineKeyboardButton("Altro", callback_data='altro')],
+        buttons = [[InlineKeyboardButton("Donna", callback_data='D')],
+                   [InlineKeyboardButton("Uomo", callback_data='U')],
+                   [InlineKeyboardButton("Altro", callback_data='A')],
                    [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
 
@@ -79,8 +79,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=keyboard)
 
     elif query.data in [str(auletta).split()[1] for auletta in GetAulette()]:
-        # TODO: Mettere il genere nel DB che è memorizzato nella varibile context.user_data['gender']] e può essere donna, uomo, altro
-        InsertUser(context.user_data["username_id"], context.user_data["username"])
+        InsertUser(idTelegram=context.user_data["username_id"], idAuletta=context.user_data["auletta"], genere=context.user_data["genere"], dataNascita=context.user_data["dataNascita"], username=context.user_data["username"])
         buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(
@@ -97,7 +96,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['typing_username_ricarica'] = query
         buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
-        await query.edit_message_text(f"Digita l'username", reply_markup=keyboard)
+        await query.edit_message_text(f"Digita l'username dell'utente che vuole ricaricare", reply_markup=keyboard)
 
     elif query.data == "admin":
         buttons = [[InlineKeyboardButton("Verifica Utente ☑", callback_data='verify_user')],
@@ -105,7 +104,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                    [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
                    [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
-        await query.edit_message_text(f"Scegli cosa fare :)", reply_markup=keyboard)
+        await query.edit_message_text(f"GESTIONE ADMIN", reply_markup=keyboard)
 
     elif query.data == "add_admin":
         context.user_data['typing_add_admin'] = query
@@ -123,7 +122,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['typing_verify_user'] = query
         buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
-        await query.edit_message_text(f"Digita l'username dell'utente da far abilitare", reply_markup=keyboard)
+        await query.edit_message_text(f"Digita l'username dell'utente da abilitare", reply_markup=keyboard)
 
     elif query.data == "typing_card":
         context.user_data["typing_card"] = query
@@ -139,7 +138,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                    [InlineKeyboardButton("Aggiungi Prodotto ➕", callback_data='new_storage')],
                    [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
-        await query.edit_message_text(f"Scegli cosa fare :)", reply_markup=keyboard)
+        await query.edit_message_text(f"GESTIONE MAGAZZINO", reply_markup=keyboard)
 
     elif query.data == 'info':
         await Info(update, context)
@@ -225,7 +224,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 keyboard = InlineKeyboardMarkup(buttons)
                 await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
                 incrementaSaldo(context.user_data['username'], amount)
-                await query.edit_message_text(text=f"Ricarica a {context.user_data['username']} effettuata, torna pure al menu principale",
+                await query.edit_message_text(text=f"Ricarica a {context.user_data['username']} effettuata!\nTorna pure al menu principale",
                                               reply_markup=keyboard)
                 context.user_data.pop("typing_amount_ricarica")
                 context.user_data.pop("username")

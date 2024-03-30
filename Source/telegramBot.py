@@ -3,25 +3,47 @@
 # QUESTO COMANDO SERVE A CREARE UN FILE CHE SPECIFICA TUTTE LE LIBRERIE
 # DA INSTALLARE SU UNA MACCHINA FRESCA
 
-import atexit # Libreria che ci permette di creare un metodo per quando il codice viene interrotto
+# region Imports
+
+import atexit  # Libreria che ci permette di creare un metodo per quando il codice viene interrotto
 
 # Librerie Telegram
 import logging
-from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, MessageHandler, filters
+import pytz
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, ConversationHandler, CallbackQueryHandler, \
+    MessageHandler, filters
 
 # File complementari, ho preferito spezzettare questi codici nei propri file per evitare di fare
-# un porcile nel file main
-from Modules.Bot.AddUser import CreateAddUserHandler
+# un porcile nel file main (hai fatto bene bro)
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.UserInfo import Info
 from Modules.Shared.Configs import LoadConfigs, GetToken
-from Modules.Bot.SetAdmin import CreateSetAdminHandler, CreateUnsetAdminHandler
 from Modules.Bot.Nostalgia import Nostalgia
 from Modules.Bot.Start import Start
-from Modules.Bot.KeyboardsHandler import KeyBoardHandler
+from Modules.Bot.Stop import Stop_command
+from Modules.Bot.Resoconto import SendResoconto
+from Modules.Bot.NavMenu import button_callbacks, handle_messages
+from Modules.Bot.States import *
 
-from telegram import BotCommand, Bot
+import datetime
+import time
+
+import logging
+
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CallbackQueryHandler,
+    CommandHandler,
+    ContextTypes,
+    ConversationHandler,
+    MessageHandler,
+    filters,
+)
+
+# Bisogna installare openpyxl, pandas e python-telegram-bot[job-queue]
+
+# endregion
 
 # Configurazione di logging base
 logging.basicConfig(
@@ -29,73 +51,26 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-MAIN_MENU, USER, ADMIN = range(3)
 
-# Creiamo la funzione Cancel che ci permette di uscire dalle conversazioni
-async def Cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="Arrivederci!")
-    return ConversationHandler.END
+def main() -> None:
+    """Run the bot."""
+    # Create the Application and pass it your bot's token.
+    LoadConfigs()
+    application = Application.builder().token(GetToken()).build()
 
-async def SetCommands() -> None:
-    
-    bot = application.updater.bot
+    application.add_handler(CommandHandler("start", Start))
+    application.add_handler(CommandHandler("stop", Stop_command))
+    # Tengo traccia di ogni messaggio e bottone premuto
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_messages))
+    application.add_handler(CallbackQueryHandler(button_callbacks))
 
-    commands = [
-        BotCommand("start", "un bellissimo risveglio"),
-        BotCommand("saldo", "Visualizza il saldo rimanente sul tuo conto"),
-        BotCommand("info", "Visualizza l'ID Telegram ed il tuo username"),
-        BotCommand("add", "Ti permette di registrarti se non hai già un account"),
-    ]
+    job_queue = application.job_queue
+    job_queue.run_daily(SendResoconto,
+                        time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
-    await bot.setMyCommands(commands)
-    
-    return None
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-# TODO: IMPLEMENTARE CHE TUTTI I COMANDI AD ESCLUSIONE DI INFO, ADD E KAMERATA KAFFETTINO DEBBANO AVERE L'UTENTE
 
 if __name__ == "__main__":
-
-    LoadConfigs()
-    application = ApplicationBuilder().token(token=GetToken()).build() # Ci impossessiamo del bot con il nostro TOKEN
-
-    # Creiamo il comando start e lo aggiungiamo ai comandi runnabili
-    start_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', Start)],
-        states={
-        },
-        fallbacks=[CommandHandler('cancel', Cancel)]
-    )
-
-    application.add_handler(start_handler)
-
-    # Handler delle keyboards
-    application.add_handler(CallbackQueryHandler(KeyBoardHandler))
-
-    """# Creiamo il comando AddUser e lo aggiungiamo ai comandi runnabili
-    # N.B: CreateAddUserHandler è un comando esterno presente in InsertUser.py
-    addUser_handler = CreateAddUserHandler(Cancel=Cancel)
-    application.add_handler(addUser_handler)
-
-    showBalance_handler = CommandHandler('saldo', ShowBalance)
-    application.add_handler(showBalance_handler)
-
-    # Handler info
-    info_handler = CommandHandler('info', Info)
-    application.add_handler(info_handler)
-
-    # Creiamo il comando AddAdmin e lo aggiungiamo ai comandi runnabili
-    setAdmin_handler = CreateSetAdminHandler(Cancel=Cancel)
-    application.add_handler(setAdmin_handler)
-
-    # Creiamo il comando AddAdmin e lo aggiungiamo ai comandi runnabili
-    unsetAdmin_handler = CreateUnsetAdminHandler(Cancel=Cancel)
-    application.add_handler(unsetAdmin_handler)
-
-    # Creiamo il comando kamerataKaffettino e lo aggiungiamo ai comandi runnabili
-    kamerata_handler = CommandHandler('kamerataKaffettino', Nostalgia)
-    application.add_handler(kamerata_handler)
-
-    SetCommands()"""
-
-    application.run_polling() # Inizializza l'app    
-    
+    main()

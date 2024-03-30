@@ -5,44 +5,9 @@ from Modules.Database.Models.Magazzino import Magazzino
 from Modules.Shared.Session import session
 from Modules.Database.connect import engine
 
+from datetime import date
+
 def CreatePersistent():
-
-    #region Utente
-
-    guest = Utente(
-        ID_Telegram = "000000000",
-        ID_Card = "1",
-        username = "guest",
-        saldo = 9999999.0,
-        isAdmin = False,
-        isVerified = True,
-    )
-
-    riccardo = Utente(
-        ID_Telegram = "188128674",
-        ID_Card = "48213022911200",
-        username = "Riccardo.Sciacca",
-        saldo = 100.0,
-        isAdmin = True,
-        isVerified = True
-    )
-
-    daniele = Utente(
-        ID_Telegram = "752154717",
-        ID_Card = "1",
-        username = "DanieleOrazio.Susino",
-        saldo = 500.0,
-        isAdmin = True,
-        isVerified = True,
-    )
-
-    session.add(guest)
-
-    session.add(riccardo)
-
-    session.add(daniele)
-
-    #endregion
 
     #region Aulette
 
@@ -127,5 +92,52 @@ def CreatePersistent():
     session.add(teDeim)
 
     #endregion
+
+    #region Utente
+
+    guest = Utente(
+        ID_Telegram = "000000000",
+        ID_Auletta = 1,
+        ID_Card = "1",
+        username = "guest",
+        genere="A",
+        dataNascita=None,
+        saldo = 9999999.0,
+        isAdmin = False,
+        isVerified = True,
+    )
+
+    riccardo = Utente(
+        ID_Telegram = "188128674",
+        ID_Auletta = 1,
+        ID_Card = "48213022911200",
+        username = "Riccardo.Sciacca",
+        genere="M",
+        dataNascita=date(2003, 11, 17),
+        saldo = 100.0,
+        isAdmin = True,
+        isVerified = True
+    )
+
+    daniele = Utente(
+        ID_Telegram = "752154717",
+        ID_Auletta = 1,
+        ID_Card = "1",
+        username = "DanieleOrazio.Susino",
+        genere="M",
+        dataNascita=date(2003, 11, 17),
+        saldo = 500.0,
+        isAdmin = True,
+        isVerified = True,
+    )
+
+    session.add(guest)
+
+    session.add(riccardo)
+
+    session.add(daniele)
+
+    #endregion
+
 
     session.commit()

@@ -1,2 +1,4 @@
 .env
 Source/database.sqlite
+Source/Arduino/ESP32_Kaffettino/arduino_secrets.h
+Source/database.sqlite

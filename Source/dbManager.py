@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-import simpleaudio as sa
+#import simpleaudio as sa
 import curses
 import time
 import random
@@ -23,8 +23,8 @@ try:
     # Specifica il percorso del tuo file MP3
     file_path = '../Resources/Audio/BGMusic.wav'
 
-    wave_obj = sa.WaveObject.from_wave_file(file_path)
-    play_obj = wave_obj.play()
+    #wave_obj = sa.WaveObject.from_wave_file(file_path)
+    #play_obj = wave_obj.play()
 except:
     print("\033[91mIl tuo sistema non puo' mandare in output la musica. Sei in connessione SSH?\033[0m")
 

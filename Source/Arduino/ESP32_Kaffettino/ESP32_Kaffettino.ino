@@ -11,6 +11,9 @@
   SDA - 21
 */
 
+// Valori segreti (Username, password)
+  #include "arduino_secrets.h"
+
 // Lib lettore
   #include <SPI.h>
   #include <MFRC522.h> // MFRC522 by Github Community
@@ -37,9 +40,9 @@
 //  #include <Bounce2.h> // Bounce 2 By Thomas O
 
 // Credenziali wifi
-  #define EAP_IDENTITY "" // Es: mario.rossi03
-  #define EAP_PASSWORD ""
-  #define EAP_USERNAME "" // Stesso di EAP_IDENTITY
+  #define EAP_IDENTITY SECRET_USERNAME // Es: mario.rossi03
+  #define EAP_PASSWORD SECRET_PASSWORD
+  #define EAP_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
   const char* ssid = "eduroam"; // SSID WiFi
 
 // Rotte

@@ -57,11 +57,14 @@ def GetIDTelegram(idCard: str) -> str:
     return session.query(Utente).filter(Utente.ID_Card == f"{idCard}").one().ID_Telegram
 
 
-def InsertUser(idTelegram: str, username: str) -> None:
+def InsertUser(idTelegram: str, idAuletta: int, genere: str, dataNascita: datetime.date, username: str) -> None:
     """DATABASE_HANDLER / ADD_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
 
     utente = Utente(
         ID_Telegram=idTelegram,
+        ID_Auletta=idAuletta,
+        genere=genere,
+        dataNascita=dataNascita,
         username=username,
         ID_Card=None,
         saldo=0.0,
@@ -119,6 +122,17 @@ def getStoricoPersonale(idTelegram: str) -> list:
     """
     return session.query(Operazione).filter(Operazione.ID_Telegram == f"{idTelegram}").all()
 
+def getGender(idTelegram: str) -> str:
+    """
+        USER: Ritorna il genere dell'utente
+    """
+    return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().genere
+
+def getBirthday(idTelegram: str) -> str:
+    """
+        USER: Ritorna il la data di nascita dell'utente
+    """
+    return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
 
 # endregion
 
