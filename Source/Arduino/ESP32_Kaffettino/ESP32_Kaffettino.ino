@@ -34,17 +34,17 @@
   #include "DFRobotDFPlayerMini.h" // DFRobotDFPlayerMini by DFRobot
 
 // Lib bottone premuto
-  #include <Bounce2.h> // Bounce 2 By Thomas O
+//  #include <Bounce2.h> // Bounce 2 By Thomas O
 
 // Credenziali wifi
-  #define EAP_IDENTITY "nome.cognome" // Es: mario.rossi03
-  #define EAP_PASSWORD "pwd"
-  #define EAP_USERNAME "nome.cognome" // Stesso di EAP_IDENTITY
+  #define EAP_IDENTITY "" // Es: mario.rossi03
+  #define EAP_PASSWORD ""
+  #define EAP_USERNAME "" // Stesso di EAP_IDENTITY
   const char* ssid = "eduroam"; // SSID WiFi
 
 // Rotte
-  const char* serverAddressPay = "http://129.152.11.76:8000/pay";
-  const char* serverAddressProdotti = "http://129.152.11.76:8000/prodotti";
+  const char* serverAddressPay = "http://204.216.213.203:8000/pay";
+  const char* serverAddressProdotti = "http://204.216.213.203:8000/prodotti";
   WiFiClient wifiClient;
 
 // Gestione prodotti
@@ -115,14 +115,18 @@
   bool firstBoot = true;
 
 // Pulsante-Interrupt
-  #define butt 15 // Attenzione a questo pin, siccome il wifi è acceso alcuni pin non diventano disponibili. Questo è uno dei pin che rimane disponibile.
+/*  #define butt 15 // Attenzione a questo pin, siccome il wifi è acceso alcuni pin non diventano disponibili. Questo è uno dei pin che rimane disponibile.
   Bounce debouncer = Bounce();  // Oggetto debounce
 
   int buttonState = 0;  // Variabile per memorizzare lo stato del pulsante
   int lastButtonState = 0;  // Variabile per memorizzare l'ultimo stato del pulsante
   unsigned long lastDebounceTime = 0;  // Variabile per memorizzare l'ultimo tempo di debounce
   unsigned long pressStartTime = 0;  // Variabile per memorizzare il tempo di inizio del press
-
+*/
+  long long int t3; //variabile temporale per la pressione prolungata
+  int durata = 5000; //costante in ms per la pressione 5sec kaffettino, 10sec bella ciao, 15sec faccetta
+  int pressed = 0; //variabile che controlla se il pulsante è premuto ed è già stato azzerato t3
+  int butt = 15; //pin del pulsante
 void setup() 
 {
 
@@ -144,9 +148,10 @@ void setup()
   digitalWrite(buzzer, LOW); digitalWrite(4, LOW);  //pin 14 usato temporaneamente come ground
   Serial.println("Buzzer Test...");
 
-  debouncer.attach(butt);
-  debouncer.interval(10);
-
+//  debouncer.attach(butt);
+//  debouncer.interval(10);
+  pinMode(butt, INPUT_PULLUP);
+  t3 = millis();
   while (!Serial);    // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
   SPI.begin();      // Init SPI bus
   mfrc522.PCD_Init();   // Init MFRC522
@@ -233,12 +238,47 @@ void loop()
 
   }
 
-  if(!firstBoot)
-    checkButtonPressed();
-    
+  //if(!firstBoot)
+  //  checkButtonPressed();
+
+  if(!digitalRead(butt) && pressed == 0)//Pressione del tasto
+  {
+    pressed = 1;  //metto ad 1 per non far rientrare in questo if durante la pressione
+    t3 = millis(); //"azzero" t3 rispetto  millis per avere un punto temporale di partenza
+    Serial.println("Premuto");
+    buttRoutine(); //alla pressione richiamo la funziona per il cambio prodotto
+  }
+  
+  if(digitalRead(butt) && pressed == 1)//Rilascio del tasto
+  {
+    pressed = 0;  //Riazzero per riabilitare la lettura della pressione
+    if(millis() > (t3 + durata) && millis() < (t3 + (2 * durata)))  //Se sono passati 5 secondi
+    {
+      myDFPlayer.play(1);  //Play the first mp3
+      Serial.println("Play caffettino");
+      stampaoled(VIV);
+      currentProdotto = 0; //se parte la musica resetto il prodotto
+    }
+    else if(millis() > (t3 + (2 * durata)) /*&& millis() < (t3 + (3 * durata))*/)  //Se sono passati 10 secondi
+    {
+      playCompleanno();
+      stampaoled(VIV);
+      currentProdotto = 0; //se parte la musica resetto il prodotto          
+    }
+    /*else if(millis() > (t3 + (3 * durata)) )  //Se sono passati 15 secondi
+    {
+      myDFPlayer.play(2);  //Play the first mp3
+      Serial.println("Faccetta nera");
+      stampaoled(VIV);
+      currentProdotto = 0; //se parte la musica resetto il prodotto          
+    }*/
+    Serial.println("Rilasciato");
+  }
+
   if(firstBoot == true)
   {
     stampaoled(VIV);
+    myDFPlayer.play(1);
     firstBoot = false;
   }
 
@@ -359,7 +399,7 @@ void logCard()
     Serial.println(verify);   //stampa di controllo dell'errore
 }
 
-void checkButtonPressed()
+/*void checkButtonPressed()
 {
   debouncer.update();  // Aggiorna lo stato del pulsante
 
@@ -416,7 +456,7 @@ void checkButtonPressed()
 
   lastButtonState = reading;
 }
-
+*/
 void buttRoutine()
 {
   currentProdotto++;
@@ -727,3 +767,8 @@ void stampaoled(int i)
   }
 }
 
+void playCompleanno()
+{
+  myDFPlayer.play(2);  //Play the first mp3
+  Serial.println("Play Bella Ciao");
+}
