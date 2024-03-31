@@ -3,7 +3,7 @@ from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 from .Session import session
 from sqlalchemy import select, func
-from sqlalchemy.orm import aliased
+from sqlalchemy.orm import aliased, load_only
 
 from ..Database.Models.Auletta import Auletta
 from ..Database.Models.Magazzino import Magazzino
@@ -57,14 +57,19 @@ def GetIDTelegram(idCard: str) -> str:
     return session.query(Utente).filter(Utente.ID_Card == f"{idCard}").one().ID_Telegram
 
 
-def InsertUser(idTelegram: str, idAuletta: int, genere: str, dataNascita: datetime.date, username: str) -> None:
+def InsertUser(idTelegram: str, auletta: str, genere: str, dataNascita: str, username: str) -> None:
     """DATABASE_HANDLER / ADD_USER: Inserisce l'utente con ID_Telegram ed Username passati come parametro nel DB"""
+
+    dn = dataNascita.split("/")
+    birthday = datetime.date(day=int(dn[0]),month=int(dn[1]),year=int(dn[2]))
+
+    idAuletta : int = GetAuletta(auletta=auletta)
 
     utente = Utente(
         ID_Telegram=idTelegram,
         ID_Auletta=idAuletta,
         genere=genere,
-        dataNascita=dataNascita,
+        dataNascita=birthday,
         username=username,
         ID_Card=None,
         saldo=0.0,
@@ -77,6 +82,9 @@ def InsertUser(idTelegram: str, idAuletta: int, genere: str, dataNascita: dateti
 
     return None
 
+def GetUnverifiedUsers(idAuletta: int) -> list:
+    """Ritorna la lista degli utenti non verificati afferenti all auletta con id specificato"""
+    return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == False).all()
 
 def GetIsAdmin(idTelegram: str) -> bool:
     """DATABASE_HANDLER: Ritorna il ruolo dell'utente"""
@@ -149,6 +157,10 @@ def GetAuletta(idAuletta: int) -> str:
 
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{idAuletta}").one().Nome
 
+def GetAuletta(auletta : str) -> int:
+    """DATABASE_HANDLER / ADD_USER: Dato il nome dell'auletta, restituisce il suo ID"""
+    
+    return session.query(Auletta).filter(Auletta.Nome == f"{auletta}").one().ID_Auletta
 
 # endregion
 

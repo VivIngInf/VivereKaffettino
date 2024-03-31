@@ -25,6 +25,8 @@ from Modules.Bot.Resoconto import SendResoconto
 from Modules.Bot.NavMenu import button_callbacks, handle_messages
 from Modules.Bot.States import *
 
+from Modules.Shared.Query import GetUnverifiedUsers
+
 import datetime
 import time
 
@@ -67,10 +69,8 @@ def main() -> None:
     job_queue = application.job_queue
     job_queue.run_daily(SendResoconto,
                         time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
-
-    # Run the bot until the user presses Ctrl-C
+    
     application.run_polling(allowed_updates=Update.ALL_TYPES)
-
 
 if __name__ == "__main__":
     main()

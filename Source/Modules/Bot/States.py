@@ -6,5 +6,6 @@ ACTIONS = ["typing_username_registra", "typing_age", "dataNascita", "selecting_g
            "typing_add_admin", "typing_verify_user", "typing_card",
            "username", "username_id"]
 
-GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "*"}
+GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}
+DB_GENDER_DICT = {"D": "a", "U": "o", "A": "ə"}
 

@@ -113,7 +113,7 @@ def CreatePersistent():
         ID_Card = "48213022911200",
         username = "Riccardo.Sciacca",
         genere="M",
-        dataNascita=date(2003, 11, 17),
+        dataNascita=date(2001, 1, 18),
         saldo = 100.0,
         isAdmin = True,
         isVerified = True

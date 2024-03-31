@@ -2,7 +2,7 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from Modules.Bot.States import *
-from ..Shared.Query import GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin
+from ..Shared.Query import GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, getGender, GetUnverifiedUsers
 from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdminDB, InsertUser, GetUsername, assignCard
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
@@ -10,6 +10,19 @@ from Modules.Bot.Stop import Stop
 from Modules.Bot.UserInfo import Info
 import re
 
+#TODO: Sistemare il codice, dovremmo evitare di fare un super mappazone qui
+
+#TODO: Vorrei evitare di dovere inserire manualmente il nome dell'utente.
+#      Direi quindi di visualizzarli tramite bottoni.
+#      Utilizzare la query GetUnverifiedUsers(int idAuletta), loopare tra tutti 
+#      gli elementi e con user[0] prendere il nome
+
+#TODO: Quando un utente crea il proprio profilo, viene mandato un messaggio al 
+#      gruppo degli amministratori in base all'auletta di afferenza.
+
+#TODO: Conferma quando si inserisce il codice della card nella verifica utente
+
+#TODO: Back singolo nella procedura di registrazione e non annullamento totale
 
 async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Ogni qual volta viene premuto un bottone del menù"""
@@ -48,9 +61,9 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=keyboard)
 
     elif query.data == "selecting_gender":
-        buttons = [[InlineKeyboardButton("Donna", callback_data='D')],
-                   [InlineKeyboardButton("Uomo", callback_data='U')],
-                   [InlineKeyboardButton("Altro", callback_data='A')],
+        buttons = [[InlineKeyboardButton("Donna", callback_data='donna')],
+                   [InlineKeyboardButton("Uomo", callback_data='uomo')],
+                   [InlineKeyboardButton("Altro", callback_data='altro')],
                    [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
 
@@ -58,7 +71,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=keyboard)
 
     elif query.data in ("donna", "uomo", "altro"):
-        buttons = [[InlineKeyboardButton("Confermi?", callback_data='selecting_auletta_registra')],
+        buttons = [[InlineKeyboardButton("✔️ Conferma", callback_data='selecting_auletta_registra')],
                    [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
         context.user_data["gender"] = query.data
@@ -75,16 +88,16 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         buttons.append([InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')])
         keyboard = InlineKeyboardMarkup(buttons)
 
-        await query.edit_message_text(text=f"Car{GENDER_DICT[context.user_data['gender']]} {context.user_data['username']} seleziona la tua Auletta di appartenenza",
+        await query.edit_message_text(text=f"Seleziona la tua Auletta di appartenenza",
                                       reply_markup=keyboard)
 
     elif query.data in [str(auletta).split()[1] for auletta in GetAulette()]:
         context.user_data["auletta"] = query.data
-        InsertUser(idTelegram=context.user_data["username_id"], idAuletta=context.user_data["auletta"], genere=context.user_data["gender"], dataNascita=context.user_data["dataNascita"], username=context.user_data["username"])
+        InsertUser(idTelegram=context.user_data["username_id"], auletta=context.user_data["auletta"], genere=convertToGenderDB(context.user_data["gender"]), dataNascita=context.user_data["dataNascita"], username=context.user_data["username"])
         buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(
-            text=f"Carissim{GENDER_DICT[context.user_data['gender']]} {context.user_data['username']} benvenuto in Vivere Kaffettino! ✌",
+            text=f"{context.user_data['username']} benvenut{GENDER_DICT[context.user_data['gender']]} in Vivere Kaffettino!",
             reply_markup=keyboard)
         context.user_data.pop("username")
         context.user_data.pop("username_id")
@@ -178,7 +191,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                        [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             query = context.user_data["typing_age"]
-            context.user_data["dataNascita"]
+            context.user_data["dataNascita"] = age
             await query.edit_message_text(text=f"Hai scritto {age}, confermi?", reply_markup=keyboard)
             context.user_data.pop("typing_age")
         else:
@@ -187,7 +200,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
             buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(
-                f"Hai digitato un'età che non rispetta lo stardard proposto, riprova.\nEs: 11/09/2001",
+                f"Hai digitato una data di nascita che non rispetta lo stardard, riprova.\nEs: 11/09/2001",
                 reply_markup=keyboard)
 
     elif list(context.user_data.keys()).count("typing_username_ricarica") > 0:
@@ -299,11 +312,15 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if idCard.isdigit():
             buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
+            
             assignCard(GetIdTelegram(context.user_data['username']), idCard)
+            idTelegram = GetIdTelegram(username=context.user_data['username'])
+            gender = getGender(idTelegram=idTelegram)
+
             await query.edit_message_text(text=f"L'utente {context.user_data['username']} è stato verificato correttamente!",
                                           reply_markup=keyboard)
             await context.bot.send_message(chat_id=GetIdTelegram(context.user_data['username']),
-                                           text=f"Carissim{GENDER_DICT[context.user_data['gender']]} {context.user_data['username']}, sei stato abilitato ad ussare Vivere Kaffettino. Premi /start per iniziare e goditi i tuoi caffè! :)")
+                                           text=f'{context.user_data["username"]}, sei stat{DB_GENDER_DICT[gender]} abilitat{DB_GENDER_DICT[gender]} ad usare Vivere Kaffettino.\n\nVieni in auletta per ritirare la card!\n\nPremi /start per iniziare e goditi i tuoi caffè! :)')
             context.user_data.pop("typing_card")
             context.user_data.pop("username")
         else:
@@ -322,8 +339,11 @@ def check_regex_username(username: str) -> bool:
     pattern = r"^[A-Z][a-z-A-Z]+\.[A-Z][a-z-A-Z]+(([1-9][1-9])|0[1-9]|[1-9]0)?$"
     return re.match(pattern, username)
 
-
 def check_regex_age(age: str) -> bool:
     """Controlla se l'età inserita ha il formato corretto"""
-    pattern = r"^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/((19|20)\d\d)$"
+    pattern = r"^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/((19|20)\d\d)$"
     return re.match(pattern, age)
+
+def convertToGenderDB(gender : str) -> str:
+    """Ritorna solo la prima lettera del genere passato come parametro"""
+    return gender[0].upper()
