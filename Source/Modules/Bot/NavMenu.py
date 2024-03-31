@@ -79,7 +79,8 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                       reply_markup=keyboard)
 
     elif query.data in [str(auletta).split()[1] for auletta in GetAulette()]:
-        InsertUser(idTelegram=context.user_data["username_id"], idAuletta=context.user_data["auletta"], genere=context.user_data["genere"], dataNascita=context.user_data["dataNascita"], username=context.user_data["username"])
+        context.user_data["auletta"] = query.data
+        InsertUser(idTelegram=context.user_data["username_id"], idAuletta=context.user_data["auletta"], genere=context.user_data["gender"], dataNascita=context.user_data["dataNascita"], username=context.user_data["username"])
         buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(
@@ -88,6 +89,8 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data.pop("username")
         context.user_data.pop("username_id")
         context.user_data.pop("gender")
+        context.user_data.pop("dataNascita")
+        context.user_data.pop("auletta")
 
     elif query.data == 'saldo':
         await ShowBalance(update, context)
@@ -175,6 +178,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                        [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             query = context.user_data["typing_age"]
+            context.user_data["dataNascita"]
             await query.edit_message_text(text=f"Hai scritto {age}, confermi?", reply_markup=keyboard)
             context.user_data.pop("typing_age")
         else:
