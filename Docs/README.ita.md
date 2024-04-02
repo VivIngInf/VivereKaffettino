@@ -47,6 +47,8 @@ Tutta la **documentazione, amministrativa ed utente** è sotto la cartella [Docs
 
 [Giovanni Castelli](https://www.linkedin.com/in/giovanni-castelli02/) - Database Consultant
 
+[Gabriele Lo Cascio](https://www.linkedin.com/in/gabriele-locascio/) - Telegram Dev
+
 ### Elettronica
 
 [Riccardo Sciacca](https://www.linkedin.com/in/riccardo-sciacca-831357218/) - Esp32 Dev
