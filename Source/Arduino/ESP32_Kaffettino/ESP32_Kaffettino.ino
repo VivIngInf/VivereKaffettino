@@ -12,6 +12,8 @@
 */
 
 // Valori segreti (Username, password)
+// Bisogna avere un file rinominato "arduino_secrets.h" che segue il modello dell'example.
+// Quel file non verrà condiviso con github, in modo tale che le credenziali rimangano segrete.
   #include "arduino_secrets.h"
 
 // Lib lettore
