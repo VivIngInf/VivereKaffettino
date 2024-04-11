@@ -22,8 +22,8 @@ from Modules.Bot.Nostalgia import Nostalgia
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop_command
 from Modules.Bot.Resoconto import SendResoconto
-from Modules.Bot.NavMenu import button_callbacks, handle_messages
-from Modules.Bot.States import *
+from Modules.Bot.NavMenu import handle_messages, button_callbacks
+from Modules.Bot.Utility import *
 
 from Modules.Shared.Query import GetUnverifiedUsers
 
@@ -37,10 +37,8 @@ from telegram.ext import (
     Application,
     CallbackQueryHandler,
     CommandHandler,
-    ContextTypes,
-    ConversationHandler,
     MessageHandler,
-    filters,
+    filters
 )
 
 # Bisogna installare openpyxl, pandas e python-telegram-bot[job-queue]

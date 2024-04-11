@@ -4,7 +4,7 @@ from datetime import datetime
 from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from ..Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
-from Modules.Bot.States import *
+from Modules.Bot.Utility import *
 
 def GiornoCorrente() -> str:
     """Funzione per ottenere il giorno della settimana attuale come stringa"""
@@ -156,10 +156,10 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
 
     # Verifico se è il primo avvio o meno
-    if list(context.user_data.keys()).count("first_start") == 0:
-        FIRST_START = True
-    else:
+    if "first_start" in context.user_data:
         FIRST_START = False
+    else:
+        FIRST_START = True
 
     if FIRST_START:
         await update.message.reply_photo(

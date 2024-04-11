@@ -1,7 +1,7 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, constants
 from telegram.ext import ContextTypes
 from ..Shared.Query import GetUsername, CheckUserExists, GetIsAdmin, GetIsVerified
-from Modules.Bot.States import *
+from Modules.Bot.Utility import *
 
 
 async def Info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
