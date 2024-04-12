@@ -163,6 +163,11 @@ def GetAuletta(auletta : str) -> int:
     
     return session.query(Auletta).filter(Auletta.Nome == f"{auletta}").one().ID_Auletta
 
+def GetMyAuletta(idTelegram : int) -> int:
+    """DATABASE_HANDLER / USER VERIFY: Dato l'id telegram dell'utente restituisce la sua auletta"""
+
+    return session.query(Utente).filter(Utente.idTelegram == f"{idTelegram}").one().ID_Auletta
+
 # endregion
 
 # region Admin
@@ -338,9 +343,11 @@ def ricaricaMagazzino(idAuletta: str, idProdotto: int, quantitaRicaricata: int) 
 # region Auletta
 
 def GetDebito(ID_Auletta: int) -> int:
+    """Dato l'id dell'auletta ritorna il quantitativo di debiti accumulabili"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().DebitoMax
 
 def GetIdGruppoTelegram(ID_Auletta: int) -> str:
+    """Dato l'id dell'auletta ritorna l'id del gruppo associato"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().ID_GruppoTelegram
 
 # endregion

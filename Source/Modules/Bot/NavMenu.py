@@ -4,7 +4,7 @@ from Modules.Bot.Utility import *
 from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdminDB, \
     InsertUser, GetUsername, assignCard, SetIsVerified, \
     GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, \
-    getGender, GetUnverifiedUsers, GetIdGruppoTelegram
+    getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop
