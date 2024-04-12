@@ -18,6 +18,7 @@ import datetime
 
 # TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
 # TODO: Quando si effettua un pagamento, controllare la validità dei parametri passati (ES: Esiste l'auletta? Esiste un utente con quell'ID_Card?)
+# TODO: Quando si effettua la decurtazione dell'importo, prima controllare se è il compleanno del ragazzo.
 
 # region User
 
@@ -339,6 +340,8 @@ def ricaricaMagazzino(idAuletta: str, idProdotto: int, quantitaRicaricata: int) 
 def GetDebito(ID_Auletta: int) -> int:
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().DebitoMax
 
+def GetIdGruppoTelegram(ID_Auletta: int) -> str:
+    return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().ID_GruppoTelegram
 
 # endregion
 
