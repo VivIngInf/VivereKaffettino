@@ -19,6 +19,7 @@ import datetime
 # TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
 # TODO: Quando si effettua un pagamento, controllare la validità dei parametri passati (ES: Esiste l'auletta? Esiste un utente con quell'ID_Card?)
 # TODO: Quando si effettua la decurtazione dell'importo, prima controllare se è il compleanno del ragazzo.
+# TODO: Quando si effettua il login, controllare se è il compleanno e mandare una foto adeguata.
 
 # region User
 
