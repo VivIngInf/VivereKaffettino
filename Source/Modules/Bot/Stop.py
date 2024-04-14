@@ -6,9 +6,9 @@ from Modules.Bot.Utility import *
 async def Stop(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """End Conversation by command."""
     # Tolgo lo stato iniziale dal dizionario
-    if list(context.user_data.keys()).count("first_start") > 0:
+    if "first_start" in context.user_data:
         for action in ACTIONS:
-            if list(context.user_data.keys()).count(action) > 0:
+            if action in context.user_data:
                 context.user_data.pop(action)
         context.user_data.pop("first_start")
         context.user_data.pop("initial_message")
@@ -28,4 +28,18 @@ async def Stop_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
                 context.user_data.pop(action)
 
         context.user_data.pop("initial_message")
+        return ConversationHandler.END
+
+
+
+async def Stop_after_registration(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """End Conversation by command."""
+    # Tolgo lo stato iniziale dal dizionario
+    if "first_start" in context.user_data:
+        for action in ACTIONS:
+            if action in context.user_data:
+                context.user_data.pop(action)
+        context.user_data.pop("first_start")
+        context.user_data.pop("initial_message")
+        await update.callback_query.edit_message_text(text="Ti sei registrato correttamente, presto verrai verificato da un Admin")
         return ConversationHandler.END

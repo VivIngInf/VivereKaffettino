@@ -5,6 +5,7 @@ ACTIONS = ["acquire_username_toregister", "acquire_age", "dataNascita", "selecti
            "selecting_auletta_registra", "auletta",
            "acquire_amount_tocharge", "validate_amount_tocharge",
            "acquire_user_tomake_admin", "acquire_user_toremove_from_admin", "acquire_card_number",
+           "acquire_user_toverify", "acquire_user_toverify_keyboard", "action_to_perform",
            "username", "username_id", "idCard", "chat_id", "message_id"]
 
 GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}

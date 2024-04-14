@@ -167,7 +167,12 @@ def GetAuletta(auletta : str) -> int:
 def GetMyAuletta(idTelegram : int) -> int:
     """DATABASE_HANDLER / USER VERIFY: Dato l'id telegram dell'utente restituisce la sua auletta"""
 
-    return session.query(Utente).filter(Utente.idTelegram == f"{idTelegram}").one().ID_Auletta
+    return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().ID_Auletta
+
+
+def GetIdCards() -> list:
+    """Ritorna l'idCard più grande"""
+    return session.query(Utente.ID_Card).all()
 
 # endregion
 

@@ -4,10 +4,11 @@ from Modules.Bot.Utility import *
 from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdminDB, \
     InsertUser, GetUsername, assignCard, SetIsVerified, \
     GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, \
-    getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta
+    getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta, removeUser, GetIdGruppoTelegram, GetAuletta, \
+    GetIdCards
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
-from Modules.Bot.Stop import Stop
+from Modules.Bot.Stop import Stop, Stop_after_registration
 from Modules.Bot.UserInfo import Info
 import re
 
@@ -91,7 +92,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case auletta_selezionata if auletta_selezionata in {str(auletta).split()[1] for auletta in GetAulette()}:
             context.user_data["auletta"] = query.data
-            Inserisci_Utente(context)
+            await Inserisci_Utente(context)
             buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(
@@ -102,6 +103,12 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.user_data.pop("gender")
             context.user_data.pop("dataNascita")
             context.user_data.pop("auletta")
+
+            for action in ACTIONS:
+                if action in context.user_data:
+                    context.user_data.pop(action)
+            await Stop_after_registration(update, context)
+
 
         case 'ricarica':
             context.user_data['acquire_amount_tocharge'] = query
@@ -143,30 +150,55 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "acquire_user_toverify":
             buttons = list()
-            for id_auletta in range(len(GetAulette())):
-                for utente in GetUnverifiedUsers(id_auletta+1):
-                    button = InlineKeyboardButton(text=utente[0], callback_data=utente[0])
-                    buttons.append([button])
+            admin_who_make_the_query = query.from_user.id
+            for utente in GetUnverifiedUsers(GetMyAuletta(admin_who_make_the_query)):
+                button = InlineKeyboardButton(text=utente[0], callback_data=utente[0])
+                buttons.append([button])
             buttons.append([InlineKeyboardButton("🔙 Torna indietro", callback_data='admin')])
             keyboard = InlineKeyboardMarkup(buttons)
             if len(buttons) == 1:
                 await query.edit_message_text(f"Non ci sono utenti da verificare", reply_markup=keyboard)
             else:
-                await query.edit_message_text(f"Scegli chi abilitare", reply_markup=keyboard)
+                context.user_data["acquire_user_toverify"] = query
+                context.user_data["acquire_user_toverify_keyboard"] = keyboard
+                await query.edit_message_text(f"Scegli chi abilitare tramite i bottoni oppure scrivi il nome utente in chat", reply_markup=keyboard)
 
-        case utente_selezionato if utente_selezionato in {utente[0] for id_auletta in range(len(GetAulette())) for utente in GetUnverifiedUsers(id_auletta+1)}:
-            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("✔ Conferma", callback_data='acquire_card_number')],
+        case utente_selezionato if utente_selezionato in {utente[0] for utente in GetUnverifiedUsers(GetMyAuletta(query.from_user.id))}:
+            for ACTION in ("acquire_user_toverify", "acquire_user_toverify_keyboard"):
+                if ACTION in context.user_data:
+                    context.user_data.pop(ACTION)
+
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("✔ Conferma", callback_data='action_to_perform')],
                                              [InlineKeyboardButton("🔙 Torna indietro", callback_data='acquire_user_toverify')]])
 
             await query.edit_message_text(f"Hai scelto {utente_selezionato}, confermi?", reply_markup=keyboard)
             context.user_data["user_toverify"] = utente_selezionato
 
 
+        case "action_to_perform":
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("✔ Verifica", callback_data='acquire_card_number')],
+                                             [InlineKeyboardButton("✖ Elimina", callback_data='delete_user')],
+                                             [InlineKeyboardButton("🔙 Torna indietro", callback_data='acquire_user_toverify')]])
+
+            await query.edit_message_text(f"Cosa vuoi fare?", reply_markup=keyboard)
+
+
+        case "delete_user":
+            removeUser(GetIdTelegram(context.user_data["user_toverify"]))
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna indietro", callback_data='acquire_user_toverify')]])
+            await query.edit_message_text(text=f"L'utente {context.user_data['user_toverify']} è stato rimosso correttamente!",
+                                            reply_markup=keyboard)
+            for ACTION in ("acquire_user_toverify", "acquire_user_toverify_keyboard", "user_toverify"):
+                if ACTION in context.user_data:
+                    context.user_data.pop(ACTION)
+
+
         case "acquire_card_number":
             context.user_data["acquire_card_number"] = query
-            buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='acquire_user_toverify')]]
+            buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='action_to_perform')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Digita l'ID CARD da assegnare all'utente", reply_markup=keyboard)
+
 
         case "acquired_card":
             # Completa la verifica dell'utente una volta inserito il numero della CARD
@@ -198,6 +230,31 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                        [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"GESTIONE MAGAZZINO", reply_markup=keyboard)
+
+
+        case _:
+            action = str(query.data).split(":")[0]
+            username = str(query.data).split(":")[1]
+
+            if action == "instant_verify":
+                # Prendo l'ID Card massimo
+                max_IdCard = max(list(map(int, [item[0] for item in GetIdCards() if item[0] is not None])))
+                idTelegram = GetIdTelegram(username=username)
+                gender = getGender(idTelegram=idTelegram)
+                # Assegno autoamticamente l'ID Card Massimo + 1
+                assignCard(GetIdTelegram(username), max_IdCard + 1)
+                SetIsVerified(GetIdTelegram(username))
+
+                await query.edit_message_text(text=f"L'utente {username} è stato verificato correttamente con idCard: {max_IdCard + 1}")
+
+                # Avviso l'utente che è stato verificato
+                await context.bot.send_message(chat_id=GetIdTelegram(username),
+                                               text=f'{username}, sei stat{DB_GENDER_DICT[gender]} abilitat{DB_GENDER_DICT[gender]} ad usare Vivere Kaffettino.\n\nVieni in auletta per ritirare la card!\n\nPremi /start per iniziare e goditi i tuoi caffè! :)')
+
+            elif action == "instant_delete":
+                removeUser(GetIdTelegram(username))
+                await query.edit_message_text(text=f"L'utente {username} è stato rimosso correttamente!")
+
 
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -394,16 +451,24 @@ async def acquire_user_toverify(username: str, chat_id: int, message_id: int, co
     query = context.user_data["acquire_user_toverify"]
 
     if GetIdTelegram(username) != "None":
-        buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='acquire_card_number')],
-                   [InlineKeyboardButton("❌ Annulla", callback_data='acquire_user_toverify')]]
-        keyboard = InlineKeyboardMarkup(buttons)
-        context.user_data["username"] = username
-        context.user_data.pop("acquire_user_toverify")
-        await query.edit_message_text(text=f"Sicuro di voler confermare {username}?", reply_markup=keyboard)
+        if username not in [user[0] for user in GetUnverifiedUsers(GetMyAuletta(chat_id))]:
+            query = context.user_data["acquire_user_toverify"]
+            keyboard = context.user_data["acquire_user_toverify_keyboard"]
+            await query.edit_message_text(
+                text=f"Non sei abilitato ad attivare questo utente in quanto non appartiente alla tua Auletta.\nRiprova o seleziona l'utente con i bottoni",
+                reply_markup=keyboard)
+            await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+        else:
+            context.user_data.pop("acquire_user_toverify")
+            context.user_data.pop("acquire_user_toverify_keyboard")
+            buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='action_to_perform')],
+                       [InlineKeyboardButton("🔙 Torna indietro", callback_data='acquire_user_toverify')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            context.user_data["username"] = username
+            await query.edit_message_text(text=f"Sicuro di voler confermare {username}?", reply_markup=keyboard)
     else:
-        buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
-        keyboard = InlineKeyboardMarkup(buttons)
-        await query.edit_message_text(text="Utente non trovato, riprova o ritorna al menu principale",
+        keyboard = context.user_data["acquire_user_toverify_keyboard"]
+        await query.edit_message_text(text="Utente non trovato, riprova o seleziona l'utente con i bottoni",
                                       reply_markup=keyboard)
 
 
@@ -423,12 +488,18 @@ async def acquire_card_number(idCard: str, chat_id: int, message_id: int, contex
                                       reply_markup=keyboard)
 
 
-def Inserisci_Utente(context: ContextTypes.DEFAULT_TYPE):
+async def Inserisci_Utente(context: ContextTypes.DEFAULT_TYPE):
     """Memorizza nel DB e avvisa gli admin"""
     InsertUser(idTelegram=context.user_data["username_id"], auletta=context.user_data["auletta"],
                genere=convertToGenderDB(context.user_data["gender"]), dataNascita=context.user_data["dataNascita"],
                username=context.user_data["username"])
+    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("✔ Verifica", callback_data=f'instant_verify:{context.user_data["username"]}')],
+                                    [InlineKeyboardButton("✖ Elimina", callback_data=f'instant_delete:{context.user_data["username"]}')]])
 
+    print(context.user_data["auletta"])
+    await context.bot.send_message(chat_id=GetIdGruppoTelegram(GetAuletta(context.user_data["auletta"])),
+                                   text=f'Ciao ragazzi, {context.user_data["username"]} si è appena registrato',
+                                   reply_markup=keyboard)
     # TODO: Quando un utente crea il proprio profilo, viene mandato un messaggio al
     #      gruppo degli amministratori in base all'auletta di afferenza.
 
