@@ -5,7 +5,7 @@ from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdm
     InsertUser, GetUsername, assignCard, SetIsVerified, \
     GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, \
     getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta, removeUser, GetIdGruppoTelegram, GetAuletta, \
-    GetIdCards
+    GetIdCards, GetIdGruppiTelegramAdmin
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop, Stop_after_registration
@@ -317,7 +317,10 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
     else:
-        await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+        # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin
+        IdGroups = [item[0] for item in GetIdGruppiTelegramAdmin() if item[0] is not None]
+        if str(update.message.chat_id) not in IdGroups:
+            await context.bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
 
 
 async def acquire_username_toregister(username: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):

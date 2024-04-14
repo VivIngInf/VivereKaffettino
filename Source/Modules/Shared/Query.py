@@ -174,6 +174,10 @@ def GetIdCards() -> list:
     """Ritorna l'idCard più grande"""
     return session.query(Utente.ID_Card).all()
 
+def GetIdGruppiTelegramAdmin() -> list:
+    """Ritorna tutti gli ID degli gruppi telegram"""
+    return session.query(Auletta.ID_GruppoTelegram).all()
+
 # endregion
 
 # region Admin
