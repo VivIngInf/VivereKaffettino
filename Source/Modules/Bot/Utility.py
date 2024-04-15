@@ -6,7 +6,7 @@ ACTIONS = ["acquire_username_toregister", "acquire_age", "dataNascita", "selecti
            "acquire_amount_tocharge", "validate_amount_tocharge",
            "acquire_user_tomake_admin", "acquire_user_toremove_from_admin", "acquire_card_number",
            "acquire_user_toverify", "acquire_user_toverify_keyboard", "action_to_perform",
-           "username", "username_id", "idCard", "chat_id", "message_id"]
+           "username", "username_id", "idCard", "chat_id", "message_id", "amount"]
 
 GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}
 DB_GENDER_DICT = {"D": "a", "U": "o", "A": "ə"}
@@ -35,6 +35,9 @@ buttons_dict = {
 
     "acquire_card_number": [[InlineKeyboardButton("✔ Conferma", callback_data='acquired_card')],
                                          [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]],
+
+    "instant_acquire_card_number": [[InlineKeyboardButton("✔ Conferma", callback_data='instant_acquired_card')],
+                                             [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]],
 
     "admin": [[InlineKeyboardButton("Verifica Utente ☑", callback_data='acquire_user_toverify')],
                            [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
