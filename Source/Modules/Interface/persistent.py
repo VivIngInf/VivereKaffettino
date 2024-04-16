@@ -67,7 +67,7 @@ def CreatePersistent():
         ID_Prodotto=2,
         ID_Auletta=1,
         quantita=33,
-        costo=0.3
+        costo=0.4
     )
     
     caffeDeim = Magazzino(
