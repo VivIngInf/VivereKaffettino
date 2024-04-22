@@ -455,7 +455,7 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
             CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
         else:
             CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=0)
-            compleanniRiscattati.append(GetUsername(idTelegram=idTelegram)) # Aggiungiamo il compleanno ai riscattati
+            compleanniRiscattati.append(username) # Aggiungiamo il compleanno ai riscattati
     except:
         return 5  # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
