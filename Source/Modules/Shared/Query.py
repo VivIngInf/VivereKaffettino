@@ -145,11 +145,10 @@ def checkBirthday(idTelegram: str) -> bool:
     
     formato = "%Y/%m/%d"
 
-    dataNascita : str = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
+    dataNascita : datetime.date = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
     dataCorrente : datetime.date = datetime.date.today()
-    dataNascitaConv : datetime.date = datetime.datetime.strptime(dataNascita, formato).date()
 
-    return dataCorrente == dataNascitaConv
+    return dataCorrente == dataNascita
 
 # endregion
 

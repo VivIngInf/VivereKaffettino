@@ -15,14 +15,14 @@ def CreatePersistent():
         ID_Auletta=1,
         Nome="Ingegneria",
         DebitoMax=3,
-        ID_GruppoTelegram=""
+        ID_GruppoTelegram="-1002059887014"
     )
 
     deim = Auletta(
         ID_Auletta=2,
         Nome="Deim",
         DebitoMax=3,
-        ID_GruppoTelegram=""
+        ID_GruppoTelegram="-1002059887014"
     )
 
     session.add(ingegneria)
@@ -138,6 +138,5 @@ def CreatePersistent():
     session.add(daniele)
 
     #endregion
-
 
     session.commit()
