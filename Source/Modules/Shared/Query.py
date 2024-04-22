@@ -438,7 +438,7 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
     isBirthday = checkBirthday(idTelegram=idTelegram)
 
-    if isBirthday and username in compleanniRiscattati:
+    if isBirthday is True and username in compleanniRiscattati:
         isBirthday = False
 
     # Decurtatre saldo ma solo se non è compleanno
