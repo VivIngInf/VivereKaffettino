@@ -79,6 +79,7 @@
   #define NOC 11 // Non c'è connessione
   #define CONNECTING 12 // Ci stiamo connettendo
   #define HTTPERR 13 // C'è satto un errore nella richiesta http
+  #define AUGURI 69 // Il bro che ha acquistato ha compiuto gli anni
   int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 
 // Periferiche  
@@ -236,7 +237,12 @@ void loop()
     {
       Serial.println("ABEMUS PRODOTTI!!!");
       flag = 1;
-      stampaoled(VIV);
+      
+      if(verify != 69)
+        stampaoled(VIV);
+      else
+        stampaoled(AUGURI);
+
       delay(2000);
       break;
     }
@@ -748,7 +754,32 @@ void stampaoled(int i)
       display.display();      // Show initial text
 
       break;
-    } 
+    }
+    case AUGURI:
+    {
+      display.stopscroll();
+      display.clearDisplay();
+      display.setTextSize(2); // Draw 2X-scale text
+      display.setTextColor(SSD1306_WHITE);
+
+      display.setCursor(5, 17);
+      display.print("AUGURI!");
+      display.display();      // Show text
+
+      display.setCursor(46, 40);
+      display.print(".");
+      delay(200);
+      display.display();      // Show text
+
+      display.print(".");
+      delay(200);
+      display.display();      // Show text
+
+      display.print(".");
+      delay(200);
+      display.display();      // Show initial text
+      break;
+    }
     case HTTPERR:
     {
       display.stopscroll();

@@ -138,11 +138,18 @@ def getGender(idTelegram: str) -> str:
     """
     return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().genere
 
-def getBirthday(idTelegram: str) -> str:
+def checkBirthday(idTelegram: str) -> bool:
     """
-        USER: Ritorna il la data di nascita dell'utente
+        USER: Ritorna vero se la data di nascita dell'utente è uguale alla data odierna
     """
-    return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
+    
+    formato = "%Y/%m/%d"
+
+    dataNascita : str = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
+    dataCorrente : datetime.date = datetime.date.today()
+    dataNascitaConv : datetime.date = datetime.datetime.strptime(dataNascita, formato).date()
+
+    return dataCorrente == dataNascitaConv
 
 # endregion
 
@@ -388,6 +395,8 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
     """DATABASE_HANDLER / WEMOS: In base all'auletta ed all'utente, far pagare il giusto"""
 
+    isBirthday : bool = False
+
     try:
 
         magazzino: Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
@@ -420,19 +429,32 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
     if totaleDisponibile < costo:
         return 1  # Saldo non sufficiente
 
-    # Decurtatre saldo
-    saldo -= costo
-    DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
+    isBirthday = checkBirthday(idTelegram=idTelegram)
+
+    # Decurtatre saldo ma solo se non è compleanno
+    if isBirthday is False:
+        saldo -= costo
+        DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
 
     # Scalare dal magazzino un unità di quel tipo
     DecurtaMagazzino(idProdotto=ID_Prodotto, idAuletta=ID_Auletta, quantita=1)
 
     try:
         # Creare storico della transazione come "Eseguito"
-        CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
+        if isBirthday is False:
+            CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
+        else:
+            CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=0)
     except:
         return 5  # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
-    return 0  # Comprato
+    returnCode = 0
+
+    if isBirthday:
+        returnCode = 69
+    else:
+        returnCode = 0
+
+    return returnCode # Comprato
 
 # endregion

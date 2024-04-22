@@ -34,7 +34,7 @@ def CreatePersistent():
 
     caffe = Prodotto(
         ID_Prodotto=1,
-        descrizione="Caffè"
+        descrizione="Caffe'"
     )
 
     acqua = Prodotto(
