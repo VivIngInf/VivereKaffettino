@@ -146,11 +146,14 @@ def checkBirthday(idTelegram: str) -> bool:
     dataNascita : datetime.date = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
     dataCorrente : datetime.date = datetime.date.today()
 
-    print(dataCorrente)
-    print(dataNascita)
-    print(dataCorrente == dataNascita)
+    isBd = False
 
-    return dataCorrente == dataNascita
+    if dataNascita.day == dataCorrente.day and dataNascita.month == dataCorrente.month:
+        isBd = True
+    else:
+        isBd = False    
+
+    return isBd
 
 # endregion
 
