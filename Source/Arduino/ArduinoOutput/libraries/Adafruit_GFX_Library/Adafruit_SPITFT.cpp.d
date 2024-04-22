@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.cpp.o: \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.cpp \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_SPITFT.h \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_GFX.h \

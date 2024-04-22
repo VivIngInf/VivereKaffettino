@@ -1,6 +1,6 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\sketch\ESP32_Kaffettino.ino.cpp.o: \
- g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\sketch\ESP32_Kaffettino.ino.cpp \
- g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\sketch\arduino_secrets.h \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\sketch\ESP32_Kaffettino.ino.cpp.o: \
+ G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\sketch\ESP32_Kaffettino.ino.cpp \
+ G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\sketch\arduino_secrets.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\libraries\SPI\src/SPI.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\variants\esp32/pins_arduino.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\cores\esp32/esp32-hal-spi.h \

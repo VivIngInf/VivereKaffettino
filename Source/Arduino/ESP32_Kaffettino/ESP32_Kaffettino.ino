@@ -760,6 +760,8 @@ void stampaoled(int i)
 	}
 	case AUGURI:
 	{
+		Serial.println("AUGURIIIIII!");
+
 		display.stopscroll();
 		display.clearDisplay();
 		display.setTextSize(2); // Draw 2X-scale text

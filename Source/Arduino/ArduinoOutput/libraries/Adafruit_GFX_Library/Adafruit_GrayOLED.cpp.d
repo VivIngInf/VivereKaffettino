@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_GFX_Library\Adafruit_GrayOLED.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_GFX_Library\Adafruit_GrayOLED.cpp.o: \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_GrayOLED.cpp \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_GrayOLED.h \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library/Adafruit_GFX.h \

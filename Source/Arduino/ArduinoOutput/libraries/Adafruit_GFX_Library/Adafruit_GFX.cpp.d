@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_GFX_Library\Adafruit_GFX.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_GFX_Library\Adafruit_GFX.cpp.o: \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_GFX.cpp \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_GFX_Library\Adafruit_GFX.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\cores\esp32/Arduino.h \

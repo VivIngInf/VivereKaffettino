@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\WiFiClientSecure\esp_crt_bundle.c.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\WiFiClientSecure\esp_crt_bundle.c.o: \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\libraries\WiFiClientSecure\src\esp_crt_bundle.c \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14/tools/sdk/esp32/include/esp_system/include/esp_system.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14/tools/sdk/esp32/include/esp_common/include/esp_err.h \

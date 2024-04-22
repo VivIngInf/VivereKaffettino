@@ -142,11 +142,13 @@ def checkBirthday(idTelegram: str) -> bool:
     """
         USER: Ritorna vero se la data di nascita dell'utente è uguale alla data odierna
     """
-    
-    formato = "%Y/%m/%d"
 
     dataNascita : datetime.date = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
     dataCorrente : datetime.date = datetime.date.today()
+
+    print(dataCorrente)
+    print(dataNascita)
+    print(dataCorrente == dataNascita)
 
     return dataCorrente == dataNascita
 

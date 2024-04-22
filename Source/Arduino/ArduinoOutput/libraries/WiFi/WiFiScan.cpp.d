@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\WiFi\WiFiScan.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\WiFi\WiFiScan.cpp.o: \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\libraries\WiFi\src\WiFiScan.cpp \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\libraries\WiFi\src\WiFi.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\cores\esp32/Print.h \

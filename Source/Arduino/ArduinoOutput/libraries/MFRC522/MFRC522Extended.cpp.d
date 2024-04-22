@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\MFRC522\MFRC522Extended.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\MFRC522\MFRC522Extended.cpp.o: \
  C:\Users\susin\Documents\Arduino\libraries\MFRC522\src\MFRC522Extended.cpp \
  C:\Users\susin\Documents\Arduino\libraries\MFRC522\src\MFRC522Extended.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\cores\esp32/Arduino.h \

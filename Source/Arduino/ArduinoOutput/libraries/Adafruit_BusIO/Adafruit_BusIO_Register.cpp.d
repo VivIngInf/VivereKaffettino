@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_BusIO\Adafruit_BusIO_Register.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_BusIO\Adafruit_BusIO_Register.cpp.o: \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_BusIO\Adafruit_BusIO_Register.cpp \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_BusIO/Adafruit_BusIO_Register.h \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\cores\esp32/Arduino.h \

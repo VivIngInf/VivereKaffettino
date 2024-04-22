@@ -1,4 +1,4 @@
-g:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_SSD1306\Adafruit_SSD1306.cpp.o: \
+G:\_Programmazione\ Varia\Vivere\VivereKaffettino\Source\Arduino\ArduinoOutput\libraries\Adafruit_SSD1306\Adafruit_SSD1306.cpp.o: \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_SSD1306\Adafruit_SSD1306.cpp \
  C:\Users\susin\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.14\cores\esp32/pgmspace.h \
  C:\Users\susin\Documents\Arduino\libraries\Adafruit_SSD1306\Adafruit_SSD1306.h \
