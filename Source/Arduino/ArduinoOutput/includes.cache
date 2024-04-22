@@ -1,0 +1,207 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\cores\\esp32"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\variants\\esp32"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "SPI.h",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\SPI\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "MFRC522.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\MFRC522\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "WiFi.h",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "HTTPClient.h",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\HTTPClient\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "WiFiClientSecure.h",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFiClientSecure\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "ArduinoJson.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\ArduinoJson\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "LinkedList.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\LinkedList"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "Wire.h",
+    "Includepath": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\Wire\\src"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "Adafruit_GFX.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "Adafruit_I2CDevice.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_BusIO"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "Adafruit_SSD1306.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_SSD1306"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "DFRobotDFPlayerMini.h",
+    "Includepath": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\DFRobotDFPlayerMini"
+  },
+  {
+    "Sourcefile": "g:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ArduinoOutput\\sketch\\ESP32_Kaffettino.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\SPI\\src\\SPI.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\MFRC522\\src\\MFRC522.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\MFRC522\\src\\MFRC522Extended.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFi.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiAP.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiClient.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiGeneric.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiMulti.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiSTA.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiScan.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiServer.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFi\\src\\WiFiUdp.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\HTTPClient\\src\\HTTPClient.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFiClientSecure\\src\\WiFiClientSecure.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFiClientSecure\\src\\esp_crt_bundle.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\WiFiClientSecure\\src\\ssl_client.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.14\\libraries\\Wire\\src\\Wire.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_GFX.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_GrayOLED.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_SPITFT.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\glcdfont.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_BusIO\\Adafruit_BusIO_Register.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_BusIO\\Adafruit_I2CDevice.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_BusIO\\Adafruit_SPIDevice.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\Adafruit_SSD1306\\Adafruit_SSD1306.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\susin\\Documents\\Arduino\\libraries\\DFRobotDFPlayerMini\\DFRobotDFPlayerMini.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]
