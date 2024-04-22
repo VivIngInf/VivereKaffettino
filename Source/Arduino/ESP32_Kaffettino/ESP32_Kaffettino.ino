@@ -767,22 +767,12 @@ void stampaoled(int i)
 		display.setTextSize(2); // Draw 2X-scale text
 		display.setTextColor(SSD1306_WHITE);
 
-		display.setCursor(5, 17);
+		display.setCursor(25, 30);
 		display.print("AUGURI!");
 		display.display(); // Show text
 
-		display.setCursor(46, 40);
-		display.print(".");
-		delay(200);
-		display.display(); // Show text
+		playCompleanno();
 
-		display.print(".");
-		delay(200);
-		display.display(); // Show text
-
-		display.print(".");
-		delay(200);
-		display.display(); // Show initial text
 		break;
 	}
 	case HTTPERR:

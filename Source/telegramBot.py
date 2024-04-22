@@ -23,6 +23,7 @@ from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop_command
 from Modules.Bot.Resoconto import SendResoconto
 from Modules.Bot.NavMenu import handle_messages, button_callbacks
+from Modules.Bot.BirthdayList import FlushBirthdayList
 from Modules.Bot.Utility import *
 
 from Modules.Shared.Query import GetUnverifiedUsers
@@ -67,6 +68,7 @@ def main() -> None:
     job_queue = application.job_queue
     job_queue.run_daily(SendResoconto,
                         time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
+    job_queue.run_daily(FlushBirthdayList, time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
     
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

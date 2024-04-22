@@ -12,6 +12,7 @@ from ..Database.Models.Prodotto import Prodotto
 from ..Database.Models.Ricarica import Ricarica
 from ..Database.Models.Rifornimento import Rifornimento
 from ..Database.Models.Utente import Utente
+from ..Bot.BirthdayList import compleanniRiscattati
 
 import datetime
 
@@ -414,6 +415,8 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
     except:
         return 2  # Utente con idCard {ID_Card} non esistente
 
+    username : str = GetUsername(idTelegram=idTelegram)
+
     saldo: float = GetBalance(idTelegram=idTelegram)
 
     debito: float = GetDebito(ID_Auletta=ID_Auletta)
@@ -435,6 +438,9 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
     isBirthday = checkBirthday(idTelegram=idTelegram)
 
+    if isBirthday and username in compleanniRiscattati:
+        isBirthday = False
+
     # Decurtatre saldo ma solo se non è compleanno
     if isBirthday is False:
         saldo -= costo
@@ -449,6 +455,7 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
             CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
         else:
             CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=0)
+            compleanniRiscattati.append(GetUsername(idTelegram=idTelegram)) # Aggiungiamo il compleanno ai riscattati
     except:
         return 5  # Non è stato possibile creare lo storico dell'operazione avvenuta TODO: Restituire soldi e non far partire il caffè
 
