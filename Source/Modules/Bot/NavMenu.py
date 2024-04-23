@@ -242,6 +242,10 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 removeUser(GetIdTelegram(username))
                 await query.edit_message_text(text=f"L'utente {username} è stato rimosso correttamente!")
 
+            elif action == "instant_verify":
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Procedi sul Bot", url=f"https://t.me/{context.bot.username}")]])
+                await query.edit_message_text(text=f"Ottimo! Procedi alla verifica direttamente dalla chat privata", reply_markup=keyboard)
+
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Quando viene scritto qualcosa in chat"""
@@ -487,7 +491,7 @@ async def Inserisci_Utente(context: ContextTypes.DEFAULT_TYPE):
                genere=convertToGenderDB(context.user_data["gender"]), dataNascita=context.user_data["dataNascita"],
                username=context.user_data["username"])
     keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("✔ Verifica",
-                                                           url=f"https://t.me/{context.bot.username}")],
+                                                           callback_data=f'instant_verify:{context.user_data["username"]}')],
                                      [InlineKeyboardButton("✖ Elimina",
                                                            callback_data=f'instant_delete:{context.user_data["username"]}')]])
 
