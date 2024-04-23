@@ -44,7 +44,7 @@
 #define EAP_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
 const char *ssid = "eduroam";		 // SSID WiFi
 
-#define usingUniversityWifi false
+#define usingUniversityWifi true
 
 // Rotte
 const char *serverAddressPay = "http://204.216.213.203:8000/pay";

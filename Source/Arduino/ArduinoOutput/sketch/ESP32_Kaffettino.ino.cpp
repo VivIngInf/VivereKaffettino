@@ -1,4 +1,4 @@
-#line 1 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+#line 1 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 /*
   SPI-LETTORE:
   RST  - 34
@@ -128,29 +128,6 @@ int durata = 5000; // costante in ms per la pressione 5sec kaffettino, 10sec bel
 int pressed = 0;   // variabile che controlla se il pulsante è premuto ed è già stato azzerato t3
 int butt = 15;	   // pin del pulsante
 
-#line 130 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void setup();
-#line 185 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void loop();
-#line 355 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void connettiWifi();
-#line 392 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void dump_byte_array(byte *buffer, byte bufferSize);
-#line 405 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void logCard();
-#line 472 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void buttRoutine();
-#line 482 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void setupAudio();
-#line 508 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void setupDisplay();
-#line 517 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void getProdotti();
-#line 598 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void pay();
-#line 801 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
-void playCompleanno();
-#line 130 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 void setup()
 {
 

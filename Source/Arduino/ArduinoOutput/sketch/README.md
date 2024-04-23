@@ -1,4 +1,4 @@
-#line 1 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\README.md"
+#line 1 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\README.md"
 # WiFiScan Example
 
 This example demonstrates how to use the WiFi library to scan available WiFi networks and print the results.
