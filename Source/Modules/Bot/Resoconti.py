@@ -42,11 +42,28 @@ async def SendDailyResoconto(context: CallbackContext):
     await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
 
 
-#async def SendUsersResoconto(context: CallbackContext):
+async def SendUsersResoconto(context: CallbackContext):
     
-    #rows = GetUsersExcel()
-    #columns = ['ID_Telegram', 'ID_Card', 'Username', 'Nome_Auletta', 'IS_Verified', 'IS_Admin']
+    columns = ['ID_Telegram', 'ID_Card', 'Username', 'Saldo' 'Nome_Auletta', 'Verificato?', 'Admin?']
+    rows = GetUsersExcel()
 
+    rowsDataframe = []
 
+    for id_t, id_c, u, s, n, v, a in rows:
+        tempArr = []
+        tempArr.append(id_t)
+        tempArr.append(id_c)
+        tempArr.append(u)
+        tempArr.append(s)
+        tempArr.append(n)
+        tempArr.append(v)
+        tempArr.append(a)
+        rowsDataframe.append(tempArr)
 
-    #await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
+    df = pandas.DataFrame(rowsDataframe, columns=columns)
+
+    excel_buffer = BytesIO()
+    df.to_excel(excel_buffer, index=False)
+    excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
+
+    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")

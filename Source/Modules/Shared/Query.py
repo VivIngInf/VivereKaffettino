@@ -475,8 +475,6 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 def GetUsersExcel() :
     
     users = session.execute(select(Utente.ID_Telegram, Utente.ID_Card, Utente.username, Utente.saldo, Auletta.Nome, Utente.isVerified, Utente.isAdmin).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
-    
-    for id_t, id_c, u, n, v, a, s in users:
-        print(f"ID_Telegram: {id_t}, ID_Card: {id_c}, Username: {u}, Saldo: {s}, Nome_Auletta: {n}, IsVerified: {v}, IsAdmin: {a}")
+    return users
 
 #endregion
