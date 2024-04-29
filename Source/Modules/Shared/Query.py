@@ -479,27 +479,7 @@ def GetUsersExcel() :
 
 def GetOperazioniExcel():
     #'ID_Operazione', 'ID_Telegram', 'Username', 'Auletta', 'Descrizione', 'Costo', 'Pagato', 'DateTimeOperazione'
-    operazioni = session.execute
-    (
-        select(
-            Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione
-        ).join(
-            Utente, 
-            Operazione.ID_Telegram == Utente.ID_Telegram
-        ).join(
-            Auletta,
-            Operazione.ID_Auletta == Auletta.ID_Auletta
-        ).join(
-            Prodotto,
-            Operazione.ID_Prodotto == Prodotto.ID_Prodotto
-        ).join(
-            Magazzino,
-            Operazione.ID_Prodotto == Magazzino.ID_Prodotto
-        ).filter(
-            func.date(Operazione.dateTimeOperazione) == datetime.date.today()
-        )
-    )
-
+    operazioni = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione).join(Utente, Operazione.ID_Telegram == Utente.ID_Telegram).join(Auletta, Operazione.ID_Auletta == Auletta.ID_Auletta).join(Prodotto, Operazione.ID_Prodotto == Prodotto.ID_Prodotto).join(Magazzino, Operazione.ID_Prodotto == Magazzino.ID_Prodotto).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()))
     return operazioni 
 
 #endregion
