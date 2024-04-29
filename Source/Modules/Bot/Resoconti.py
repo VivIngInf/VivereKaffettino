@@ -44,7 +44,7 @@ async def SendDailyResoconto(context: CallbackContext):
 
 async def SendUsersResoconto(context: CallbackContext):
     
-    columns = ['ID_Telegram', 'ID_Card', 'Username', 'Saldo' 'Nome_Auletta', 'Verificato?', 'Admin?']
+    columns = ['ID_Telegram', 'ID_Card', 'Username', 'Saldo', 'Nome_Auletta', 'Verificato?', 'Admin?']
     rows = GetUsersExcel()
 
     rowsDataframe = []
@@ -66,4 +66,4 @@ async def SendUsersResoconto(context: CallbackContext):
     df.to_excel(excel_buffer, index=False)
     excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
 
-    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
+    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'ResocontoUtenti-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto utenti del {datetime.date(datetime.now())} inviato!")
