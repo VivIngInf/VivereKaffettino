@@ -8,32 +8,33 @@ from datetime import datetime
 # TODO: Fare il join nel resoconto giornaliero con Utente, Auletta e Prodotto:
 #       Fargli visualizzare Username, NomeAuletta, NomeProdotto, DateTimeOperazione, Costo
 
-async def SendDailyResoconto(context: CallbackContext):
+#async def SendDailyResoconto(context: CallbackContext):
+async def SendDailyResoconto():
     columns = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
 
     rows = GetOperazioniExcel()
-    rowsDataframe = []
+    #rowsDataframe = []
 
     for id_o, id_t, u, na, pr, c, pa, do in rows:
-        tempArr = []
-        tempArr.append(id_o)
-        tempArr.append(id_t)
-        tempArr.append(u)
-        tempArr.append(na)
-        tempArr.append(pr)
-        tempArr.append(c)
-        tempArr.append(pa)
-        tempArr.append(do)
-        rowsDataframe.append(tempArr)
-
-    # Creazione del DataFrame
-    df = pandas.DataFrame(rowsDataframe, columns=columns)
-
-    excel_buffer = BytesIO()
-    df.to_excel(excel_buffer, index=False)
-    excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
-
-    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
+        #tempArr = []
+        print(id_o)
+        print(id_t)
+        print(u)
+        print(na)
+        print(pr)
+        print(c)
+        print(pa)
+        print(do)
+        #rowsDataframe.append(tempArr)
+#
+#    # Creazione del DataFrame
+#    df = pandas.DataFrame(rowsDataframe, columns=columns)
+#
+#    excel_buffer = BytesIO()
+#    df.to_excel(excel_buffer, index=False)
+#    excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
+#
+#    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
 
 
 async def SendUsersResoconto(context: CallbackContext):
