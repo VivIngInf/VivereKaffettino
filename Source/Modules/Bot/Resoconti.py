@@ -1,6 +1,6 @@
 from telegram.ext import  CallbackContext
 from ..Shared.Configs import GetChannelID
-from ..Shared.Query import getOperazioniGiornaliere, GetUsersExcel
+from ..Shared.Query import GetOperazioniExcel, GetUsersExcel
 import pandas
 from io import BytesIO
 from datetime import datetime
@@ -11,7 +11,7 @@ from datetime import datetime
 async def SendDailyResoconto(context: CallbackContext):
     columns = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
 
-    rows = getOperazioniGiornaliere()
+    rows = GetOperazioniExcel()
     rowsDataframe = []
 
     for id_o, id_t, u, na, pr, c, pa, do in rows:
