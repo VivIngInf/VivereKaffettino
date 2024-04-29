@@ -17,6 +17,9 @@ def SendDailyResoconto():
 
     print(rows)
 
+    for x in rows:
+        print(x)
+
 #    for id_o, id_t, u, na, pr, c, pa, do in rows:
 #        #tempArr = []
 #        print(id_o)
