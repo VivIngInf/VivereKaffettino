@@ -477,6 +477,7 @@ def GetUsersExcel() :
     users = session.scalars(select(Utente.username, Auletta.Nome).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
     
     for u in users:
-        print(u)
+        for x in u:
+            print(x)
 
 #endregion
