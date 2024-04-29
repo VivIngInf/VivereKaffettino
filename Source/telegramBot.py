@@ -67,11 +67,8 @@ def main() -> None:
 
     job_queue = application.job_queue
     job_queue.run_daily(SendDailyResoconto,
-                        time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
+                        time=datetime.time(hour=14, minute=23, second=0, tzinfo=pytz.timezone('Europe/Rome')))
     job_queue.run_daily(FlushBirthdayList, time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
-    
-    job_queue.run_daily(SendUsersResoconto,
-                        time=datetime.time(hour=13, minute=45, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 

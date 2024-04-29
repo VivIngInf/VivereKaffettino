@@ -9,27 +9,21 @@ from datetime import datetime
 #       Fargli visualizzare Username, NomeAuletta, NomeProdotto, DateTimeOperazione, Costo
 
 async def SendDailyResoconto(context: CallbackContext):
-
-    columns = ['ID_Operazione', 'ID_Telegram', 'ID_Auletta', 'ID_Prodotto', 'DateTimeOperazione', 'Costo']
+    columns = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
 
     rows = getOperazioniGiornaliere()
     rowsDataframe = []
 
-    print(rows)
-
-    for row in rows:
+    for id_o, id_t, u, na, pr, c, pa, do in rows:
         tempArr = []
-        dTime = ""
-        valori = str(row).split(" ")
-        for v in valori:
-            if str(v).find("-") != -1:
-                dTime += v
-                continue
-            elif str(v).find(":") != -1:
-                dTime += v
-                tempArr.append(dTime)
-            else:
-                tempArr.append(v)
+        tempArr.append(id_o)
+        tempArr.append(id_t)
+        tempArr.append(u)
+        tempArr.append(na)
+        tempArr.append(pr)
+        tempArr.append(c)
+        tempArr.append(pa)
+        tempArr.append(do)
         rowsDataframe.append(tempArr)
 
     # Creazione del DataFrame
