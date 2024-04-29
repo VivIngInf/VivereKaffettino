@@ -45,7 +45,7 @@
 #define EAP_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
 const char *ssid = "eduroam";		 // SSID WiFi
 
-#define usingUniversityWifi false
+#define usingUniversityWifi true
 
 // Rotte
 const char *serverAddressPay = "http://204.216.213.203:8000/pay";
@@ -128,6 +128,29 @@ int durata = 5000; // costante in ms per la pressione 5sec kaffettino, 10sec bel
 int pressed = 0;   // variabile che controlla se il pulsante è premuto ed è già stato azzerato t3
 int butt = 15;	   // pin del pulsante
 
+#line 130 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void setup();
+#line 185 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void loop();
+#line 355 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void connettiWifi();
+#line 392 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void dump_byte_array(byte *buffer, byte bufferSize);
+#line 405 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void logCard();
+#line 472 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void buttRoutine();
+#line 482 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void setupAudio();
+#line 508 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void setupDisplay();
+#line 517 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void getProdotti();
+#line 598 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void pay();
+#line 801 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+void playCompleanno();
+#line 130 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 void setup()
 {
 

@@ -21,7 +21,7 @@ from Modules.Shared.Configs import LoadConfigs, GetToken
 from Modules.Bot.Nostalgia import Nostalgia
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop_command
-from Modules.Bot.Resoconto import SendResoconto
+from Source.Modules.Bot.Resoconti import SendDailyResoconto, GetUsersExcel
 from Modules.Bot.NavMenu import handle_messages, button_callbacks
 from Modules.Bot.BirthdayList import FlushBirthdayList
 from Modules.Bot.Utility import *
@@ -66,10 +66,12 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(button_callbacks))
 
     job_queue = application.job_queue
-    job_queue.run_daily(SendResoconto,
+    job_queue.run_daily(SendDailyResoconto,
                         time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
     job_queue.run_daily(FlushBirthdayList, time=datetime.time(hour=23, minute=59, second=0, tzinfo=pytz.timezone('Europe/Rome')))
     
+    GetUsersExcel()
+
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":

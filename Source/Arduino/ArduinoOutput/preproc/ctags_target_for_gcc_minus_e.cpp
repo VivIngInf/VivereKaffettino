@@ -1,4 +1,4 @@
-# 1 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 1 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 /*
 
   SPI-LETTORE:
@@ -22,33 +22,33 @@
   SDA - 21
 
 */
-# 14 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 14 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 // Valori segreti (Username, password)
 // Bisogna avere un file rinominato "arduino_secrets.h" che segue il modello dell'example.
 // Quel file non verrà condiviso con github, in modo tale che le credenziali rimangano segrete.
-# 18 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 18 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
 
 // Lib lettore
-# 21 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 22 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 21 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 22 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
 
 // Lib wifi
-# 25 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 26 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 25 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 26 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
 
 // Lib http
-# 29 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 30 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 31 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 29 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 30 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 31 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
 
 // Lib Oled
-# 34 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 35 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 36 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 34 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 35 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 36 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
 
 // Lib audio
-# 39 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
-# 40 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 39 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
+# 40 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 2
 
 // Credenziali wifi
 
@@ -83,11 +83,11 @@ int IDProdotto = 1;
 JsonArray products;
 
 // Codici di stampa per la funzione stampaOled()
-# 85 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 85 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 
 // Periferiche
-# 96 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 96 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 // Impostazione schermo
 
 
@@ -279,7 +279,7 @@ void loop()
 		  currentProdotto = 0; //se parte la musica resetto il prodotto
 
 		}*/
-# 281 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 281 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
   Serial.println("Rilasciato");
  }
 
@@ -356,13 +356,13 @@ void loop()
 
 void connettiWifi()
 {
- if (false)
+ if (true)
  {
   WiFi.begin(ssid, WPA2_AUTH_PEAP, "danieleorazio.susino" /* Es: mario.rossi03*/ /* Es: mario.rossi03*/, "danieleorazio.susino" /* Es: mario.rossi03*/ /* Stesso di EAP_IDENTITY*/, "#Matricola25!#"); // Passiamo le credenziali e istanziamo una nuova connessione
  }
  else
  {
-  WiFi.begin("WiFi S - Repeater", "wifiSusino1000gb");
+  WiFi.begin("", "");
  }
 
  while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
@@ -528,7 +528,7 @@ void logCard()
 }
 
 */
-# 472 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 472 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 void buttRoutine()
 {
  currentProdotto++;
@@ -577,17 +577,17 @@ void setupDisplay()
 void getProdotti()
 {
  const size_t bufferSize =
-# 519 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 519 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 
-# 519 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 519 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
  
-# 519 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
+# 519 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
                           (ArduinoJson::detail::sizeofObject(
-# 519 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 519 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
                           1
-# 519 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
+# 519 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
                           ))
-# 519 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 519 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
                                              ;
  DynamicJsonDocument doc(bufferSize);
 
@@ -670,17 +670,17 @@ void getProdotti()
 void pay()
 {
  const size_t bufferSize =
-# 600 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 600 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 
-# 600 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 600 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
  
-# 600 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
+# 600 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
                           (ArduinoJson::detail::sizeofObject(
-# 600 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 600 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
                           1
-# 600 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
+# 600 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino" 3
                           ))
-# 600 "G:\\_Programmazione Varia\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
+# 600 "D:\\Programmazione\\Vivere\\VivereKaffettino\\Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
                                              ;
  DynamicJsonDocument doc(bufferSize);
 
