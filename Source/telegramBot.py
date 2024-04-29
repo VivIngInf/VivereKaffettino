@@ -21,7 +21,7 @@ from Modules.Shared.Configs import LoadConfigs, GetToken
 from Modules.Bot.Nostalgia import Nostalgia
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop_command
-from Source.Modules.Bot.Resoconti import SendDailyResoconto, GetUsersExcel
+from Modules.Bot.Resoconti import SendDailyResoconto, GetUsersExcel
 from Modules.Bot.NavMenu import handle_messages, button_callbacks
 from Modules.Bot.BirthdayList import FlushBirthdayList
 from Modules.Bot.Utility import *
