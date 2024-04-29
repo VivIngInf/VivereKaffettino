@@ -15,16 +15,18 @@ def SendDailyResoconto():
     rows = GetOperazioniExcel()
     #rowsDataframe = []
 
-    for id_o, id_t, u, na, pr, c, pa, do in rows:
-        #tempArr = []
-        print(id_o)
-        print(id_t)
-        print(u)
-        print(na)
-        print(pr)
-        print(c)
-        print(pa)
-        print(do)
+    print(rows)
+
+#    for id_o, id_t, u, na, pr, c, pa, do in rows:
+#        #tempArr = []
+#        print(id_o)
+#        print(id_t)
+#        print(u)
+#        print(na)
+#        print(pr)
+#        print(c)
+#        print(pa)
+#        print(do)
         #rowsDataframe.append(tempArr)
 #
 #    # Creazione del DataFrame
