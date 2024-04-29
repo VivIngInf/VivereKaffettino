@@ -9,7 +9,7 @@ from datetime import datetime
 #       Fargli visualizzare Username, NomeAuletta, NomeProdotto, DateTimeOperazione, Costo
 
 #async def SendDailyResoconto(context: CallbackContext):
-async def SendDailyResoconto():
+def SendDailyResoconto():
     columns = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
 
     rows = GetOperazioniExcel()
