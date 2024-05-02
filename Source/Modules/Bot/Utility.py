@@ -5,7 +5,7 @@ ACTIONS = ["acquire_username_toregister", "acquire_age", "dataNascita", "selecti
            "selecting_auletta_registra", "auletta",
            "acquire_amount_tocharge", "validate_amount_tocharge",
            "acquire_user_tomake_admin", "acquire_user_toremove_from_admin", "acquire_card_number",
-           "acquire_user_toverify", "acquire_user_toverify_keyboard", "action_to_perform",
+           "acquire_user_toverify", "change_card", "acquire_card_to_change", "idCard_tochange", "acquire_user_to_change_card", "acquire_user_toverify_keyboard", "action_to_perform",
            "username", "username_id", "idCard", "chat_id", "message_id", "amount"]
 
 GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}
@@ -40,8 +40,10 @@ buttons_dict = {
                                              [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]],
 
     "admin": [[InlineKeyboardButton("Verifica Utente ☑", callback_data='acquire_user_toverify')],
-                           [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
-                           [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
-                           [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
+               [InlineKeyboardButton("Cambia Tessera 🔄", callback_data='change_card')],
+               [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
+               [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
+               [InlineKeyboardButton("Resoconto Excel 📃", callback_data='send_resoconto')],
+               [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
 }
 

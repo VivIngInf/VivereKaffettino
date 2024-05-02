@@ -272,6 +272,18 @@ def assignCard(idTelegram: str, idCard: str) -> int:
     return 0
 
 
+def getIDCard(idTelegram: str) -> int:
+    if SetIsVerified(idTelegram=idTelegram) == 1:
+        return 1  # l'utente non esiste
+
+    user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
+    card = user.ID_Card
+    if card is not None:
+        return int(card)
+    else:
+        return 0
+
+
 # endregion
 
 # region Magazzino

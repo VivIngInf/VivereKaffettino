@@ -5,11 +5,12 @@ from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdm
     InsertUser, GetUsername, assignCard, SetIsVerified, \
     GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, \
     getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta, removeUser, GetIdGruppoTelegram, GetAuletta, \
-    GetIdGruppiTelegramAdmin
+    GetIdGruppiTelegramAdmin, getIDCard
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop, Stop_after_registration, Stop_command
 from Modules.Bot.UserInfo import Info
+from Modules.Bot.Resoconti import SendUsersResoconto
 import re
 
 
@@ -134,6 +135,35 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = InlineKeyboardMarkup(buttons_dict["admin"])
             await query.edit_message_text(f"GESTIONE ADMIN", reply_markup=keyboard)
 
+        case "change_card":
+            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
+            if "acquire_card_to_change" in context.user_data:
+                context.user_data.pop('acquire_card_to_change')
+            context.user_data['acquire_user_to_change_card'] = query
+            buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(f"Digita l'username dell'utente di cui cambiare l'ID CARD", reply_markup=keyboard)
+
+        case "acquire_card_to_change":
+            context.user_data['acquire_card_to_change'] = query
+            buttons = [[InlineKeyboardButton("🔙 Torna Indietro", callback_data='change_card')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            if getIDCard(GetIdTelegram(context.user_data['username'])) == 0:
+                await query.edit_message_text(
+                    f"Non è assegnato alcun ID CARD al momento.\nDigita il nuovo ID CARD",
+                    reply_markup=keyboard)
+            else:
+                await query.edit_message_text(f"Adesso l'ID CARD è {getIDCard(GetIdTelegram(context.user_data['username']))}.\nDigita il nuovo ID CARD", reply_markup=keyboard)
+
+
+        case "perform_card_change":
+            assignCard(GetIdTelegram(context.user_data["username"]), context.user_data["idCard_tochange"])
+            buttons = [[InlineKeyboardButton("🔙 Torna al menu principale", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(
+                f"Adesso l'ID CARD è {context.user_data['idCard_tochange']}",
+                reply_markup=keyboard)
+
         case "add_admin":
             context.user_data['acquire_user_tomake_admin'] = query
             buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='admin')]]
@@ -146,6 +176,13 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='admin')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Digita l'username dell'utente da rimuovere dagli admin",
+                                          reply_markup=keyboard)
+
+        case "send_resoconto":
+            SendUsersResoconto(context)
+            buttons = [[InlineKeyboardButton("🔙 Torna al menu admin", callback_data='admin')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(f"Resoconto inviato",
                                           reply_markup=keyboard)
 
         case "acquire_user_toverify":
@@ -301,6 +338,17 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_id = update.message.message_id
         await acquire_user_toverify(username, chat_id, message_id, context)
 
+    elif "acquire_user_to_change_card" in context.user_data:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        await acquire_user_to_change_card(username, chat_id, message_id, context)
+
+    elif "acquire_card_to_change" in context.user_data:
+        idCard = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        await acquire_card_to_change(idCard, chat_id, message_id, context)
 
     elif "acquire_card_number" in context.user_data:
         idCard = update.message.text
@@ -467,6 +515,47 @@ async def acquire_user_toverify(username: str, chat_id: int, message_id: int, co
         keyboard = context.user_data["acquire_user_toverify_keyboard"]
         await query.edit_message_text(text="Utente non trovato, riprova o seleziona l'utente con i bottoni",
                                       reply_markup=keyboard)
+
+
+async def acquire_user_to_change_card(username: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """Acquisisco il nome utente per cui deve essere cambiata la card"""
+    await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+    query = context.user_data["acquire_user_to_change_card"]
+
+    if GetIdTelegram(username) != "None":
+        context.user_data.pop("acquire_user_to_change_card")
+        buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='acquire_card_to_change')],
+                   [InlineKeyboardButton("🔙 Torna indietro", callback_data='admin')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        context.user_data["username"] = username
+        await query.edit_message_text(text=f"Sicuro di voler confermare {username}?", reply_markup=keyboard)
+    else:
+        buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='admin')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        await query.edit_message_text(text="Utente non trovato, riprova o torna al menu admin",
+                                      reply_markup=keyboard)
+
+
+async def acquire_card_to_change(idCard: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """Acquisisco il nuovo ID CARD"""
+    await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+    query = context.user_data["acquire_card_to_change"]
+
+    try:
+        int(idCard)
+    except ValueError:
+        buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='change_card')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        await query.edit_message_text(text="Inserisci un numero intero valido per favore!",
+                                      reply_markup=keyboard)
+    else:
+        context.user_data.pop("acquire_card_to_change")
+        buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='perform_card_change')],
+                   [InlineKeyboardButton("🔙 Torna indietro", callback_data='change_card')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        context.user_data["idCard_tochange"] = idCard
+        await query.edit_message_text(text=f"Sicuro di voler confermare {idCard}?", reply_markup=keyboard)
+
 
 
 async def acquire_card_number(idCard: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
