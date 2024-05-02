@@ -43,7 +43,7 @@ buttons_dict = {
                [InlineKeyboardButton("Cambia Tessera 🔄", callback_data='change_card')],
                [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
                [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
-               [InlineKeyboardButton("Resoconto Excel 📃", callback_data='send_resoconto')],
+               [InlineKeyboardButton("Resoconto Utenti Excel 📃", callback_data='send_resoconto')],
                [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
 }
 
