@@ -103,7 +103,7 @@ def CreatePersistent():
     session.add(acquaIngegneria)
     session.add(caffeDeim)
     session.add(teDeim)
-    session.add(gelatoIngegneria)\
+    session.add(gelatoIngegneria)
 
     #endregion
 
