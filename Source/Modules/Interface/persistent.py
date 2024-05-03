@@ -163,6 +163,8 @@ def CreatePersistent():
 
     session.add(daniele)
 
+    session.add(andreaDePasquale)
+
     #endregion
 
     session.commit()
