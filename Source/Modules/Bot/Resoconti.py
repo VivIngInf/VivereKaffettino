@@ -5,9 +5,6 @@ import pandas
 from io import BytesIO
 from datetime import datetime
 
-# TODO: Fare il join nel resoconto giornaliero con Utente, Auletta e Prodotto:
-#       Fargli visualizzare Username, NomeAuletta, NomeProdotto, DateTimeOperazione, Costo
-
 async def SendDailyResoconto(context: CallbackContext):
     columns = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
 
