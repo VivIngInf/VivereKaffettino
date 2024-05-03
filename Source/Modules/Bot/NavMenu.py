@@ -111,7 +111,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await Stop_after_registration(update, context)
 
         case 'ricarica':
-            context.user_data['acquire_amount_tocharge'] = query
+            context.user_data['acquire_user_tocharge'] = query
             buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Digita l'username dell'utente che vuole ricaricare", reply_markup=keyboard)
@@ -119,16 +119,12 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "done_ricarica":
             buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
-            await context.bot.delete_message(chat_id=context.user_data["chat_id"],
-                                             message_id=context.user_data["message_id"])
             incrementaSaldo(context.user_data['username'], context.user_data["amount"])
             await query.edit_message_text(
                 text=f"Ricarica a {context.user_data['username']} effettuata!\nTorna pure al menu principale",
                 reply_markup=keyboard)
             context.user_data.pop("validate_amount_tocharge")
             context.user_data.pop("username")
-            context.user_data.pop("chat_id")
-            context.user_data.pop("message_id")
             context.user_data.pop("amount")
 
         case "admin":
@@ -304,11 +300,11 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await acquire_age(age, chat_id, message_id, context)
 
 
-    elif "acquire_amount_tocharge" in context.user_data:
+    elif "acquire_user_tocharge" in context.user_data:
         username = update.message.text
         chat_id = update.message.chat_id
         message_id = update.message.message_id
-        await acquire_amount_tocharge(username, chat_id, message_id, context)
+        await acquire_user_tocharge(username, chat_id, message_id, context)
 
 
     elif "validate_amount_tocharge" in context.user_data:
@@ -401,19 +397,22 @@ async def acquire_age(age: str, chat_id: int, message_id: int, context: ContextT
             reply_markup=keyboard)
 
 
-async def acquire_amount_tocharge(username: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
+async def acquire_user_tocharge(username: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
 
     buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
     keyboard = InlineKeyboardMarkup(buttons)
-    query = context.user_data["acquire_amount_tocharge"]
+    query = context.user_data["acquire_user_tocharge"]
     if GetIdTelegram(username=username) != "None":
-        context.user_data["validate_amount_tocharge"] = query
-        context.user_data["username"] = username
-        await query.edit_message_text(text="Digita l'importo da ricaricare", reply_markup=keyboard)
-        context.user_data.pop("acquire_amount_tocharge")
+        if GetIdTelegram(username=username) != chat_id:
+            await query.edit_message_text(text="Sorry ma non puoi ricaricare te stesso, riprova oppure annulla e ritorna al menu principale", reply_markup=keyboard)
+        else:
+            context.user_data["validate_amount_tocharge"] = query
+            context.user_data["username"] = username
+            await query.edit_message_text(text="Digita l'importo da ricaricare", reply_markup=keyboard)
+            context.user_data.pop("acquire_user_tocharge")
     else:
-        await query.edit_message_text(text="Utente non trovato riprova oppure ritorna al menu principale",
+        await query.edit_message_text(text="Utente non trovato riprova oppure annulla e ritorna al menu principale",
                                       reply_markup=keyboard)
 
 
@@ -437,8 +436,7 @@ async def validate_amount_tocharge(amount: str, chat_id: int, message_id: int, c
         else:
             keyboard = InlineKeyboardMarkup(buttons_dict["validate_amount_tocharge"])
             context.user_data["amount"] = amount
-            context.user_data["chat_id"] = chat_id
-            context.user_data["message_id"] = message_id
+            await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
             await query.edit_message_text(text=f"Sicuro di voler confermare {amount}?", reply_markup=keyboard)
 
 
