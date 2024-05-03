@@ -171,6 +171,11 @@ def GetAuletta(idAuletta: int) -> str:
 
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{idAuletta}").one().Nome
 
+def GetNomeAuletta(idAuletta: int) -> str:
+    """DATABASE_HANDLER / ADD_USER: Dato l'ID di un'auletta, restituisce il suo nome"""
+
+    return session.query(Auletta).filter(Auletta.ID_Auletta == f"{idAuletta}").one().Nome
+
 def GetAuletta(auletta : str) -> int:
     """DATABASE_HANDLER / ADD_USER: Dato il nome dell'auletta, restituisce il suo ID"""
     

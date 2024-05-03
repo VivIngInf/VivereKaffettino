@@ -5,7 +5,7 @@ from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdm
     InsertUser, GetUsername, assignCard, SetIsVerified, \
     GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, \
     getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta, removeUser, GetIdGruppoTelegram, GetAuletta, \
-    GetIdGruppiTelegramAdmin, getIDCard
+    GetIdGruppiTelegramAdmin, getIDCard, GetNomeAuletta
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop, Stop_after_registration, Stop_command
@@ -255,16 +255,47 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             context.user_data.pop("idCard")
             context.user_data.pop("user_toverify")
 
-
         case "storage":
+            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
+            if "acquire" in context.user_data:
+                context.user_data.pop('nome_prodotto')
             # TODO: Sotto menu per lo storage e relative comunicazioni con il DB
-            buttons = [[InlineKeyboardButton("Visualizza magazzino 🗄", callback_data='see_storage')],
-                       [InlineKeyboardButton("Incrementa scorta 🟩", callback_data='add_storage')],
-                       [InlineKeyboardButton("Rimuovi Prodotto 🟥", callback_data='remove_storage')],
+            buttons = [[InlineKeyboardButton("Rimuovi Prodotto 🟥", callback_data='remove_storage')],
                        [InlineKeyboardButton("Aggiungi Prodotto ➕", callback_data='new_storage')],
                        [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"GESTIONE MAGAZZINO", reply_markup=keyboard)
+
+        case "new_storage":
+            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
+            if "acquire_nome_prodotto" in context.user_data:
+                context.user_data.pop('acquire_nome_prodotto')
+            context.user_data["acquire_nome_prodotto"] = query
+            username = query.from_user.first_name
+            admin_who_make_the_query = query.from_user.id
+            auletta = GetNomeAuletta(GetMyAuletta(admin_who_make_the_query))
+            context.user_data["auletta_4storage"] = auletta
+            buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(f"Ciao {username}, dimmi pure il prodotto da aggiungere nella tua Auletta ({auletta})", reply_markup=keyboard)
+
+        case "acquire_costo_prodotto":
+            context.user_data["acquire_costo_prodotto"] = query
+            buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text("Ora dimmi quanto costa per favore", reply_markup=keyboard)
+
+        case "confirm_new_prodotto":
+            auletta = context.user_data["auletta_4storage"]
+            nome_prodotto = context.user_data["nome_prodotto"]
+            costo_prodotto = context.user_data["costo_prodotto"]
+            # TODO: Query per l'aggiunta al DB
+            context.user_data.pop("auletta_4storage")
+            context.user_data.pop("nome_prodotto")
+            context.user_data.pop("costo_prodotto")
+            buttons = [[InlineKeyboardButton("🔙 Torna al menu principale", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(f"{nome_prodotto} al costo di {costo_prodotto}, aggiunto all'Auletta {auletta} correttamente!", reply_markup=keyboard)
 
         case _:
             # (azione proveniente dal gruppo degli admin)
@@ -352,6 +383,17 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_id = update.message.message_id
         await acquire_card_number(idCard, chat_id, message_id, context)
 
+    elif "acquire_nome_prodotto" in context.user_data:
+        nome_prodotto = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        await acquire_nome_prodotto(nome_prodotto, chat_id, message_id, context)
+
+    elif "acquire_costo_prodotto" in context.user_data:
+        costo_prodotto = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        await acquire_costo_prodotto(costo_prodotto, chat_id, message_id, context)
 
     else:
         # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin
@@ -404,7 +446,7 @@ async def acquire_user_tocharge(username: str, chat_id: int, message_id: int, co
     keyboard = InlineKeyboardMarkup(buttons)
     query = context.user_data["acquire_user_tocharge"]
     if GetIdTelegram(username=username) != "None":
-        if GetIdTelegram(username=username) != chat_id:
+        if GetIdTelegram(username=username) == str(chat_id):
             await query.edit_message_text(text="Sorry ma non puoi ricaricare te stesso, riprova oppure annulla e ritorna al menu principale", reply_markup=keyboard)
         else:
             context.user_data["validate_amount_tocharge"] = query
@@ -418,6 +460,7 @@ async def acquire_user_tocharge(username: str, chat_id: int, message_id: int, co
 
 async def validate_amount_tocharge(amount: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
     query = context.user_data["validate_amount_tocharge"]
+    amount = amount.replace(",", ".")
     try:
         amount = float(amount)
     except ValueError:
@@ -438,6 +481,7 @@ async def validate_amount_tocharge(amount: str, chat_id: int, message_id: int, c
             context.user_data["amount"] = amount
             await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
             await query.edit_message_text(text=f"Sicuro di voler confermare {amount}?", reply_markup=keyboard)
+            context.user_data.pop("validate_amount_tocharge")
 
 
 async def acquire_user_tomake_admin(username: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
@@ -572,6 +616,47 @@ async def acquire_card_number(idCard: str, chat_id: int, message_id: int, contex
         keyboard = InlineKeyboardMarkup(buttons)
         await query.edit_message_text(text="ID CARD non valido, inserire un valore strettamente numerico!",
                                       reply_markup=keyboard)
+
+
+
+async def acquire_nome_prodotto(nome_prodotto: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
+    """Acquisisco il nuovo prodotto"""
+    await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+    query = context.user_data["acquire_nome_prodotto"]
+    context.user_data.pop("acquire_nome_prodotto")
+    buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='acquire_costo_prodotto')],
+               [InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
+    keyboard = InlineKeyboardMarkup(buttons)
+    context.user_data["nome_prodotto"] = nome_prodotto
+    await query.edit_message_text(text=f"Sicuro di voler confermare {nome_prodotto}?", reply_markup=keyboard)
+
+
+async def acquire_costo_prodotto(costo_prodotto: str, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
+    query = context.user_data["acquire_costo_prodotto"]
+    costo_prodotto = costo_prodotto.replace(",", ".")
+    try:
+        costo_prodotto = float(costo_prodotto)
+    except ValueError:
+        buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
+        keyboard = InlineKeyboardMarkup(buttons)
+        await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+        await query.edit_message_text(text="Inserire un importo numerico valido!",
+                                      reply_markup=keyboard)
+    else:
+        if costo_prodotto <= 0:
+            buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+            await query.edit_message_text(text="Il prezzo deve essere positivo!",
+                                          reply_markup=keyboard)
+        else:
+            buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='confirm_new_prodotto')],
+                        [InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            context.user_data["costo_prodotto"] = costo_prodotto
+            context.user_data.pop("acquire_costo_prodotto")
+            await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+            await query.edit_message_text(text=f"Sicuro di voler confermare {costo_prodotto}?", reply_markup=keyboard)
 
 
 
