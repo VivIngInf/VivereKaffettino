@@ -45,8 +45,9 @@ def SendUsersResoconto(context: CallbackContext):
 
     rowsDataframe = []
 
-    for id_t, id_c, u, s, n, v, a in rows:
+    for id_o, id_t, id_c, u, s, n, v, a in rows:
         tempArr = []
+        tempArr.append(id_o)
         tempArr.append(id_t)
         tempArr.append(id_c)
         tempArr.append(u)

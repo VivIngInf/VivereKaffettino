@@ -488,15 +488,6 @@ def GetUsersExcel() :
     
     users = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.ID_Card, Utente.username, Utente.saldo, Auletta.Nome, Utente.isVerified, Utente.isAdmin).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
 
-    for id_t, id_c, u, s, n, v, a in users:
-        print(id_t)
-        print(id_c)
-        print(u)
-        print(s)
-        print(n)
-        print(v)
-        print(a)
-
     return users
 
 def GetOperazioniExcel():
