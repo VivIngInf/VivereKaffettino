@@ -40,7 +40,7 @@ async def SendDailyResoconto(context: CallbackContext):
 
 def SendUsersResoconto(context: CallbackContext):
     
-    columns = ['ID_Telegram', 'ID_Card', 'Username', 'Saldo', 'Nome_Auletta', 'Verificato?', 'Admin?']
+    columns = ['ID_Operazione', 'ID_Telegram', 'ID_Card', 'Username', 'Saldo', 'Nome_Auletta', 'Verificato?', 'Admin?']
     rows = GetUsersExcel()
 
     rowsDataframe = []
