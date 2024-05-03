@@ -304,9 +304,14 @@ def DecurtaMagazzino(idProdotto: int, idAuletta: int, quantita: int) -> dict:
     if magazzino.quantita - quantita < 0:
         return {"Error": "La quantità rimanente non può essere negativa!"}
 
-    magazzino.quantita -= quantita
+    # Siccome DePasquale è un cornuto allora questo lo commentiamo in modo tale 
+    # che kaffettino non dia problemi con il magazzino
+    
+    # È lapalissiano nonché cristallino che a Depa pesi il culo
 
-    session.commit()
+    # magazzino.quantita -= quantita
+
+    # session.commit()
 
     return {"State": "Done"}
 

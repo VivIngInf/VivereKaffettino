@@ -47,6 +47,11 @@ def CreatePersistent():
         descrizione="Tè"
     )
 
+    gelato = Prodotto(
+        ID_Prodotto=4,
+        descrizione="Gelato"
+    )
+
     session.add(caffe)
     session.add(acqua)
     session.add(te)
@@ -66,15 +71,23 @@ def CreatePersistent():
         ID_Magazzino=2,
         ID_Prodotto=2,
         ID_Auletta=1,
-        quantita=33,
+        quantita=100,
         costo=0.4
     )
     
+    gelatoIngegneria = Magazzino(
+        ID_Magazzino=5,
+        ID_Prodotto=4,
+        ID_Auletta=1,
+        quantita=100,
+        costo=1
+    )
+
     caffeDeim = Magazzino(
         ID_Magazzino=3,
         ID_Prodotto=1,
         ID_Auletta=2,
-        quantita=50,
+        quantita=100,
         costo=0.4
     )
 
@@ -82,7 +95,7 @@ def CreatePersistent():
         ID_Magazzino=4,
         ID_Prodotto=3,
         ID_Auletta=2,
-        quantita=80,
+        quantita=100,
         costo=0.6
     )
 
@@ -90,16 +103,17 @@ def CreatePersistent():
     session.add(acquaIngegneria)
     session.add(caffeDeim)
     session.add(teDeim)
+    session.add(gelatoIngegneria)\
 
     #endregion
 
     #region Utente
 
-    guest = Utente(
+    aulettaIngegneria = Utente(
         ID_Telegram = "000000000",
         ID_Auletta = 1,
-        ID_Card = "1",
-        username = "guest",
+        ID_Card = "2091883115",
+        username = "Auletta.Ingegneria",
         genere="A",
         dataNascita=None,
         saldo = 9999999.0,
@@ -114,7 +128,7 @@ def CreatePersistent():
         username = "Riccardo.Sciacca",
         genere="M",
         dataNascita=date(2001, 1, 18),
-        saldo = 100.0,
+        saldo = 0,
         isAdmin = True,
         isVerified = True
     )
@@ -126,12 +140,24 @@ def CreatePersistent():
         username = "DanieleOrazio.Susino",
         genere="M",
         dataNascita=date(2003, 11, 17),
-        saldo = 500.0,
+        saldo = 0,
         isAdmin = True,
         isVerified = True,
     )
 
-    session.add(guest)
+    andreaDePasquale = Utente(
+        ID_Telegram= "154366501",
+        ID_Auletta= 1,
+        ID_Card= "425116123111200",
+        username="Andrea.Depasquale",
+        genere="M",
+        dataNascita=date(2001, 7, 17),
+        saldo = 0,
+        isAdmin = True,
+        isVerified = True,
+    )
+
+    session.add(aulettaIngegneria)
 
     session.add(riccardo)
 
