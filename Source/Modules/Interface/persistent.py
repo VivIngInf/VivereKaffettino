@@ -55,6 +55,7 @@ def CreatePersistent():
     session.add(caffe)
     session.add(acqua)
     session.add(te)
+    session.add(gelato)
 
     #endregion
 
