@@ -179,7 +179,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                           reply_markup=keyboard)
 
         case "send_resoconto":
-            SendUsersResoconto(context)
+            await SendUsersResoconto(context)
             buttons = [[InlineKeyboardButton("🔙 Torna al menu admin", callback_data='admin')]]
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Resoconto inviato",
