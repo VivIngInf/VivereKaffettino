@@ -486,7 +486,7 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
 def GetUsersExcel() :
     
-    users = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.ID_Card, Utente.username, Utente.saldo, Auletta.Nome, Utente.isVerified, Utente.isAdmin).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
+    users = session.execute(select(Utente.ID_Telegram, Utente.ID_Card, Utente.username, Utente.saldo, Auletta.Nome, Utente.isVerified, Utente.isAdmin).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
 
     return users
 
