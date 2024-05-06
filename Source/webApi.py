@@ -1,14 +1,44 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard
 from Modules.Api.requests import CoffeRequest, SaldoRequest, ProdottiRequest, MagazzinoRequest, DeleteUserRequest, ImpostaSaldoRequest, StoricoPersonaleRequest, ModificaMagazzinoRequest, AssignCardRequest
+from dotenv import load_dotenv, find_dotenv
+from os import environ
 
 app = FastAPI()
+
+#region Middleware
+
+token : str | None = ""
+invalidTokenResponse : Response = Response(content="Unauthorized", status_code=401)
+
+def LoadConfigs() -> None:
+    global token
+    load_dotenv(find_dotenv()) # Carichiamo il file di ambiente dove sono stati salvati i file di config
+    token = environ.get("SECRET_API")
+    pass
+
+@app.middleware("http")
+async def myAuth(request: Request, call_next):
+
+    s = request.headers.get("X-Secret")
+
+    if s is None:
+        return invalidTokenResponse
+
+    if s != token:
+        return invalidTokenResponse
+    
+    response = await call_next(request)
+    
+    return response
+
+#endregion
 
 #region Events
 
 @app.on_event("startup")
 async def startup():
-    #await LoadConfigs()
+    LoadConfigs()
     pass
 
 @app.on_event("shutdown")

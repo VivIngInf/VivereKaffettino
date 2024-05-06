@@ -3,3 +3,13 @@ Source/database.sqlite
 Source/Arduino/ESP32_Kaffettino/arduino_secrets.h
 Source/Arduino/ArduinoOutput/sketch/arduino_secrets.h
 Source/Arduino/ArduinoOutput/
+Source/Modules/Shared/__pycache__/Query.cpython-310.pyc
+Source/Modules/Bot/__pycache__/BirthdayList.cpython-310.pyc
+Source/Modules/Api/__pycache__/requests.cpython-310.pyc
+Source/Arduino/ArduinoOutput/sketch/README.md
+Source/Arduino/ArduinoOutput/sketch/ESP32_Kaffettino.ino.cpp
+Source/Arduino/ArduinoOutput/sketch/arduino_secrets_example.h
+Source/Arduino/ArduinoOutput/sketch/arduino_secrets.h
+Source/Arduino/ArduinoOutput/ESP32_Kaffettino.ino.bootloader.bin
+Source/Arduino/ArduinoOutput/build.options.json
+Source/__pycache__/webApi.cpython-310.pyc
