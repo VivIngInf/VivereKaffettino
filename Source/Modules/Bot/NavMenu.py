@@ -149,7 +149,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"Non è assegnato alcun ID CARD al momento.\nDigita il nuovo ID CARD",
                     reply_markup=keyboard)
             else:
-                await query.edit_message_text(f"Adesso l'ID CARD è {getIDCard(GetIdTelegram(context.user_data['username']))}.\nDigita il nuovo ID CARD", reply_markup=keyboard)
+                await query.edit_message_text(f"Il vecchio ID CARD è {getIDCard(GetIdTelegram(context.user_data['username']))}.\nDigita il nuovo ID CARD", reply_markup=keyboard)
 
 
         case "perform_card_change":

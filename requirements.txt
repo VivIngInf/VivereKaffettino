@@ -9,3 +9,5 @@ python-telegram-bot==20.3
 pytz==2023.3.post1
 simpleaudio==1.0.4
 SQLAlchemy==2.0.22
+python-telegram-bot[job-queue]
+openpyxl
