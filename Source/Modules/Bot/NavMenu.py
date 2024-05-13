@@ -298,20 +298,22 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text(f"{nome_prodotto} al costo di {costo_prodotto}, aggiunto all'Auletta {auletta} correttamente!", reply_markup=keyboard)
 
         case _:
-            # (azione proveniente dal gruppo degli admin)
-            action = str(query.data).split(":")[0]
-            username = str(query.data).split(":")[1]
 
-            if GetIsVerified(GetIdTelegram(username)):
-                await query.edit_message_text(text=f"L'utente {username} è già stato verificato!")
-            else:
-                if action == "instant_delete":
-                    removeUser(GetIdTelegram(username))
-                    await query.edit_message_text(text=f"L'utente {username} è stato rimosso correttamente!")
+            if _ not in ("remove_storage", ):
+                # (azione proveniente dal gruppo degli admin)
+                action = str(query.data).split(":")[0]
+                username = str(query.data).split(":")[1]
 
-                elif action == "instant_verify":
-                    keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Procedi sul Bot", url=f"https://t.me/{context.bot.username}")]])
-                    await query.edit_message_text(text=f"Ottimo! Procedi alla verifica direttamente dalla chat privata", reply_markup=keyboard)
+                if GetIsVerified(GetIdTelegram(username)):
+                    await query.edit_message_text(text=f"L'utente {username} è già stato verificato!")
+                else:
+                    if action == "instant_delete":
+                        removeUser(GetIdTelegram(username))
+                        await query.edit_message_text(text=f"L'utente {username} è stato rimosso correttamente!")
+
+                    elif action == "instant_verify":
+                        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Procedi sul Bot", url=f"https://t.me/{context.bot.username}")]])
+                        await query.edit_message_text(text=f"Ottimo! Procedi alla verifica direttamente dalla chat privata", reply_markup=keyboard)
 
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
