@@ -39,20 +39,21 @@
 #include "DFRobotDFPlayerMini.h" // DFRobotDFPlayerMini by DFRobot
 
 // Credenziali wifi
-#define EAP_IDENTITY SECRET_USERNAME // Es: mario.rossi03
-#define EAP_PASSWORD SECRET_PASSWORD
-#define EAP_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
-const char *ssid = "eduroam";		 // SSID WiFi
-
-#define usingUniversityWifi true
+#define WIFI_SSID SECRET_SSID	 // SSID WiFi
+#define WIFI_IDENTITY SECRET_USERNAME // Es: mario.rossi03
+#define WIFI_PASSWORD SECRET_PASSWORD
+#define WIFI_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
+#define IS_EAP SECRET_IS_EAP // Se siamo collegati ad una rete EAP
+#define PAY_ROUTE SECRET_PAY
+#define PRODUCTS_ROUTE SECRET_PRODUCTS
+#define ID_AULETTA SECRET_ID_AULETTA // Gestione prodotti
+#define TOKEN_HEADER_NAME SECRET_HEADER_NAME
+#define TOKEN_HEADER_VALUE SECRET_HEADER_VALUE
 
 // Rotte
-const char *serverAddressPay = "http://204.216.213.203:8000/pay";
-const char *serverAddressProdotti = "http://204.216.213.203:8000/prodotti";
+const char *serverAddressPay = PAY_ROUTE;
+const char *serverAddressProdotti = PRODUCTS_ROUTE;
 WiFiClient wifiClient;
-
-// Gestione prodotti
-#define ID_AULETTA 1
 
 class Prodotto
 {
@@ -354,14 +355,10 @@ void loop()
 
 void connettiWifi()
 {
-	if (usingUniversityWifi)
-	{
-		WiFi.begin(ssid, WPA2_AUTH_PEAP, EAP_IDENTITY, EAP_USERNAME, EAP_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
-	}
+	if (IS_EAP)
+		WiFi.begin(WIFI_SSID, WPA2_AUTH_PEAP, WIFI_USERNAME, WIFI_USERNAME, WIFI_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
 	else
-	{
-		WiFi.begin(SECRET_SSID, SECRET_WifiPwd);
-	}
+		WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
 
 	while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
 	{
@@ -530,6 +527,7 @@ void getProdotti()
 	HTTPClient http;
 	http.begin(wifiClient, serverAddressProdotti);
 	http.addHeader("Content-Type", "application/json");
+	http.addHeader(TOKEN_HEADER_NAME,TOKEN_HEADER_VALUE);
 	int httpResponseCode = http.POST(jsonString); // Passiamo come body il json
 
 	Serial.print("HTTP Response code: ");
