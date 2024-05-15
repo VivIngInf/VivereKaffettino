@@ -125,7 +125,7 @@ def CreatePersistent():
     riccardo = Utente(
         ID_Telegram = "188128674",
         ID_Auletta = 1,
-        ID_Card = "48213022911200",
+        ID_Card = "42044823011200",
         username = "Riccardo.Sciacca",
         genere="M",
         dataNascita=date(2001, 1, 18),
