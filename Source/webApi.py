@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Response
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard, getRecharge
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard, GetRecharges
 from Modules.Api.requests import CoffeRequest, SaldoRequest, ProdottiRequest, MagazzinoRequest, DeleteUserRequest, ImpostaSaldoRequest, StoricoPersonaleRequest, ModificaMagazzinoRequest, AssignCardRequest
 from dotenv import load_dotenv, find_dotenv
 from os import environ
@@ -111,6 +111,6 @@ async def assegnaCard(request : AssignCardRequest):
 
 @app.get("/getRicariche")
 async def getRicariche():
-    return getRecharge()
+    return GetRecharges()
 
 #endregion
