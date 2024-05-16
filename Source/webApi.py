@@ -79,7 +79,7 @@ async def pay(request: CoffeRequest):
 
 @app.post("/incrementaSaldo")
 async def incrementaS(request: SaldoRequest):
-    return incrementaSaldo(username=request.Username, ricarica=request.Ricarica)
+    return incrementaSaldo(usernameBeneficiario=request.UsernameBeneficiario, IDTelegramAmministratore=request.IDTelegramAmministratore, ricarica=request.Ricarica)
 
 @app.post("/impostaSaldo")
 async def impostS(request: ImpostaSaldoRequest):

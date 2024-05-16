@@ -217,12 +217,12 @@ def getOperazioniGiornaliere() -> list:
     return session.query(Operazione).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).all()
 
 
-def incrementaSaldo(username: str, ricarica: float) -> int:
+def incrementaSaldo(usernameBeneficiario: str, IDTelegramAmministratore: str, ricarica: float) -> int:
     """
         ADMIN: Incrementa il saldo in base alla ricarica passata come parametro
         
         Parameters:
-            - username: l'username dell'utente alla quale aumentare il saldo
+            - usernameBeneficiario: l'username dell'utente alla quale aumentare il saldo
             - ricarica: di quanto incrementare il saldo dell'utente
 
         Returns:
@@ -230,14 +230,26 @@ def incrementaSaldo(username: str, ricarica: float) -> int:
             - 1 se il saldo è stato incrementato correttamente
     """
 
-    ID_Telegram = GetIdTelegram(username=username)
+    IDTelegramBeneficiario = GetIdTelegram(username=usernameBeneficiario)
 
-    if not CheckUserExists(idTelegram=ID_Telegram):
+    if not CheckUserExists(idTelegram=IDTelegramBeneficiario):
         return 0
 
-    user = session.query(Utente).filter(Utente.ID_Telegram == f"{ID_Telegram}").one()
+    user = session.query(Utente).filter(Utente.ID_Telegram == f"{IDTelegramBeneficiario}").one()
+    
+    saldoRicaricato = round(user.saldo + ricarica, 2)
 
-    user.saldo = round(user.saldo + ricarica, 2)
+    r = Ricarica(
+        ID_Ricarica= None,
+        beneficiario=IDTelegramBeneficiario,
+        amministratore=IDTelegramAmministratore,
+        importo=ricarica,
+        saldoPrima=user.saldo,
+        saldoDopo=user.saldo + ricarica
+    )
+
+    user.saldo = saldoRicaricato
+    session.add(r)
 
     session.commit()
 
@@ -509,5 +521,14 @@ def GetOperazioniExcel():
     #'ID_Operazione', 'ID_Telegram', 'Username', 'Auletta', 'Descrizione', 'Costo', 'Pagato', 'DateTimeOperazione'
     operazioni = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione).join(Utente, Operazione.ID_Telegram == Utente.ID_Telegram).join(Auletta, Operazione.ID_Auletta == Auletta.ID_Auletta).join(Prodotto, Operazione.ID_Prodotto == Prodotto.ID_Prodotto).join(Magazzino, Operazione.ID_Prodotto == Magazzino.ID_Prodotto).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()))
     return operazioni 
+
+def GetRicaricheExcel():
+    #'R.ID_Ricarica', 'ID_Beneficiario', 'A.Username AS Beneficiario', 'R.ID_Amministratore', 'B.Username AS Amministratore', 'R.Importo', 'R.Saldo_Prima', 'R.Saldo_Dopo', 'R.Date_Time_Ricarica'
+
+    user1 = aliased(Utente)
+    user2 = aliased(Utente)
+
+    ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram))
+    return ricariche 
 
 #endregion

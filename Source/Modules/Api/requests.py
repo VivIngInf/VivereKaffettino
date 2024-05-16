@@ -11,7 +11,8 @@ class ProdottiRequest(BaseModel):
     ID_Auletta : int
 
 class SaldoRequest(BaseModel):
-    Username : str
+    UsernameBeneficiario : str
+    IDTelegramAmministratore : str
     Ricarica : float
 
 class ImpostaSaldoRequest(BaseModel):

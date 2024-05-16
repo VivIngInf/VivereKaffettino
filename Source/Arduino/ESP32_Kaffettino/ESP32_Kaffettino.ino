@@ -39,11 +39,11 @@
 #include "DFRobotDFPlayerMini.h" // DFRobotDFPlayerMini by DFRobot
 
 // Credenziali wifi
-#define WIFI_SSID SECRET_SSID	 // SSID WiFi
+#define WIFI_SSID SECRET_SSID		  // SSID WiFi
 #define WIFI_IDENTITY SECRET_USERNAME // Es: mario.rossi03
 #define WIFI_PASSWORD SECRET_PASSWORD
 #define WIFI_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
-#define IS_EAP SECRET_IS_EAP // Se siamo collegati ad una rete EAP
+#define IS_EAP SECRET_IS_EAP		  // Se siamo collegati ad una rete EAP
 #define PAY_ROUTE SECRET_PAY
 #define PRODUCTS_ROUTE SECRET_PRODUCTS
 #define ID_AULETTA SECRET_ID_AULETTA // Gestione prodotti
@@ -527,7 +527,7 @@ void getProdotti()
 	HTTPClient http;
 	http.begin(wifiClient, serverAddressProdotti);
 	http.addHeader("Content-Type", "application/json");
-	http.addHeader(TOKEN_HEADER_NAME,TOKEN_HEADER_VALUE);
+	http.addHeader(TOKEN_HEADER_NAME, TOKEN_HEADER_VALUE);
 	int httpResponseCode = http.POST(jsonString); // Passiamo come body il json
 
 	Serial.print("HTTP Response code: ");
@@ -616,8 +616,11 @@ void pay()
 
 	// Avviamo la richiesta HTTP
 	HTTPClient http;
+
 	http.begin(wifiClient, serverAddressPay);
 	http.addHeader("Content-Type", "application/json");
+	http.addHeader(TOKEN_HEADER_NAME, TOKEN_HEADER_VALUE);
+
 	int httpResponseCode = http.POST(jsonString); // Passiamo come body il json
 
 	Serial.print("HTTP Response code: ");

@@ -119,10 +119,13 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "done_ricarica":
             buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)
-            incrementaSaldo(context.user_data['username'], context.user_data["amount"])
+
+            incrementaSaldo(usernameBeneficiario=context.user_data['username'], IDTelegramAmministratore=query.from_user.id, ricarica=context.user_data["amount"])
+
             await query.edit_message_text(
                 text=f"Ricarica a {context.user_data['username']} effettuata!\nTorna pure al menu principale",
                 reply_markup=keyboard)
+            
             context.user_data.pop("validate_amount_tocharge")
             context.user_data.pop("username")
             context.user_data.pop("amount")
@@ -183,8 +186,8 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "acquire_user_toverify":
             buttons = list()
-            admin_who_make_the_query = query.from_user.id
-            for utente in GetUnverifiedUsers(GetMyAuletta(admin_who_make_the_query)):
+            admin_who_makes_the_query = query.from_user.id
+            for utente in GetUnverifiedUsers(GetMyAuletta(admin_who_makes_the_query)):
                 button = InlineKeyboardButton(text=utente[0], callback_data=utente[0])
                 buttons.append([button])
             buttons.append([InlineKeyboardButton("🔙 Torna indietro", callback_data='admin')])
@@ -272,8 +275,8 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 context.user_data.pop('acquire_nome_prodotto')
             context.user_data["acquire_nome_prodotto"] = query
             username = query.from_user.first_name
-            admin_who_make_the_query = query.from_user.id
-            auletta = GetNomeAuletta(GetMyAuletta(admin_who_make_the_query))
+            admin_who_makes_the_query = query.from_user.id
+            auletta = GetNomeAuletta(GetMyAuletta(admin_who_makes_the_query))
             context.user_data["auletta_4storage"] = auletta
             buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
             keyboard = InlineKeyboardMarkup(buttons)

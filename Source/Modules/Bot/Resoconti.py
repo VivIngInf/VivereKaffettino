@@ -1,19 +1,21 @@
 from telegram.ext import  CallbackContext
 from ..Shared.Configs import GetChannelID
-from ..Shared.Query import GetOperazioniExcel, GetUsersExcel
+from ..Shared.Query import GetOperazioniExcel, GetUsersExcel, GetRicaricheExcel
 import pandas
 from io import BytesIO
 from datetime import datetime
 
 async def SendDailyResoconto(context: CallbackContext):
-    columns = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
+    columnsOperazioni = ['ID_Operazione', 'ID_Telegram', 'Username', 'Nome_Auletta', 'Prodotto', 'Costo', 'Pagato', 'Data_Ora']
+    columnsRicariche = ['ID_Ricarica', 'ID_Beneficiario', 'Username_Beneficiario', 'ID_Amministratore', 'Username_Amministratore', 'Importo', 'Saldo_Prima', 'Saldo_Dopo', 'Date_Time_Ricarica']
 
-    rows = GetOperazioniExcel()
-    rowsDataframe = []
+    rowsOperazioni = GetOperazioniExcel()
+    rowsRicariche = GetRicaricheExcel()
 
-    print(rows)
+    rowsOperazioniDataframe = []
+    rowsRicaricheDataframe = []
 
-    for id_o, id_t, u, na, pr, c, pa, do in rows:
+    for id_o, id_t, u, na, pr, c, pa, do in rowsOperazioni:
         tempArr = []
         tempArr.append(id_o)
         tempArr.append(id_t)
@@ -23,13 +25,30 @@ async def SendDailyResoconto(context: CallbackContext):
         tempArr.append(c)
         tempArr.append(pa)
         tempArr.append(datetime(do.year, do.month, do.day, do.hour, do.minute, do.second, do.microsecond))
-        rowsDataframe.append(tempArr)
+        rowsOperazioniDataframe.append(tempArr)
+
+    for id_r, id_b, u_b, id_a, u_a, i, sp, sd, dt_r in rowsRicariche:
+        tempArr = []
+        tempArr.append(id_r)
+        tempArr.append(id_b)
+        tempArr.append(u_b)
+        tempArr.append(id_a)
+        tempArr.append(u_a)
+        tempArr.append(i)
+        tempArr.append(sp)
+        tempArr.append(sd)
+        tempArr.append(datetime(dt_r.year, dt_r.month, dt_r.day, dt_r.hour, dt_r.minute, dt_r.second, dt_r.microsecond))
+        rowsRicaricheDataframe.append(tempArr)
 
     # Creazione del DataFrame
-    df = pandas.DataFrame(rowsDataframe, columns=columns)
+    dfOperazioni = pandas.DataFrame(rowsOperazioniDataframe, columns=columnsOperazioni)
+    dfRicariche = pandas.DataFrame(rowsRicaricheDataframe, columns=columnsRicariche)
 
     excel_buffer = BytesIO()
-    df.to_excel(excel_buffer, index=False)
+    
+    dfOperazioni.to_excel(excel_buffer, sheet_name='Operazioni', index=False)
+    dfOperazioni.to_excel(excel_buffer, sheet_name='Ricariche', index=False)
+
     excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
 
     await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
