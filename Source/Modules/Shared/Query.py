@@ -2,7 +2,7 @@ from mysql.connector import cursor, connect, MySQLConnection
 from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 from .Session import session
-from sqlalchemy import select, func
+from sqlalchemy import select, func, distinct
 from sqlalchemy.orm import aliased, load_only
 
 from ..Database.Models.Auletta import Auletta
@@ -144,6 +144,9 @@ def checkBirthday(idTelegram: str) -> bool:
         USER: Ritorna vero se la data di nascita dell'utente è uguale alla data odierna
     """
 
+    if "Auletta" in GetUsername(idTelegram=idTelegram):
+        return False
+
     dataNascita : datetime.date = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
     dataCorrente : datetime.date = datetime.date.today()
 
@@ -230,6 +233,8 @@ def incrementaSaldo(usernameBeneficiario: str, IDTelegramAmministratore: str, ri
             - 1 se il saldo è stato incrementato correttamente
     """
 
+    now: datetime.datetime = datetime.datetime.now()
+
     IDTelegramBeneficiario = GetIdTelegram(username=usernameBeneficiario)
 
     if not CheckUserExists(idTelegram=IDTelegramBeneficiario):
@@ -245,7 +250,8 @@ def incrementaSaldo(usernameBeneficiario: str, IDTelegramAmministratore: str, ri
         amministratore=IDTelegramAmministratore,
         importo=ricarica,
         saldoPrima=user.saldo,
-        saldoDopo=user.saldo + ricarica
+        saldoDopo=user.saldo + ricarica,
+        dateTimeRicarica=now
     )
 
     user.saldo = saldoRicaricato
@@ -519,7 +525,7 @@ def GetUsersExcel() :
 
 def GetOperazioniExcel():
     #'ID_Operazione', 'ID_Telegram', 'Username', 'Auletta', 'Descrizione', 'Costo', 'Pagato', 'DateTimeOperazione'
-    operazioni = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione).join(Utente, Operazione.ID_Telegram == Utente.ID_Telegram).join(Auletta, Operazione.ID_Auletta == Auletta.ID_Auletta).join(Prodotto, Operazione.ID_Prodotto == Prodotto.ID_Prodotto).join(Magazzino, Operazione.ID_Prodotto == Magazzino.ID_Prodotto).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()))
+    operazioni = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione).join(Utente, Operazione.ID_Telegram == Utente.ID_Telegram).join(Auletta, Operazione.ID_Auletta == Auletta.ID_Auletta).join(Prodotto, Operazione.ID_Prodotto == Prodotto.ID_Prodotto).join(Magazzino, Operazione.ID_Prodotto == Magazzino.ID_Prodotto).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).distinct())
     return operazioni 
 
 def GetRicaricheExcel():
@@ -528,7 +534,7 @@ def GetRicaricheExcel():
     user1 = aliased(Utente)
     user2 = aliased(Utente)
 
-    ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram))
+    ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).distinct())
     return ricariche 
 
 #endregion

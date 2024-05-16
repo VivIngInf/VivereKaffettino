@@ -11,6 +11,7 @@ async def SendDailyResoconto(context: CallbackContext):
 
     rowsOperazioni = GetOperazioniExcel()
     rowsRicariche = GetRicaricheExcel()
+    print(rowsRicariche)
 
     rowsOperazioniDataframe = []
     rowsRicaricheDataframe = []
@@ -46,12 +47,14 @@ async def SendDailyResoconto(context: CallbackContext):
 
     excel_buffer = BytesIO()
     
-    dfOperazioni.to_excel(excel_buffer, sheet_name='Operazioni', index=False)
-    dfOperazioni.to_excel(excel_buffer, sheet_name='Ricariche', index=False)
+    with pandas.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+        dfOperazioni.to_excel(writer, sheet_name='Operazioni', index=False)
+        dfRicariche.to_excel(writer, sheet_name='Ricariche', index=False)
 
     excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
 
     await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'Resoconto-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto del {datetime.date(datetime.now())} inviato!")
+    excel_buffer.close()
 
 
 async def SendUsersResoconto(context: CallbackContext):
