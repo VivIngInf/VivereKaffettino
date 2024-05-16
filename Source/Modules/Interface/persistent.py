@@ -7,6 +7,8 @@ from Modules.Database.connect import engine
 
 from datetime import date
 
+# !!! IL NOME DELLE AULETTE DEVE ESSERE TUTTO ATTACCATO !!!
+
 def CreatePersistent():
 
     #region Aulette
