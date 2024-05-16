@@ -13,14 +13,14 @@ def CreatePersistent():
 
     ingegneria = Auletta(
         ID_Auletta=1,
-        Nome="Ingegneria - ED. 8",
+        Nome="Ingegneria-ED.8",
         DebitoMax=3,
         ID_GruppoTelegram="-1002059887014"
     )
 
     deim = Auletta(
         ID_Auletta=2,
-        Nome="Ingegneria - DEIM",
+        Nome="Ingegneria-DEIM",
         DebitoMax=3,
         ID_GruppoTelegram="-1002059887014"
     )
