@@ -515,6 +515,12 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
 # endregion
 
+#region Ricariche
+def GetRecharges():
+    ricariche = session.query(Auletta).all()
+    return ricariche
+#endregion
+
 #region Resoconti
 
 def GetUsersExcel() :
