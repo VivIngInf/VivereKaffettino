@@ -540,7 +540,7 @@ def GetRicaricheExcel():
     user1 = aliased(Utente)
     user2 = aliased(Utente)
 
-    ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).distinct())
+    ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram).filter(func.date(Ricarica.dateTimeRicarica) == datetime.date.today()).distinct())
     return ricariche 
 
 #endregion
