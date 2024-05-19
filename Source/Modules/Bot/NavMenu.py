@@ -125,7 +125,10 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text(
                 text=f"Ricarica a {context.user_data['username']} effettuata!\nTorna pure al menu principale",
                 reply_markup=keyboard)
-            
+
+            await context.bot.send_message(chat_id=GetIdTelegram(context.user_data['username']),
+                                           text=f'Ciao {context.user_data["username"]}, ricarica di {context.user_data["amount"]} effettuata grazie e goditi i tuoi caffè! :)')
+
             context.user_data.pop("validate_amount_tocharge")
             context.user_data.pop("username")
             context.user_data.pop("amount")
