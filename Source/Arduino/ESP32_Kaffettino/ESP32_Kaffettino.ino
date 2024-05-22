@@ -64,7 +64,7 @@ public:
 };
 
 LinkedList<Prodotto *> listaProdotti = LinkedList<Prodotto *>(); // Array dei prodotti disponibili
-int currentProdotto = 0;
+int currentProdotto = -1;
 
 int pointer = 0;
 int IDProdotto = 1;
@@ -76,6 +76,7 @@ JsonArray products;
 #define NOSALDO 1	  // Non hai abbastanza saldo nella carta per quel determinato prodotto
 #define NOCARD 2	  // Non esiste la carta nel database
 #define NOPROD 3	  // Non esiste il prodotto nel database (cosa che non dovrebbe comunque succedere)
+#define NOSELECTION 4 // Non è stato selezionato alcun prodotto
 #define STAMPAPROD 7  // Stampa il prodotto con id == currentProdotto
 #define VIV 10		  // Codice di stampa vivere kaffettino
 #define NOC 11		  // Non c'è connessione
@@ -264,20 +265,20 @@ void loop()
 			myDFPlayer.play(1); // Play the first mp3
 			Serial.println("Play caffettino");
 			stampaoled(VIV);
-			currentProdotto = 0; // se parte la musica resetto il prodotto
+			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
 		}
 		else if (millis() > (t3 + (2 * durata)) /*&& millis() < (t3 + (3 * durata))*/) // Se sono passati 10 secondi
 		{
 			playCompleanno();
 			stampaoled(VIV);
-			currentProdotto = 0; // se parte la musica resetto il prodotto
+			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
 		}
 		/*else if(millis() > (t3 + (3 * durata)) )  //Se sono passati 15 secondi
 		{
 		  myDFPlayer.play(2);  //Play the first mp3
 		  Serial.println("Faccetta nera");
 		  stampaoled(VIV);
-		  currentProdotto = 0; //se parte la musica resetto il prodotto
+		  currentProdotto = 0; //se parte la musica resettiamo il counter prodotto
 		}*/
 		Serial.println("Rilasciato");
 	}
@@ -309,13 +310,45 @@ void loop()
 			return; // Ritorna all'inizio del loop
 		}
 
+		// Se non è stato selezionato nessun prodotto
+		if(currentProdotto == -1)
+		{
+			digitalWrite(green, LOW);
+			digitalWrite(red, HIGH);
+
+			stampaoled(NOSELECTION);
+
+			digitalWrite(buzzer, 1);
+			delay(1000);
+			digitalWrite(buzzer, 0);
+
+			delay(100);
+			digitalWrite(buzzer, 1);
+			delay(100);
+			digitalWrite(buzzer, 0);
+			
+			delay(100);
+			digitalWrite(buzzer, 1);
+			delay(100);
+			digitalWrite(buzzer, 0);
+
+			delay(1000);
+
+			stampaoled(VIV);
+
+			digitalWrite(green, HIGH);
+			digitalWrite(red, LOW);
+
+			return;	
+		}
+
 		verify = 0; // reset variabile di controllo, il valore deve essere il ritorno del server
 
 		logCard(); // Siccome è stata riconosciuta una card, logghiamo le sue caratteristiche.
 
 		pay();
 
-		currentProdotto = 0; // Resettiamo il prodottoCorrente al primo della lista.
+		currentProdotto = -1; // Resettiamo il prodottoCorrente resettiamo il counter prodotto.
 		flag = false;		 // Reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
 		t = millis();		 // Reset t perché è stata letta una carta
 
@@ -703,6 +736,20 @@ void stampaoled(int i)
 		display.print("PROD NON");
 		display.setCursor(10, 35);
 		display.print("ESISTENTE");
+		display.display();
+		break;
+	}
+	case NOSELECTION:
+	{
+		display.stopscroll();
+		display.clearDisplay();
+		delay(10);
+		display.setTextSize(2);
+		display.setTextColor(SSD1306_WHITE);
+		display.setCursor(10, 15);
+		display.print("SCEGLI IL");
+		display.setCursor(12, 35);
+		display.print("PRODOTTO!");
 		display.display();
 		break;
 	}
