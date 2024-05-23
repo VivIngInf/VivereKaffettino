@@ -129,6 +129,9 @@ int durata = 5000; // costante in ms per la pressione 5sec kaffettino, 10sec bel
 int pressed = 0;   // variabile che controlla se il pulsante è premuto ed è già stato azzerato t3
 int butt = 15;	   // pin del pulsante
 
+int timerResetProd = 0;		// timer reset selezione prodotto
+int durataResetProd = 5000; // durata della selezione prodotto
+
 void setup()
 {
 
@@ -140,8 +143,6 @@ void setup()
 	pinMode(butt, INPUT_PULLUP);
 	pinMode(GND, OUTPUT);
 	digitalWrite(GND, LOW);
-	// pinMode(GND2, OUTPUT);  digitalWrite(GND2, LOW);
-	// pinMode(VCC, OUTPUT);   digitalWrite(VCC, HIGH);
 
 	pinMode(buzzer, OUTPUT);
 	pinMode(4, OUTPUT); // pin 4 usato temporaneamente come ground
@@ -152,8 +153,6 @@ void setup()
 	digitalWrite(4, LOW); // pin 14 usato temporaneamente come ground
 	Serial.println("Buzzer Test...");
 
-	//  debouncer.attach(butt);
-	//  debouncer.interval(10);
 	pinMode(butt, INPUT_PULLUP);
 	t3 = millis();
 	while (!Serial)
@@ -246,8 +245,14 @@ void loop()
 		}
 	}
 
-	// if(!firstBoot)
-	//   checkButtonPressed();
+	// Se non è stato utilizzato il bottone o non è stato pagato
+	// entro durataResetProd secondi allora resetta allo stato iniziale
+	if (millis() >= timerResetProd + durataResetProd && currentProdotto != -1)
+	{
+		Serial.println("Reset selezione prodotto");
+		stampaoled(VIV);
+		currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
+	}
 
 	if (!digitalRead(butt) && pressed == 0) // Pressione del tasto
 	{
@@ -280,6 +285,10 @@ void loop()
 		  stampaoled(VIV);
 		  currentProdotto = 0; //se parte la musica resettiamo il counter prodotto
 		}*/
+		else
+		{
+			timerResetProd = millis();
+		}
 		Serial.println("Rilasciato");
 	}
 
@@ -311,7 +320,7 @@ void loop()
 		}
 
 		// Se non è stato selezionato nessun prodotto
-		if(currentProdotto == -1)
+		if (currentProdotto == -1)
 		{
 			digitalWrite(green, LOW);
 			digitalWrite(red, HIGH);
@@ -326,7 +335,7 @@ void loop()
 			digitalWrite(buzzer, 1);
 			delay(100);
 			digitalWrite(buzzer, 0);
-			
+
 			delay(100);
 			digitalWrite(buzzer, 1);
 			delay(100);
@@ -339,7 +348,7 @@ void loop()
 			digitalWrite(green, HIGH);
 			digitalWrite(red, LOW);
 
-			return;	
+			return;
 		}
 
 		verify = 0; // reset variabile di controllo, il valore deve essere il ritorno del server
@@ -349,8 +358,8 @@ void loop()
 		pay();
 
 		currentProdotto = -1; // Resettiamo il prodottoCorrente resettiamo il counter prodotto.
-		flag = false;		 // Reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
-		t = millis();		 // Reset t perché è stata letta una carta
+		flag = false;		  // Reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
+		t = millis();		  // Reset t perché è stata letta una carta
 
 		if (verify != 0) // Se il codice di ritorno non è 0 questo vuol dire che c'è stato un errore.
 		{
@@ -441,64 +450,6 @@ void logCard()
 	Serial.println(verify); // stampa di controllo dell'errore
 }
 
-/*void checkButtonPressed()
-{
-  debouncer.update();  // Aggiorna lo stato del pulsante
-
-  int reading = debouncer.read();  // Leggi lo stato del pulsante
-  if (reading != lastButtonState) {
-	lastDebounceTime = millis();
-  }
-
-  if ((millis() - lastDebounceTime) > 50) {
-	// Se è trascorso abbastanza tempo dal debounce
-	if (reading != buttonState)
-	{
-	  buttonState = reading;
-
-	  if (buttonState == HIGH)
-	  {
-		// Se il pulsante è stato rilasciato
-		unsigned long pressDuration = millis() - pressStartTime;
-
-		if (pressDuration >= 4000 && pressDuration < 10000)
-		{
-		  // Se il pulsante è stato tenuto premuto per almeno 4 secondi
-		  Serial.println("Pulsante tenuto premuto per 4 secondi");
-		  myDFPlayer.play(1);  //Play the first mp3
-		  Serial.println("Play caffettino");
-		}
-		else if(pressDuration >= 10000 && pressDuration < 15000)
-		{
-		  // Se il pulsante è stato tenuto premuto per almeno 10 secondi
-		  Serial.println("Pulsante tenuto premuto per 10 secondi");
-		  myDFPlayer.play(3);  //Play the first mp3
-		  Serial.println("Play bella ciao");
-		}
-		else if(pressDuration >= 15000)
-		{
-		  // Se il pulsante è stato tenuto premuto per almeno 15 secondi
-		  Serial.println("Pulsante tenuto premuto per 15 secondi");
-		  myDFPlayer.play(2);  //Play the first mp3
-		  Serial.println("Play faccetta nera");
-		}
-		else
-		{
-		  // Altrimenti è stato eseguito solo un click
-		  Serial.println("Click del pulsante");
-		  buttRoutine(); // Il pulsante è solo stato clicckato
-		}
-	  }
-	  else
-	  {
-		pressStartTime = millis();
-	  }
-	}
-  }
-
-  lastButtonState = reading;
-}
-*/
 void buttRoutine()
 {
 	currentProdotto++;
@@ -848,6 +799,6 @@ void stampaoled(int i)
 
 void playCompleanno()
 {
-	myDFPlayer.play(2); // Play the first mp3
-	Serial.println("Play Bella Ciao");
+	myDFPlayer.play(2); // Play compleanno mp3
+	Serial.println("Play compleanno");
 }
