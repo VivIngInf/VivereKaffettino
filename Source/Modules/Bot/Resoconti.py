@@ -18,7 +18,7 @@ async def SendDailyResoconto(context: CallbackContext):
 
     for id_o, id_t, u, na, pr, c, pa, do in rowsOperazioni:
         date = datetime(do.year, do.month, do.day, do.hour, do.minute, do.second, do.microsecond)
-        tempArr = [id_o, id_t, u, na, pr, c, pa]        
+        tempArr = [id_o, id_t, u, na, pr, c, pa, date]        
         rowsOperazioniDataframe.append(tempArr)
 
     for id_r, id_b, u_b, id_a, u_a, i, sp, sd, dt_r in rowsRicariche:
