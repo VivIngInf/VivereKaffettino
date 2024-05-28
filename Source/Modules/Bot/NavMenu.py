@@ -285,6 +285,10 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Ciao {username}, dimmi pure il prodotto da aggiungere nella tua Auletta ({auletta})", reply_markup=keyboard)
 
+        case "remove_storage":
+            # Funzione da implementare in futuro
+            pass
+
         case "acquire_costo_prodotto":
             context.user_data["acquire_costo_prodotto"] = query
             buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
@@ -304,8 +308,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.edit_message_text(f"{nome_prodotto} al costo di {costo_prodotto}, aggiunto all'Auletta {auletta} correttamente!", reply_markup=keyboard)
 
         case _:
-
-            if _ not in ("remove_storage", ):
+            try:
                 # (azione proveniente dal gruppo degli admin)
                 action = str(query.data).split(":")[0]
                 username = str(query.data).split(":")[1]
@@ -320,6 +323,8 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     elif action == "instant_verify":
                         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("Procedi sul Bot", url=f"https://t.me/{context.bot.username}")]])
                         await query.edit_message_text(text=f"Ottimo! Procedi alla verifica direttamente dalla chat privata", reply_markup=keyboard)
+            except IndexError:
+                pass
 
 
 async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
