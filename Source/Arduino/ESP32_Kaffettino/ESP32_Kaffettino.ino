@@ -131,6 +131,7 @@ int butt = 15;	   // pin del pulsante
 
 int timerResetProd = 0;		// timer reset selezione prodotto
 int durataResetProd = 5000; // durata della selezione prodotto
+bool startedTimer = false;
 
 void setup()
 {
@@ -245,21 +246,22 @@ void loop()
 		}
 	}
 
-	// Se non è stato utilizzato il bottone o non è stato pagato
-	// entro durataResetProd secondi allora resetta allo stato iniziale
-	if (millis() >= timerResetProd + durataResetProd && currentProdotto != -1)
-	{
-		Serial.println("Reset selezione prodotto");
-		stampaoled(VIV);
-		currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
-	}
-
 	if (!digitalRead(butt) && pressed == 0) // Pressione del tasto
 	{
 		pressed = 1;   // metto ad 1 per non far rientrare in questo if durante la pressione
 		t3 = millis(); //"azzero" t3 rispetto  millis per avere un punto temporale di partenza
 		Serial.println("Premuto");
 		buttRoutine(); // alla pressione richiamo la funziona per il cambio prodotto
+	}
+
+	// Se non è stato utilizzato il bottone o non è stato pagato
+	// entro durataResetProd secondi allora resetta allo stato iniziale
+	if (millis() >= timerResetProd + durataResetProd && currentProdotto != -1 && startedTimer == true)
+	{
+		Serial.println("Reset selezione prodotto");
+		stampaoled(VIV);
+		currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
+		startedTimer = false;
 	}
 
 	if (digitalRead(butt) && pressed == 1) // Rilascio del tasto
@@ -288,6 +290,7 @@ void loop()
 		else
 		{
 			timerResetProd = millis();
+			startedTimer = true;
 		}
 		Serial.println("Rilasciato");
 	}
@@ -328,7 +331,12 @@ void loop()
 			stampaoled(NOSELECTION);
 
 			digitalWrite(buzzer, 1);
-			delay(1000);
+			delay(100);
+			digitalWrite(buzzer, 0);
+
+			delay(100);
+			digitalWrite(buzzer, 1);
+			delay(100);
 			digitalWrite(buzzer, 0);
 
 			delay(100);
