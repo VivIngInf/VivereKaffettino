@@ -534,6 +534,21 @@ def GetOperazioniExcel():
     operazioni = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione).join(Utente, Operazione.ID_Telegram == Utente.ID_Telegram).join(Auletta, Operazione.ID_Auletta == Auletta.ID_Auletta).join(Prodotto, Operazione.ID_Prodotto == Prodotto.ID_Prodotto).join(Magazzino, Operazione.ID_Prodotto == Magazzino.ID_Prodotto).filter(func.date(Operazione.dateTimeOperazione) == datetime.date.today()).distinct())
     return operazioni 
 
+def GetOperazioniMensiliExcel():
+    #'ID_Operazione', 'ID_Telegram', 'Username', 'Auletta', 'Descrizione', 'Costo', 'Pagato', 'DateTimeOperazione'
+
+    today = datetime.date.today()
+    start_of_month = today.replace(day=1)
+    # Per ottenere l'ultimo giorno del mese, dobbiamo passare al mese successivo e poi sottrarre un giorno.
+    if today.month == 12:  # Se il mese corrente è dicembre
+        next_month = today.replace(year=today.year + 1, month=1, day=1)
+    else:
+        next_month = today.replace(month=today.month + 1, day=1)
+    end_of_month = next_month - datetime.timedelta(days=1)
+
+    operazioni = session.execute(select(Operazione.ID_Operazione, Utente.ID_Telegram, Utente.username, Auletta.Nome, Prodotto.descrizione, Magazzino.costo, Operazione.costo, Operazione.dateTimeOperazione).join(Utente, Operazione.ID_Telegram == Utente.ID_Telegram).join(Auletta, Operazione.ID_Auletta == Auletta.ID_Auletta).join(Prodotto, Operazione.ID_Prodotto == Prodotto.ID_Prodotto).join(Magazzino, Operazione.ID_Prodotto == Magazzino.ID_Prodotto).filter(func.date(Operazione.dateTimeOperazione) >= start_of_month, func.date(Operazione.dateTimeOperazione) <= end_of_month).distinct())
+    return operazioni 
+
 def GetRicaricheExcel():
     #'R.ID_Ricarica', 'ID_Beneficiario', 'A.Username AS Beneficiario', 'R.ID_Amministratore', 'B.Username AS Amministratore', 'R.Importo', 'R.Saldo_Prima', 'R.Saldo_Dopo', 'R.Date_Time_Ricarica'
 
@@ -541,6 +556,24 @@ def GetRicaricheExcel():
     user2 = aliased(Utente)
 
     ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram).filter(func.date(Ricarica.dateTimeRicarica) == datetime.date.today()))
+    return ricariche 
+
+def GetRicaricheMensiliExcel():
+    #'R.ID_Ricarica', 'ID_Beneficiario', 'A.Username AS Beneficiario', 'R.ID_Amministratore', 'B.Username AS Amministratore', 'R.Importo', 'R.Saldo_Prima', 'R.Saldo_Dopo', 'R.Date_Time_Ricarica'
+
+    user1 = aliased(Utente)
+    user2 = aliased(Utente)
+
+    today = datetime.date.today()
+    start_of_month = today.replace(day=1)
+    # Per ottenere l'ultimo giorno del mese, dobbiamo passare al mese successivo e poi sottrarre un giorno.
+    if today.month == 12:  # Se il mese corrente è dicembre
+        next_month = today.replace(year=today.year + 1, month=1, day=1)
+    else:
+        next_month = today.replace(month=today.month + 1, day=1)
+    end_of_month = next_month - datetime.timedelta(days=1)
+
+    ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram).filter(func.date(Ricarica.dateTimeRicarica) >= start_of_month, func.date(Ricarica.dateTimeRicarica) <= end_of_month))
     return ricariche 
 
 #endregion
