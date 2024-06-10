@@ -43,3 +43,16 @@ async def Stop_after_registration(update: Update, context: ContextTypes.DEFAULT_
         context.user_data.pop("initial_message")
         await update.callback_query.edit_message_text(text="Ti sei registrato correttamente, presto verrai verificato da un Admin")
         return ConversationHandler.END
+
+
+async def Stop_torestart_again(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """End Conversation by command."""
+    # Tolgo lo stato iniziale dal dizionario
+    if "first_start" in context.user_data:
+        for action in ACTIONS:
+            if action in context.user_data:
+                context.user_data.pop(action)
+        context.user_data.pop("first_start")
+        context.user_data.pop("initial_message")
+        await update.callback_query.edit_message_text(text="Hai annullato la registrazione 😢. Non andartene, premi /start e ricominciamo 😊")
+        return ConversationHandler.END

@@ -8,7 +8,7 @@ from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdm
     GetIdGruppiTelegramAdmin, getIDCard, GetNomeAuletta
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
-from Modules.Bot.Stop import Stop, Stop_after_registration, Stop_command
+from Modules.Bot.Stop import Stop, Stop_after_registration, Stop_command, Stop_torestart_again
 from Modules.Bot.UserInfo import Info
 from Modules.Bot.Resoconti import SendUsersResoconto
 import re
@@ -40,6 +40,22 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "info":
             await Info(update, context)
+
+
+        case "ask_for_restart_again":
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("✔ Conferma", callback_data='remove_and_restart_again')],
+                        [InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]])
+            await query.edit_message_text(
+                f"Sei sicuro di voler annullare la registrazione? Ti perderai il nostro buonissimo Kaffè 😤",
+                reply_markup=keyboard)
+
+        case "remove_and_restart_again":
+            removeUser(query.from_user.id)
+            for action in ACTIONS:
+                if action in context.user_data:
+                    context.user_data.pop(action)
+
+            await Stop_torestart_again(update, context)
 
         case 'saldo':
             await ShowBalance(update, context)

@@ -118,6 +118,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
     storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
     info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
+    removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌", callback_data="ask_for_restart_again")
     stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="stop")
 
     # -------------------
@@ -132,6 +133,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRiceverai un messaggio appena la tua card sarà pronta!"
 
         mainMenuKeyboard.append([info])
+        mainMenuKeyboard.append([removeUser])
         mainMenuKeyboard.append([stop])
 
     elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
