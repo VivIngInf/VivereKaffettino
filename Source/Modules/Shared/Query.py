@@ -400,9 +400,13 @@ def ricaricaMagazzino(idAuletta: str, idProdotto: int, quantitaRicaricata: int) 
 
 # region Auletta
 
-def GetDebito(ID_Auletta: int) -> int:
+def GetDebito(ID_Auletta: int) -> float:
     """Dato l'id dell'auletta ritorna il quantitativo di debiti accumulabili"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().DebitoMax
+
+def GetDebitori() -> list:
+    """Ritorna il nome, l'id telegram ed il saldo di tutti gli utenti che devono ancora saldare il proprio debito"""
+    return session.query(Utente.ID_Telegram, Utente.username, Utente.saldo).filter(Utente.saldo < 0).all()
 
 def GetIdGruppoTelegram(ID_Auletta: int) -> str:
     """Dato l'id dell'auletta ritorna l'id del gruppo associato"""
@@ -442,7 +446,7 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
     isBirthday : bool = False
 
-    try:
+    try: # Prendiamo dal magazzino il costo del prodotto
 
         magazzino: Magazzino = QuantitaECosto(ID_Prodotto=ID_Prodotto, ID_Auletta=ID_Auletta)
         costo = magazzino.costo
@@ -466,20 +470,14 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
     debito: float = GetDebito(ID_Auletta=ID_Auletta)
 
-    # Calcola il totale del debito possibile
-    debitoMassimo = debito * costo
-
-    # Calcola il totale disponibile (saldo + debito massimo)
-    totaleDisponibile = saldo + debitoMassimo
-
     # Verifica se l'utente può permettersi il prodotto
-    if totaleDisponibile < costo:
-        return 1  # Saldo non sufficiente
+    saldoRimanente = saldo - costo
 
-    isBirthday = checkBirthday(idTelegram=idTelegram)
+    if saldoRimanente < debito:
+        return 1 # Saldo non sufficiente
 
-    if isBirthday is True and username in compleanniRiscattati:
-        isBirthday = False
+    # Controlla se è il compleanno dell'utente
+    isBirthday = checkBirthday(idTelegram=idTelegram) and username not in compleanniRiscattati
 
     # Decurtatre saldo ma solo se non è compleanno
     if isBirthday is False:

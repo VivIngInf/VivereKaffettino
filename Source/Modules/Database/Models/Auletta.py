@@ -7,10 +7,10 @@ class Auletta(Base):
 
     ID_Auletta = Column("ID_Auletta", Integer, primary_key=True, nullable=False, autoincrement=True)
     Nome = Column("Nome", String, nullable=False)
-    DebitoMax = Column("DebitoMax", Integer, nullable=False, default=0)
+    DebitoMax = Column("DebitoMax", Double, nullable=False, default=0)
     ID_GruppoTelegram = Column("ID_GruppoTelegram", CHAR(13), nullable=True)
 
-    def __init__(self, ID_Auletta : int, Nome : str, DebitoMax : int, ID_GruppoTelegram : str):
+    def __init__(self, ID_Auletta : int, Nome : str, DebitoMax : Double, ID_GruppoTelegram : str):
         self.ID_Auletta = ID_Auletta
         self.Nome = Nome
         self.DebitoMax = DebitoMax

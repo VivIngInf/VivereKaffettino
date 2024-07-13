@@ -5,8 +5,6 @@
 
 # region Imports
 
-import atexit  # Libreria che ci permette di creare un metodo per quando il codice viene interrotto
-
 # Librerie Telegram
 import logging
 import pytz
@@ -25,11 +23,9 @@ from Modules.Bot.Resoconti import SendDailyResoconto, SendUsersResoconto, SendMo
 from Modules.Bot.NavMenu import handle_messages, button_callbacks
 from Modules.Bot.BirthdayList import FlushBirthdayList
 from Modules.Bot.Utility import *
-
-from Modules.Shared.Query import GetUnverifiedUsers
+from Modules.Bot.Debt import SendMessageToDebtors
 
 import datetime
-import time
 
 import logging
 
@@ -52,7 +48,6 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-
 def main() -> None:
     """Run the bot."""
     # Create the Application and pass it your bot's token.
@@ -69,6 +64,8 @@ def main() -> None:
     job_queue.run_daily(SendDailyResoconto,
                         time=datetime.time(hour=23, minute=59, second=50, tzinfo=pytz.timezone('Europe/Rome')))
     job_queue.run_daily(FlushBirthdayList, time=datetime.time(hour=23, minute=59, second=59, tzinfo=pytz.timezone('Europe/Rome')))
+
+    job_queue.run_daily(SendMessageToDebtors, time=datetime.time(hour=7, minute=0, second=0, tzinfo=pytz.timezone('Europe/Rome')), days=(1))
 
     job_queue.run_monthly(SendMonthlyResoconto, day=-1, when=datetime.time(hour=23, minute=59, second=55, tzinfo=pytz.timezone('Europe/Rome')))
 
