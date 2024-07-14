@@ -11,3 +11,4 @@ SQLAlchemy==2.0.22
 python-telegram-bot[job-queue]
 openpyxl
 xlsxwriter
+uvicorn[standard]
