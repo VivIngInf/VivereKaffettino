@@ -65,6 +65,10 @@ async def operazioniGiornaliere():
 async def users():
     return getUsers()
 
+@app.get("/getRicariche")
+async def getRicariche():
+    return GetRecharges()
+
 #endregion routes
 
 #region Post Routes
@@ -108,9 +112,5 @@ async def rimuoviUtente(request : DeleteUserRequest):
 @app.post("/assegnaCard")
 async def assegnaCard(request : AssignCardRequest):
     return assignCard(request.ID_Telegram, request.ID_Card)
-
-@app.get("/getRicariche")
-async def getRicariche():
-    return GetRecharges()
 
 #endregion

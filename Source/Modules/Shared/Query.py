@@ -143,14 +143,14 @@ def checkBirthday(idTelegram: str) -> bool:
     """
         USER: Ritorna vero se la data di nascita dell'utente è uguale alla data odierna
     """
-
-    if "Auletta" in GetUsername(idTelegram=idTelegram):
-        return False
+    isBd = False
 
     dataNascita : datetime.date = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().dataNascita
-    dataCorrente : datetime.date = datetime.date.today()
 
-    isBd = False
+    if dataNascita is None:
+        return isBd
+
+    dataCorrente : datetime.date = datetime.date.today()
 
     if dataNascita.day == dataCorrente.day and dataNascita.month == dataCorrente.month:
         isBd = True
