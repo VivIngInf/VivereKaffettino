@@ -130,7 +130,7 @@ async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
         mainMenuKeyboard.append([stop])
 
     elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
-        text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRiceverai un messaggio appena la tua card sarà pronta!"
+        text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRicordati di andare in auletta e pagare 1€ per avevere la tua card!"
 
         mainMenuKeyboard.append([info])
         mainMenuKeyboard.append([removeUser])
