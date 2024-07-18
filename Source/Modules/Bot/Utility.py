@@ -45,6 +45,7 @@ buttons_dict = {
                [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
                [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
                [InlineKeyboardButton("Resoconto Utenti Excel 📃", callback_data='send_resoconto')],
+               [InlineKeyboardButton("Manda messaggio a tutti gli utenti 📣", callback_data='send_message_toeveryone')],
                [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
 }
 
