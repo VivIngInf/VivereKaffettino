@@ -1,11 +1,12 @@
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 from Modules.Bot.Utility import *
 from Modules.Shared.Query import InsertUser, GetAulette, incrementaSaldo, SetAdminDB, \
     InsertUser, GetUsername, assignCard, SetIsVerified, \
     GetIdTelegram, CheckUsernameExists, GetIsVerified, GetIsAdmin, \
     getGender, GetUnverifiedUsers, GetIdGruppoTelegram, GetMyAuletta, removeUser, GetIdGruppoTelegram, GetAuletta, \
-    GetIdGruppiTelegramAdmin, getIDCard, GetNomeAuletta
+    GetIdGruppiTelegramAdmin, getIDCard, GetNomeAuletta, getUsers
 from Modules.Bot.ShowBalance import ShowBalance
 from Modules.Bot.Start import Start
 from Modules.Bot.Stop import Stop, Stop_after_registration, Stop_command, Stop_torestart_again
@@ -202,6 +203,25 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard = InlineKeyboardMarkup(buttons)
             await query.edit_message_text(f"Resoconto inviato",
                                           reply_markup=keyboard)
+
+        case "send_message_toeveryone":
+            context.user_data['acquire_message_tosent'] = query
+            await query.edit_message_text(f"Dimmi pure il messaggio da inviare a tutti 😊")
+
+        case "confirm_message_tosent":
+            users = getUsers()
+            ids_utenti = []
+            for user in users:
+                if str(str(user).split(" ")[3]).split(".")[0] == "Auletta":
+                    continue
+                ids_utenti.append(str(user).split(" ")[0])
+
+            for id_telegram in ids_utenti:
+                await context.bot.send_message(chat_id=id_telegram,
+                                               text=context.user_data["message_tosent"], parse_mode=ParseMode.MARKDOWN_V2)
+            context.user_data.pop("message_tosent")
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Ritorna al menu admin", callback_data='admin')]])
+            await query.edit_message_text(f"La parola di Dio è stata diffusa!", reply_markup=keyboard)
 
         case "acquire_user_toverify":
             buttons = list()
@@ -423,6 +443,13 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
         message_id = update.message.message_id
         await acquire_costo_prodotto(costo_prodotto, chat_id, message_id, context)
+
+    elif "acquire_message_tosent" in context.user_data:
+        messaggio_da_inviare = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        entities = update.message.entities
+        await acquire_message_tosent(messaggio_da_inviare, entities, chat_id, message_id, context)
 
     else:
         # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin
@@ -688,6 +715,18 @@ async def acquire_costo_prodotto(costo_prodotto: str, chat_id: int, message_id: 
             await query.edit_message_text(text=f"Sicuro di voler confermare {costo_prodotto}?", reply_markup=keyboard)
 
 
+async def acquire_message_tosent(messaggio_da_inviare: str, entities, chat_id: int, message_id: int, context: ContextTypes.DEFAULT_TYPE):
+    query = context.user_data["acquire_message_tosent"]
+    buttons = [[InlineKeyboardButton("✔ Conferma", callback_data='confirm_message_tosent')],
+                [InlineKeyboardButton("🔙 Torna indietro", callback_data='admin')]]
+    keyboard = InlineKeyboardMarkup(buttons)
+    formatted_text = reconstruct_message_with_markdown(messaggio_da_inviare, entities)
+    context.user_data["message_tosent"] = formatted_text
+    context.user_data.pop("acquire_message_tosent")
+    await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
+    await query.edit_message_text(text=f"Sicuro di voler confermare?\n{messaggio_da_inviare}", reply_markup=keyboard)
+
+
 
 async def Inserisci_Utente(context: ContextTypes.DEFAULT_TYPE):
     """Memorizza nel DB e avvisa gli admin"""
@@ -719,3 +758,32 @@ def check_regex_age(age: str) -> bool:
 def convertToGenderDB(gender: str) -> str:
     """Ritorna solo la prima lettera del genere passato come parametro"""
     return gender[0].upper()
+
+
+def reconstruct_message_with_markdown(text, entities):
+    offset = 0
+    formatted_text = ""
+    last_offset = 0
+
+    for entity in entities:
+        formatted_text += text[last_offset:entity.offset]
+
+        if entity.type == 'bold':
+            formatted_text += f"*{text[entity.offset:entity.offset + entity.length]}*"
+        elif entity.type == 'italic':
+            formatted_text += f"_{text[entity.offset:entity.offset + entity.length]}_"
+        elif entity.type == 'code':
+            formatted_text += f"`{text[entity.offset:entity.offset + entity.length]}`"
+        # Add handling for other entity types if necessary
+
+        last_offset = entity.offset + entity.length
+
+    formatted_text += text[last_offset:]
+
+    return formatted_text
+
+
+def escape_markdown_v2(text):
+    escape_chars = r'_*[]()~`>#+-=|{}.!'
+    return ''.join(f'\\{char}' if char in escape_chars else char for char in text)
+
