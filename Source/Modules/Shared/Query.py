@@ -473,7 +473,7 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
     # Verifica se l'utente può permettersi il prodotto
     saldoRimanente = saldo - costo
 
-    if saldoRimanente < debito:
+    if saldoRimanente < 0 - debito:
         return 1 # Saldo non sufficiente
 
     # Controlla se è il compleanno dell'utente
