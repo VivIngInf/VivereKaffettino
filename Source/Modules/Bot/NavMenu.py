@@ -212,6 +212,8 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             users = getUsers()
             ids_utenti = []
             for user in users:
+                if str(str(user).split(" ")[3]).split(".")[0] == "Auletta":
+                    continue
                 ids_utenti.append(str(user).split(" ")[0])
 
             for id_telegram in ids_utenti:
