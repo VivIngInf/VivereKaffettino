@@ -761,24 +761,25 @@ def convertToGenderDB(gender: str) -> str:
 
 
 def reconstruct_message_with_markdown(text, entities):
-    offset = 0
     formatted_text = ""
     last_offset = 0
 
     for entity in entities:
-        formatted_text += text[last_offset:entity.offset]
+        formatted_text += escape_markdown_v2(text[last_offset:entity.offset])
+
+        entity_text = escape_markdown_v2(text[entity.offset:entity.offset + entity.length])
 
         if entity.type == 'bold':
-            formatted_text += f"*{text[entity.offset:entity.offset + entity.length]}*"
+            formatted_text += f"*{entity_text}*"
         elif entity.type == 'italic':
-            formatted_text += f"_{text[entity.offset:entity.offset + entity.length]}_"
+            formatted_text += f"_{entity_text}_"
         elif entity.type == 'code':
-            formatted_text += f"`{text[entity.offset:entity.offset + entity.length]}`"
+            formatted_text += f"`{entity_text}`"
         # Add handling for other entity types if necessary
 
         last_offset = entity.offset + entity.length
 
-    formatted_text += text[last_offset:]
+    formatted_text += escape_markdown_v2(text[last_offset:])
 
     return formatted_text
 
