@@ -36,3 +36,11 @@ class DeleteUserRequest(BaseModel):
 class AssignCardRequest(BaseModel):
     ID_Telegram : str
     ID_Card : str
+
+class InfiniteUserRequest(BaseModel):
+    Username : str
+    ID_Auletta : str
+    ID_Card : str
+
+class TestingRequest(BaseModel):
+    Is_Testing : bool

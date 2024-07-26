@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, Response
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard, GetRecharges
-from Modules.Api.requests import CoffeRequest, SaldoRequest, ProdottiRequest, MagazzinoRequest, DeleteUserRequest, ImpostaSaldoRequest, StoricoPersonaleRequest, ModificaMagazzinoRequest, AssignCardRequest
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard, GetRecharges, InsertInfiniteUser
+from Modules.Api.requests import CoffeRequest, SaldoRequest, ProdottiRequest, MagazzinoRequest, DeleteUserRequest, ImpostaSaldoRequest, StoricoPersonaleRequest, ModificaMagazzinoRequest, AssignCardRequest, InfiniteUserRequest
 from dotenv import load_dotenv, find_dotenv
 from os import environ
 
@@ -112,5 +112,12 @@ async def rimuoviUtente(request : DeleteUserRequest):
 @app.post("/assegnaCard")
 async def assegnaCard(request : AssignCardRequest):
     return assignCard(request.ID_Telegram, request.ID_Card)
+
+@app.post("/newInfiniteUser")
+async def newInfiniteUser(request : InfiniteUserRequest):
+    exitCode : int = InsertInfiniteUser(request.Username, request.ID_Auletta, request.ID_Card)
+    
+    return {"Status" : "Utente creato" if exitCode is 0 else "Card già esistente!"}
+
 
 #endregion

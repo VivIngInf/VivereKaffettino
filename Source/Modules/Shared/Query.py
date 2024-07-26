@@ -1,5 +1,4 @@
 from mysql.connector import cursor, connect, MySQLConnection
-from .Configs import GetDBHost, GetDBUsername, GetDBPassword, GetDBDatabase
 
 from .Session import session
 from sqlalchemy import select, func, distinct
@@ -15,12 +14,13 @@ from ..Database.Models.Utente import Utente
 from ..Bot.BirthdayList import compleanniRiscattati
 
 import datetime
-
+from os import environ
 
 # TODO: Notificare dell'inserimento dell'utente il gruppo degli amministratori dell'auletta selezionata
 # TODO: Quando si effettua un pagamento, controllare la validità dei parametri passati (ES: Esiste l'auletta? Esiste un utente con quell'ID_Card?)
 # TODO: Quando si effettua la decurtazione dell'importo, prima controllare se è il compleanno del ragazzo.
 # TODO: Quando si effettua il login, controllare se è il compleanno e mandare una foto adeguata.
+# TODO: Implementare CheckCardExists anche per l'utente base e per il cambio di carta
 
 # region User
 
@@ -33,10 +33,10 @@ def CheckUserExists(idTelegram: str) -> bool:
     return bool(exists)
 
 
-def CheckUsernameExists(username: str) -> bool:
+def CheckUsernameExists(username: str) -> str:
     """DATABASE_HANDLER: Controlla se l'username è già stato preso"""
 
-    exists = session.query(Utente).filter(Utente.username == f"{username}").exists()
+    exists = (session.query(Utente).filter(Utente.username == f"{username}").exists()).scalar()
 
     return bool(exists)
 
@@ -58,6 +58,11 @@ def GetIDTelegram(idCard: str) -> str:
     """DATABASE_HANDLER: Ritorna l'ID_Telegram partendo dall'ID della carta passato come parametro"""
 
     return session.query(Utente).filter(Utente.ID_Card == f"{idCard}").one().ID_Telegram
+
+
+def GetIsInfinite(idTelegram: str) -> bool:
+    """DATABASE_HANDLER: Ritorna se l'utente ha saldo infinito"""
+    return bool(session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().isInfinite)
 
 
 def InsertUser(idTelegram: str, auletta: str, genere: str, dataNascita: str, username: str) -> None:
@@ -84,6 +89,46 @@ def InsertUser(idTelegram: str, auletta: str, genere: str, dataNascita: str, use
     session.commit()
 
     return None
+
+def CheckCardExists (ID_Card : str) -> bool:
+    
+    query = session.query(Utente).filter(Utente.ID_Card == f"{ID_Card}")
+    exists = session.query(query.exists()).scalar()
+    return bool(exists)
+
+def InsertInfiniteUser(username: str, auletta: str, ID_Card: str) -> int:
+    """DATABASE_HANDLER / INFINITE USER: Inserisce l'utente infinito nel DB"""
+    cardExists : str = CheckCardExists(ID_Card=ID_Card)
+
+    if cardExists is True:
+        print(f"Esiste già un utente con ID_Card: {ID_Card}")
+        return -1
+
+    idAuletta : int = GetAuletta(auletta=auletta)
+
+    telegramIDInt : int = int(GetLastInfiniteTelegramID()) + 1
+
+    paddedID : str = str(telegramIDInt).zfill(9)
+
+    idTelegram : str = paddedID
+
+    utenteInfinito = Utente(
+        ID_Telegram=idTelegram,
+        ID_Auletta=idAuletta,
+        genere="A",
+        dataNascita=None,
+        username=username,
+        ID_Card=ID_Card,
+        saldo=100,
+        isAdmin=False,
+        isVerified=True,
+        isInfinite=True
+    )
+
+    session.add(utenteInfinito)
+    session.commit()
+
+    return 0
 
 def GetUnverifiedUsers(idAuletta: int) -> list:
     """Ritorna la lista degli utenti non verificati afferenti all auletta con id specificato"""
@@ -158,6 +203,10 @@ def checkBirthday(idTelegram: str) -> bool:
         isBd = False    
 
     return isBd
+
+def GetLastInfiniteTelegramID() -> str:
+    """Ritorna l'ID dell'ultimo utente infinito inserito"""
+    return session.query(func.Max(Utente.ID_Telegram)).filter(Utente.isInfinite == True).scalar()
 
 # endregion
 
@@ -437,6 +486,8 @@ def CreateOperazione(ID_Telegram: str, ID_Auletta: int, ID_Prodotto: int, costo:
 # region Wemos
 
 # TODO: Sistemare notazione
+# TODO: Fare in modo che se è in fase di testing kaffettino lo riconosca e riproduca
+# una canzone diversa e nello schermo un avvertimento
 def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
     """users = session.query(Utente).all()
 
@@ -479,8 +530,16 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
     # Controlla se è il compleanno dell'utente
     isBirthday = checkBirthday(idTelegram=idTelegram) and username not in compleanniRiscattati
 
+    # Controlla se l'utente è abilitato al saldo infinito
+    isInfinite = GetIsInfinite(idTelegram=idTelegram)
+
+    isTesting = environ.get('IS_TESTING', 'false').lower() in ('true', '1', 't')
+
+    print(f"IS TESTING: {isTesting}")
+
     # Decurtatre saldo ma solo se non è compleanno
-    if isBirthday is False:
+    
+    if isBirthday is False and isInfinite is False and isTesting is False:
         saldo -= costo
         DecurtaSaldo(ID_Telegram=idTelegram, saldo=saldo)
 
@@ -489,11 +548,15 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
 
     try:
         # Creare storico della transazione come "Eseguito"
-        if isBirthday is False:
-            CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
-        else:
+
+        if isBirthday is True or isInfinite is True or isTesting:
             CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=0)
-            compleanniRiscattati.append(username) # Aggiungiamo il compleanno ai riscattati
+            
+            if isBirthday:
+                compleanniRiscattati.append(username) # Aggiungiamo il compleanno ai riscattati
+        else:
+            CreateOperazione(ID_Telegram=idTelegram, ID_Auletta=ID_Auletta, ID_Prodotto=ID_Prodotto, costo=costo)
+            
     except:
         # Non è stato possibile creare lo storico dell'operazione avvenuta
         incrementaSaldo(username=username, ricarica=saldo)
@@ -523,7 +586,7 @@ def GetRecharges():
 
 def GetUsersExcel() :
     
-    users = session.execute(select(Utente.ID_Telegram, Utente.ID_Card, Utente.username, Utente.saldo, Auletta.Nome, Utente.isVerified, Utente.isAdmin).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
+    users = session.execute(select(Utente.ID_Telegram, Utente.ID_Card, Utente.username, Utente.saldo, Auletta.Nome, Utente.isVerified, Utente.isAdmin, Utente.isInfinite).join(Auletta, Utente.ID_Auletta == Auletta.ID_Auletta))
 
     return users
 

@@ -13,3 +13,5 @@ Source/Arduino/ArduinoOutput/sketch/arduino_secrets.h
 Source/Arduino/ArduinoOutput/ESP32_Kaffettino.ino.bootloader.bin
 Source/Arduino/ArduinoOutput/build.options.json
 Source/__pycache__/webApi.cpython-310.pyc
+Source/**/__pycache__/
+Source/**/**/__pycache__/

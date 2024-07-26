@@ -119,13 +119,13 @@ async def SendMonthlyResoconto(context: CallbackContext):
 
 async def SendUsersResoconto(context: CallbackContext):
     
-    columns = ['ID_Telegram', 'ID_Card', 'Username', 'Saldo', 'Nome_Auletta', 'Verificato?', 'Admin?']
+    columns = ['ID_Telegram', 'ID_Card', 'Username', 'Saldo', 'Nome_Auletta', 'Verificato?', 'Admin?', 'Infinito?']
     rows = GetUsersExcel()
 
     rowsDataframe = []
 
-    for id_t, id_c, u, s, n, v, a in rows:
-        tempArr = [id_t, id_c, u, s, n, v, a]
+    for id_t, id_c, u, s, n, v, a, inf in rows:
+        tempArr = [id_t, id_c, u, s, n, v, a, inf]
         rowsDataframe.append(tempArr)
 
     df = pandas.DataFrame(rowsDataframe, columns=columns)

@@ -15,14 +15,14 @@ def CreatePersistent():
 
     ingegneria = Auletta(
         ID_Auletta=1,
-        Nome="Ingegneria-ED.8",
+        Nome="Auletta.Ingegneria",
         DebitoMax=1.2,
         ID_GruppoTelegram="-1002059887014"
     )
 
     deim = Auletta(
         ID_Auletta=2,
-        Nome="Ingegneria-DEIM",
+        Nome="Auletta.DEIM",
         DebitoMax=1.2,
         ID_GruppoTelegram="-1002059887014"
     )
@@ -122,6 +122,7 @@ def CreatePersistent():
         saldo = 9999999.0,
         isAdmin = False,
         isVerified = True,
+        isInfinite= True,
     )
 
     riccardo = Utente(
@@ -133,7 +134,8 @@ def CreatePersistent():
         dataNascita=date(2001, 1, 18),
         saldo = 0,
         isAdmin = True,
-        isVerified = True
+        isVerified = True,
+        isInfinite = False,
     )
 
     daniele = Utente(
@@ -146,6 +148,7 @@ def CreatePersistent():
         saldo = 0,
         isAdmin = True,
         isVerified = True,
+        isInfinite = False,
     )
 
     andreaDePasquale = Utente(
@@ -158,6 +161,7 @@ def CreatePersistent():
         saldo = 0,
         isAdmin = True,
         isVerified = True,
+        isInfinite = False,
     )
 
     session.add(aulettaIngegneria)

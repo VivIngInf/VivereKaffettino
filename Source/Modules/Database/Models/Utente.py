@@ -15,8 +15,9 @@ class Utente(Base):
     dataNascita = Column("DataNascita", Date, nullable=True)
     isAdmin = Column("IsAdmin", Boolean, default=False, nullable=True)
     isVerified = Column("IsVerified", Boolean, default=False, nullable=True)
+    isInfinite = Column("IsInfinite", Boolean, default=False, nullable=True)
     
-    def __init__(self, ID_Telegram : str, ID_Auletta : int, ID_Card : str, username : str, saldo : Double, genere : String, dataNascita : date, isAdmin : bool, isVerified : bool):
+    def __init__(self, ID_Telegram : str, ID_Auletta : int, ID_Card : str, username : str, saldo : Double, genere : String, dataNascita : date, isAdmin : bool, isVerified : bool, isInfinite : bool):
         self.ID_Telegram = ID_Telegram
         self.ID_Auletta = ID_Auletta
         self.ID_Card = ID_Card
@@ -26,6 +27,7 @@ class Utente(Base):
         self.dataNascita = dataNascita
         self.isAdmin = isAdmin
         self.isVerified = isVerified
+        self.isInfinite = isInfinite
 
     def __repr__(self):
-        return f"{self.ID_Telegram} {self.ID_Auletta} {self.ID_Card} {self.username} {self.saldo} {self.genere} {self.dataNascita} {self.isAdmin} {self.isVerified}"
+        return f"{self.ID_Telegram} {self.ID_Auletta} {self.ID_Card} {self.username} {self.saldo} {self.genere} {self.dataNascita} {self.isAdmin} {self.isVerified} {self.isInfinite}"
