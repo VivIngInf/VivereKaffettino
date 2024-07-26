@@ -1,4 +1,4 @@
-#! bin/bash
-source venv/bin/activate
-cd source
-python3 telegramBot.py
+#! usr/bin/bash
+source ./venv/bin/activate
+cd ./Source
+python3 ./telegramBot.py
