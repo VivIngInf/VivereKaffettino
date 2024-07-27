@@ -39,7 +39,7 @@ class AssignCardRequest(BaseModel):
 
 class InfiniteUserRequest(BaseModel):
     Username : str
-    ID_Auletta : str
+    NomeAuletta : str
     ID_Card : str
 
 class TestingRequest(BaseModel):

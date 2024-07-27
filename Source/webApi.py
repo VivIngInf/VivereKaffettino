@@ -115,7 +115,7 @@ async def assegnaCard(request : AssignCardRequest):
 
 @app.post("/newInfiniteUser")
 async def newInfiniteUser(request : InfiniteUserRequest):
-    exitCode : int = InsertInfiniteUser(request.Username, request.ID_Auletta, request.ID_Card)
+    exitCode : int = InsertInfiniteUser(request.Username, request.NomeAuletta, request.ID_Card)
     
     return {"Status" : "Utente creato" if exitCode is 0 else "Card già esistente!"}
 
