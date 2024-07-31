@@ -15,3 +15,4 @@ Source/Arduino/ArduinoOutput/build.options.json
 Source/__pycache__/webApi.cpython-310.pyc
 Source/**/__pycache__/
 Source/**/**/__pycache__/
+/venv

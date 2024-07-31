@@ -1,6 +1,5 @@
 import os
 from dotenv import load_dotenv, find_dotenv
-from distutils.util import strtobool
 
 token : str = ""
 host : str = ""

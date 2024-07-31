@@ -83,6 +83,7 @@ def InsertUser(idTelegram: str, auletta: str, genere: str, dataNascita: str, use
         saldo=0.0,
         isAdmin=False,
         isVerified=False,
+        isInfinite=False
     )
 
     session.add(utente)
