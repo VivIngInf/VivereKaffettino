@@ -1,0 +1,13 @@
+ACTIONS = ["acquire_username_toregister", "acquire_age", "dataNascita", "selecting_gender", "gender",
+           "selecting_auletta_registra", "auletta",
+           "acquire_user_tocharge", "validate_amount_tocharge",
+           "acquire_user_tomake_admin", "acquire_user_toremove_from_admin", "acquire_card_number",
+           "acquire_nome_prodotto", "acquire_costo_prodotto", "confirm_new_prodotto", "auletta_4storage",
+           "acquire_user_toverify", "change_card", "acquire_card_to_change", "idCard_tochange", "acquire_user_to_change_card", "acquire_user_toverify_keyboard", "action_to_perform",
+           "username", "username_id", "idCard", "amount", "nome_prodotto", "costo_prodotto"]
+
+
+CONVERSATION_CLASSES = ["ConversationManager", "Registration"]
+
+GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}
+DB_GENDER_DICT = {"D": "a", "U": "o", "A": "ə"}
