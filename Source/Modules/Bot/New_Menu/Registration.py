@@ -1,9 +1,9 @@
-from SubMenu import SubMenu
+from Modules.Bot.New_Menu.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from Utility import *
+from Modules.Bot.New_Menu.Utility import *
 from Modules.Shared.Query import GetAulette, InsertUser, GetIdGruppoTelegram, GetAuletta
-from Stop import stop_after_registration
+from Modules.Bot.New_Menu.Stop import stop_after_registration
 
 
 class Registration(SubMenu):
@@ -30,11 +30,8 @@ class Registration(SubMenu):
 
         self.INTRO_MESSAGES = {
 
-            "register": f"Digita l'username rispettando lo stardard Unipa con iniziali grandi.\n"
-                        f"Es: Massimo.Midiri03",
-
-            "acquire_username": "Hai digitato un username che non rispetta lo stardard Unipa, riprova.\n"
-                                "Es: Massimo.Midiri03",
+            "acquire_username": f"Digita l'username rispettando lo stardard Unipa con iniziali grandi.\n"
+                                f"Es: Massimo.Midiri03",
 
             "acquire_age": "Digita la tua data di nascita rispettando il formato dell'esempio per favore.\n"
                            "Es: 11/09/2001",
@@ -57,7 +54,7 @@ class Registration(SubMenu):
 
         self.KEYBOARDS = {
 
-            "register": InlineKeyboardMarkup([[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]),
+            "acquire_username": InlineKeyboardMarkup([[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]),
 
             "acquire_age": InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna indietro", callback_data='register')]]),
 
@@ -77,8 +74,6 @@ class Registration(SubMenu):
 
         self.ERROR_MESSAGES = {
 
-            "register": "Empty, just to add an offset for the next ones",
-
             "acquire_username": "Hai digitato un username che non rispetta lo stardard Unipa, "
                                 "riprova.\nEs: Massimo.Midiri03",
 
@@ -86,7 +81,7 @@ class Registration(SubMenu):
                            "riprova.\nEs: 11/09/2001",
         }
 
-    async def start_conversation(self, update: Update, current_batch: str, query=None):
+    async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None, current_batch: str = None):
         self.query = query
         self.current_batch = current_batch
         await query.edit_message_text(self.INTRO_MESSAGES[current_batch], reply_markup=self.KEYBOARDS[current_batch])
@@ -122,7 +117,7 @@ class Registration(SubMenu):
             keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna indietro", callback_data=previous_batch)]])
             await query.edit_message_text(self.ERROR_MESSAGES[current_batch], reply_markup=keyboard)
 
-    async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query):
+    async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None):
         # Since we are at the end, the last batch is "select_auletta"
         self.user_params["select_auletta"] = query.data
         await self.insert_user(context)

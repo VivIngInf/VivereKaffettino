@@ -8,10 +8,10 @@ class SubMenu:
         self.query = None
         self.current_batch = ""
 
-    async def start_conversation(self, update: Update, current_batch: str, query=None):
+    async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """The first part of the conversation"""
 
-    async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query):
+    async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """The last part of the conversation"""
 
     async def forward_conversation(self, query, context: ContextTypes.DEFAULT_TYPE, current_batch: str):

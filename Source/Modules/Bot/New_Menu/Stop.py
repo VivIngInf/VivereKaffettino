@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import ContextTypes, ConversationHandler
-from Utility import *
+from Modules.Bot.New_Menu.Utility import *
 
 
 async def stop_after_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):

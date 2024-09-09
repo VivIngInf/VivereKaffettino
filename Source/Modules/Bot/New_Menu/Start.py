@@ -4,10 +4,10 @@ from datetime import datetime
 from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from ...Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
-from Utility import *
-from SubMenu import SubMenu
-from Registration import Registration
-from ConversationManager import ConversationManager
+from Modules.Bot.New_Menu.Utility import *
+from Modules.Bot.New_Menu.SubMenu import SubMenu
+from Modules.Bot.New_Menu.Registration import Registration
+from Modules.Bot.New_Menu.ConversationManager import ConversationManager
 
 
 class Start(SubMenu):
@@ -15,7 +15,7 @@ class Start(SubMenu):
     def __init__(self):
         super().__init__()
 
-    async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None) -> str:
+    async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
         image: InputFile = self.SendRandomImage()
         caption = "☕ Benvenuto su vivere kaffettino! ☕"
@@ -26,7 +26,7 @@ class Start(SubMenu):
 
         # ----- BOTTONI -----
 
-        register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="registra")
+        register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="register")
         saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="saldo")
         ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="ricarica")
         admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
@@ -73,7 +73,7 @@ class Start(SubMenu):
         keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
 
         # Verifico se è il primo avvio o meno
-        if "first_start" in context.user_data:
+        if "first_start" not in context.user_data:
             await update.message.reply_photo(
                 photo=image,
                 caption=caption
@@ -81,7 +81,8 @@ class Start(SubMenu):
             initial_message = await update.message.reply_text(text=text, reply_markup=keyboard)
             context.user_data['first_start'] = True
             context.user_data['initial_message'] = initial_message
-            context.user_data |= classes_to_generate
+            for key, value in classes_to_generate.items():
+                context.user_data[key] = value
         else:
             await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
