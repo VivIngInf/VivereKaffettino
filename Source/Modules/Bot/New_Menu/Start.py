@@ -7,6 +7,7 @@ from ...Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsern
 from Modules.Bot.New_Menu.Utility import *
 from Modules.Bot.New_Menu.SubMenu import SubMenu
 from Modules.Bot.New_Menu.Registration import Registration
+from Modules.Bot.New_Menu.Recharge import Recharge
 from Modules.Bot.New_Menu.ConversationManager import ConversationManager
 
 
@@ -27,12 +28,13 @@ class Start(SubMenu):
         # ----- BOTTONI -----
 
         register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="register")
-        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="saldo")
-        ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="ricarica")
+        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="balance")
+        ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="recharge")
         admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
         storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
         info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
-        removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌", callback_data="delete_request_registration_account")
+        removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌",
+                                          callback_data="delete_request_registration_account")
         stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="stop")
 
         # -------------------
@@ -63,6 +65,8 @@ class Start(SubMenu):
             username = GetUsername(idTelegram=update.effective_chat.id)
             text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
+            classes_to_generate |= {"Recharge": Recharge()}
+
             mainMenuKeyboard.append([saldo])
             mainMenuKeyboard.append([ricarica])
             mainMenuKeyboard.append([admin])
@@ -86,13 +90,11 @@ class Start(SubMenu):
         else:
             await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
-
     @staticmethod
     def GiornoCorrente() -> str:
         """Get current day of the week"""
         weekdays: list = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
         return weekdays[datetime.now().weekday()]
-
 
     def GiornoFestivo(self):
         """Verify if current date is a festivity day"""
@@ -110,7 +112,6 @@ class Start(SubMenu):
         ]
 
         return (current_date.month, current_date.day) in festive_dates
-
 
     @staticmethod
     def calcola_pasqua(anno) -> datetime:
@@ -133,7 +134,6 @@ class Start(SubMenu):
         data_pasqua = datetime(anno, (h + l - 7 * m + 114) // 31, ((h + l - 7 * m + 114) % 31) + 1)
 
         return data_pasqua
-
 
     def SendRandomImage(self) -> InputFile:
         """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
@@ -187,4 +187,3 @@ class Start(SubMenu):
 
             # Invia l'immagine all'utente
             return open(image_path, 'rb')
-

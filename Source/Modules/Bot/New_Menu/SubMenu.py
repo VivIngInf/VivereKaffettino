@@ -23,6 +23,16 @@ class SubMenu:
         """Just get actual typed string"""
 
     def get_current_batch(self) -> str:
+        """
+        Imagine the Bot says: "Write your username". Then our current batch is acquire_username.
+        So this variable represents the current state of the conversation. You can find:
+
+        - self.current_batch = current_batch
+        - self.current_batch = next_batch
+
+        But the meaning is that we are referring to the current topic of the conversation, given by the
+        message sent by the bot.
+        """
         return self.current_batch
 
     async def bot_send_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):

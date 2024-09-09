@@ -11,6 +11,7 @@ class ConversationManager:
         """
         Get the name of current conversation, which is one of these:
         - Registration
+        - Recharge
 
         """
         self.active_conversation = active_conversation
@@ -21,6 +22,7 @@ class ConversationManager:
         """
         Get the name of current conversation, which is one of these:
         - Registration
+        - Recharge
 
         """
 

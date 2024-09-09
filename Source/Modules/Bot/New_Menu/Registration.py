@@ -30,8 +30,8 @@ class Registration(SubMenu):
 
         self.INTRO_MESSAGES = {
 
-            "acquire_username": f"Digita l'username rispettando lo stardard Unipa con iniziali grandi.\n"
-                                f"Es: Massimo.Midiri03",
+            "acquire_username": "Digita l'username rispettando lo stardard Unipa con iniziali grandi.\n"
+                                "Es: Massimo.Midiri03",
 
             "acquire_age": "Digita la tua data di nascita rispettando il formato dell'esempio per favore.\n"
                            "Es: 11/09/2001",
@@ -145,9 +145,6 @@ class Registration(SubMenu):
         await context.bot.send_message(chat_id=GetIdGruppoTelegram(GetAuletta(self.user_params["select_auletta"])),
                                        text=f'Ciao ragazzi, {self.user_params["acquire_username"]} si è appena registrato',
                                        reply_markup=keyboard)
-
-    def get_current_batch(self) -> str:
-        return self.current_batch
 
     @staticmethod
     def convert_to_gender_db(gender: str) -> str:
