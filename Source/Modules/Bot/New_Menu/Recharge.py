@@ -82,13 +82,9 @@ class Recharge(SubMenu):
                 self.user_params[current_batch] = typed_string if typed_num is None else typed_num
                 self.current_batch = next_batch
                 self.user_params["telegramID"] = chat_id
-
-                if current_batch != "acquire_amount":
-                    await query.edit_message_text(text=self.INTRO_MESSAGES[next_batch],
-                                                  reply_markup=self.KEYBOARDS[current_batch])
-                else:
-                    await query.edit_message_text(f"{self.INTRO_MESSAGES[next_batch]} {typed_num}?",
-                                                  reply_markup=self.KEYBOARDS[next_batch])
+                await query.edit_message_text(self.text_to_send(current_batch=current_batch,
+                                                                optional_param=str(typed_num)),
+                                              reply_markup=self.keyboard_to_show(current_batch))
 
         else:
             query = self.query
@@ -113,4 +109,18 @@ class Recharge(SubMenu):
 
         context.user_data.pop("Recharge")
         self.current_batch = ""
+
+    def text_to_send(self, optional_param: str = None, current_batch: str = None) -> str:
+        """Base on the current batch the message to send need to be manipulated"""
+        if current_batch != "acquire_amount":
+            return self.INTRO_MESSAGES[self.current_batch]
+        else:
+            return f"{self.INTRO_MESSAGES[self.current_batch]} {optional_param}?"
+
+    def keyboard_to_show(self, current_batch: str = None) -> str:
+        """Base on the current batch the keyboard to show need is different"""
+        if current_batch != "acquire_amount":
+            return self.KEYBOARDS[current_batch]
+        else:
+            return self.KEYBOARDS[self.current_batch]
 

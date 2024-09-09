@@ -90,14 +90,7 @@ class Registration(SubMenu):
         self.query = query
         self.current_batch = current_batch
         self.user_params[current_batch] = query.data
-
-        if current_batch == "confirm_gender":
-            await query.edit_message_text(
-                f"{self.INTRO_MESSAGES[current_batch][0]} {query.data.upper()} {self.INTRO_MESSAGES[current_batch][1]}",
-                reply_markup=self.KEYBOARDS[current_batch])
-        else:
-            await query.edit_message_text(self.INTRO_MESSAGES[current_batch],
-                                          reply_markup=self.KEYBOARDS[current_batch])
+        await query.edit_message_text(self.text_to_send(), reply_markup=self.KEYBOARDS[current_batch])
 
     async def acquire_conversation_param(self, context: ContextTypes.DEFAULT_TYPE, previous_batch: str,
                                          current_batch: str, next_batch: str, chat_id: int, message_id: int,
@@ -145,6 +138,14 @@ class Registration(SubMenu):
         await context.bot.send_message(chat_id=GetIdGruppoTelegram(GetAuletta(self.user_params["select_auletta"])),
                                        text=f'Ciao ragazzi, {self.user_params["acquire_username"]} si è appena registrato',
                                        reply_markup=keyboard)
+
+    def text_to_send(self, optional_param: str = None) -> str:
+        """Base on the current batch the message to send need to be manipulated"""
+
+        if self.current_batch == "confirm_gender":
+            return f"{self.INTRO_MESSAGES[self.current_batch][0]} {self.query.data.upper()} {self.INTRO_MESSAGES[self.current_batch][1]}"
+        else:
+            return self.INTRO_MESSAGES[self.current_batch]
 
     @staticmethod
     def convert_to_gender_db(gender: str) -> str:

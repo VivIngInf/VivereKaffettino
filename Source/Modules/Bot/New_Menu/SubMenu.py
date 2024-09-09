@@ -35,5 +35,5 @@ class SubMenu:
         """
         return self.current_batch
 
-    async def bot_send_message(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """Use this function to send a message with the bot"""
+    def text_to_send(self, optional_param: str = None) -> str:
+        """Base on the current batch the message to send need to be manipulated"""
