@@ -110,13 +110,20 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.user_data["Admin"].start_conversation(update=None, context=context, query=query,
                                                                 current_batch="main_admin")
 
-        # case "change_card":
-        #     buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
-        #     keyboard = InlineKeyboardMarkup(buttons)
-        #     await query.edit_message_text(f"Digita l'username dell'utente di cui cambiare l'ID CARD",
-        #                                   reply_markup=keyboard)
+        ##### CHANGE CARD #####
 
-        #####  VERIFY USER #####
+        case "change_card":
+            context.user_data["ConversationManager"].set_active_conversation("ChangeCard")
+            await context.user_data["ChangeCard"].start_conversation(update=None, context=context, query=query,
+                                                                     current_batch="change_card")
+
+        case "acquire_card_to_change":
+            await context.user_data["ChangeCard"].forward_conversation(query, context, current_batch="acquire_card")
+
+        case "change_card_done":
+            await context.user_data["ChangeCard"].end_conversation(update=update, context=context, query=query)
+
+        ##### VERIFY USER #####
 
         case "verify_user":
             context.user_data["ConversationManager"].set_active_conversation("VerifyUser")
@@ -142,6 +149,40 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "delete_user":
             await context.user_data["VerifyUser"].bad_ending_conversation(update=update, context=context, query=query)
+
+        ##### ADD ADMIN #####
+
+        case "add_admin":
+            context.user_data["ConversationManager"].set_active_conversation("AddAdmin")
+            await context.user_data["AddAdmin"].start_conversation(update=None, context=context, query=query,
+                                                                   current_batch="add_admin")
+
+        ##### REMOVE ADMIN #####
+
+        case "remove_admin":
+            context.user_data["ConversationManager"].set_active_conversation("RemoveAdmin")
+            await context.user_data["RemoveAdmin"].start_conversation(update=None, context=context, query=query,
+                                                                      current_batch="remove_admin")
+
+        ##### SEND RESOCONTO #####
+
+        case "send_resoconto":
+            await SendUsersResoconto(context)
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("🔙 Torna al menu admin", callback_data='main_admin')]])
+            await query.edit_message_text(f"Resoconto inviato",
+                                          reply_markup=keyboard)
+
+        ##### SEND MESSAGE TO EVERYONE #####
+
+        case "send_message_to_everyone":
+            context.user_data["ConversationManager"].set_active_conversation("SendMessageAll")
+            await context.user_data["SendMessageAll"].start_conversation(update=None, context=context, query=query,
+                                                                         current_batch="send_message_to_everyone")
+
+        case "confirm_message_to_sent":
+            await context.user_data["SendMessageAll"].end_conversation(update=update, context=context, query=query)
+
 
         case _:
             try:
@@ -265,6 +306,83 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                          flag=True,
                                                                          flag2=is_string)
 
+    elif conversation_id == ACQUIRE_USERNAME_ADD_ADMIN:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        user_is_valid = GetIdTelegram(username=username) != "None"
+        user_is_admin = False
+        if user_is_valid:
+            user_is_admin = GetIsAdmin(GetIdTelegram(username=username))
+        await context.user_data["AddAdmin"].acquire_conversation_param(context,
+                                                                       previous_batch="add_admin",
+                                                                       current_batch="acquire_username",
+                                                                       next_batch="done",
+                                                                       chat_id=chat_id,
+                                                                       message_id=message_id,
+                                                                       typed_string=username,
+                                                                       flag=user_is_valid,
+                                                                       flag2=user_is_admin)
+    elif conversation_id == ACQUIRE_USERNAME_REMOVE_ADMIN:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        user_is_valid = GetIdTelegram(username=username) != "None"
+        user_is_user = False
+        if user_is_valid:
+            user_is_user = not GetIsAdmin(GetIdTelegram(username=username))
+        await context.user_data["RemoveAdmin"].acquire_conversation_param(context,
+                                                                          previous_batch="remove_admin",
+                                                                          current_batch="acquire_username",
+                                                                          next_batch="done",
+                                                                          chat_id=chat_id,
+                                                                          message_id=message_id,
+                                                                          typed_string=username,
+                                                                          flag=user_is_valid,
+                                                                          flag2=user_is_user)
+
+    elif conversation_id == ACQUIRE_MESSAGE_TO_SEND_ALL:
+        message_to_sent = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        entities = update.message.entities
+        await context.user_data["SendMessageAll"].acquire_conversation_param(context,
+                                                                             previous_batch="send_message_to_everyone",
+                                                                             current_batch="acquire_message",
+                                                                             next_batch="done",
+                                                                             chat_id=chat_id,
+                                                                             message_id=message_id,
+                                                                             typed_string=message_to_sent,
+                                                                             entities=entities)
+
+    elif conversation_id == ACQUIRE_USERNAME_CARD_CHANGE:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        user_is_invalid = not GetIdTelegram(username) != "None"
+        await context.user_data["ChangeCard"].acquire_conversation_param(context,
+                                                                         previous_batch="change_card",
+                                                                         current_batch="acquire_username",
+                                                                         next_batch="acquire_card_number",
+                                                                         chat_id=chat_id,
+                                                                         message_id=message_id,
+                                                                         typed_string=username,
+                                                                         flag=True,
+                                                                         flag2=user_is_invalid)
+    elif conversation_id == ACQUIRE_CARD_NUMBER_CHANGE:
+        idCard = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        is_string = not idCard.isdigit()
+        await context.user_data["ChangeCard"].acquire_conversation_param(context,
+                                                                         previous_batch="acquire_username",
+                                                                         current_batch="acquire_card_number",
+                                                                         next_batch="change_card_done",
+                                                                         chat_id=chat_id,
+                                                                         message_id=message_id,
+                                                                         typed_string=idCard,
+                                                                         flag=True,
+                                                                         flag2=is_string)
 
     else:
         # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin

@@ -11,7 +11,8 @@ class VerifyUser(SubMenu):
     def __init__(self):
         super().__init__()
 
-        # conversation_batches = ["verify_user", "acquire_username", "action_to_apply"]
+        # conversation_batches = ["verify_user", "acquire_username", "action_to_apply",
+        # "acquire_card_number", "assign_card", "delete_user"]
 
         self.UNVERIFIED_USERS_LIST_KEYBOARD = None
 
@@ -145,6 +146,7 @@ class VerifyUser(SubMenu):
                                             f'sei stat{DB_GENDER_DICT[gender]} abilitat{DB_GENDER_DICT[gender]} '
                                             f'ad usare Vivere Kaffettino.\n\nVieni in auletta per ritirare la card!'
                                             f'\n\nPremi /start per iniziare e goditi i tuoi caffè! :)')
+        self.current_batch = ""
 
     async def bad_ending_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None):
         removeUser(GetIdTelegram(self.user_params["acquire_username"]))
@@ -153,6 +155,7 @@ class VerifyUser(SubMenu):
         await query.edit_message_text(
             text=f"L'utente {self.user_params['acquire_username']} è stato rimosso correttamente!",
             reply_markup=keyboard)
+        self.current_batch = ""
 
     def text_to_send(self, optional_param: str = None, current_batch: str = None) -> str:
         if current_batch == "acquire_username":

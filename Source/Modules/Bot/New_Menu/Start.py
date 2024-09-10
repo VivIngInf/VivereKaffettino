@@ -10,6 +10,10 @@ from Modules.Bot.New_Menu.Registration import Registration
 from Modules.Bot.New_Menu.Recharge import Recharge
 from Modules.Bot.New_Menu.AdminMenu import AdminMenu
 from Modules.Bot.New_Menu.VerifyUser import VerifyUser
+from Modules.Bot.New_Menu.AddAdmin import AddAdmin
+from Modules.Bot.New_Menu.RemoveAdmin import RemoveAdmin
+from Modules.Bot.New_Menu.SendMessageAll import SendMessageAll
+from Modules.Bot.New_Menu.ChangeCard import ChangeCard
 from Modules.Bot.New_Menu.ConversationManager import ConversationManager
 
 
@@ -67,7 +71,9 @@ class Start(SubMenu):
             username = GetUsername(idTelegram=update.effective_chat.id)
             text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
-            classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser()}
+            classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser(),
+                                    "AddAdmin": AddAdmin(), "RemoveAdmin": RemoveAdmin(),
+                                    "SendMessageAll": SendMessageAll(), "ChangeCard": ChangeCard()}
 
             mainMenuKeyboard.append([saldo])
             mainMenuKeyboard.append([ricarica])

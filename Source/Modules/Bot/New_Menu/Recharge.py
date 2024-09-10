@@ -1,7 +1,6 @@
 from Modules.Bot.New_Menu.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from Modules.Bot.New_Menu.Utility import *
 from Modules.Shared.Query import incrementaSaldo, GetIdTelegram
 
 
@@ -106,8 +105,6 @@ class Recharge(SubMenu):
                                        text=f'Ciao {self.user_params["acquire_username"]}, ricarica di '
                                             f'{self.user_params["acquire_amount"]} effettuata grazie e '
                                             f'goditi i tuoi caffè! :)')
-
-        context.user_data.pop("Recharge")
         self.current_batch = ""
 
     def text_to_send(self, optional_param: str = None, current_batch: str = None) -> str:
