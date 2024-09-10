@@ -98,11 +98,50 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "recharge":
             context.user_data["ConversationManager"].set_active_conversation("Recharge")
             await context.user_data["Recharge"].start_conversation(update=None, context=context, query=query,
-                                                                       current_batch="acquire_username")
+                                                                   current_batch="acquire_username")
 
         case "recharge_done":
             await context.user_data["Recharge"].end_conversation(update=update, context=context, query=query)
 
+        ##### ADMIN MENU #####
+
+        case "main_admin":
+            delete_all_conversations(context)
+            await context.user_data["Admin"].start_conversation(update=None, context=context, query=query,
+                                                                current_batch="main_admin")
+
+        # case "change_card":
+        #     buttons = [[InlineKeyboardButton("❌ Annulla", callback_data='back_main_menu')]]
+        #     keyboard = InlineKeyboardMarkup(buttons)
+        #     await query.edit_message_text(f"Digita l'username dell'utente di cui cambiare l'ID CARD",
+        #                                   reply_markup=keyboard)
+
+        #####  VERIFY USER #####
+
+        case "verify_user":
+            context.user_data["ConversationManager"].set_active_conversation("VerifyUser")
+            await context.user_data["VerifyUser"].start_conversation(update=None, context=context, query=query,
+                                                                     current_batch="verify_user")
+
+        case selected_user if selected_user in {utente[0] for utente in
+                                                GetUnverifiedUsers(GetMyAuletta(query.from_user.id))}:
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("✔ Conferma", callback_data='action_to_apply')],
+                 [InlineKeyboardButton("🔙 Torna indietro", callback_data='verify_user')]])
+            await query.edit_message_text(f"Hai scelto {selected_user}, confermi?", reply_markup=keyboard)
+
+        case "action_to_apply":
+            await context.user_data["VerifyUser"].forward_conversation(query, context, current_batch="action_to_apply")
+
+        case "acquire_card_number":
+            await context.user_data["VerifyUser"].forward_conversation(query, context,
+                                                                       current_batch="acquire_card_number")
+
+        case "assign_card":
+            await context.user_data["VerifyUser"].end_conversation(update=update, context=context, query=query)
+
+        case "delete_user":
+            await context.user_data["VerifyUser"].bad_ending_conversation(update=update, context=context, query=query)
 
         case _:
             try:
@@ -195,6 +234,36 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                        typed_num=converted_amount,
                                                                        flag=valid_number,
                                                                        flag2=is_negative)
+
+    elif conversation_id == ACQUIRE_USERNAME_VERIFY:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        admin_user_is_valid = GetIdTelegram(username) != "None"
+        admin_can_verify_user = username not in [user[0] for user in GetUnverifiedUsers(GetMyAuletta(chat_id))]
+        await context.user_data["VerifyUser"].acquire_conversation_param(context,
+                                                                         previous_batch="verify_user",
+                                                                         current_batch="acquire_username",
+                                                                         next_batch="action_to_apply",
+                                                                         chat_id=chat_id,
+                                                                         message_id=message_id,
+                                                                         typed_string=username,
+                                                                         flag=admin_user_is_valid,
+                                                                         flag2=admin_can_verify_user)
+    elif conversation_id == ACQUIRE_CARD_NUMBER:
+        idCard = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        is_string = not idCard.isdigit()
+        await context.user_data["VerifyUser"].acquire_conversation_param(context,
+                                                                         previous_batch="action_to_apply",
+                                                                         current_batch="acquire_card_number",
+                                                                         next_batch="assign_card",
+                                                                         chat_id=chat_id,
+                                                                         message_id=message_id,
+                                                                         typed_string=idCard,
+                                                                         flag=True,
+                                                                         flag2=is_string)
 
 
     else:

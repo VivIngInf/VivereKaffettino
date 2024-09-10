@@ -8,6 +8,8 @@ from Modules.Bot.New_Menu.Utility import *
 from Modules.Bot.New_Menu.SubMenu import SubMenu
 from Modules.Bot.New_Menu.Registration import Registration
 from Modules.Bot.New_Menu.Recharge import Recharge
+from Modules.Bot.New_Menu.AdminMenu import AdminMenu
+from Modules.Bot.New_Menu.VerifyUser import VerifyUser
 from Modules.Bot.New_Menu.ConversationManager import ConversationManager
 
 
@@ -30,7 +32,7 @@ class Start(SubMenu):
         register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="register")
         saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="balance")
         ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="recharge")
-        admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
+        admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="main_admin")
         storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
         info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
         removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌",
@@ -65,7 +67,7 @@ class Start(SubMenu):
             username = GetUsername(idTelegram=update.effective_chat.id)
             text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
-            classes_to_generate |= {"Recharge": Recharge()}
+            classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser()}
 
             mainMenuKeyboard.append([saldo])
             mainMenuKeyboard.append([ricarica])
