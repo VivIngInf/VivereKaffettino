@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from Modules.Shared.Query import (GetAulette, GetIdGruppiTelegramAdmin,
                                   GetIdTelegram, GetIsAdmin, GetIsVerified,
-                                  GetMyAuletta, GetNomeAuletta, GetUnverifiedUsers, removeUser)
+                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists)
 
 from Modules.Bot.Stop import stop, stop_to_restart_again
 from Modules.Bot.UserInfo import Info
@@ -179,6 +179,24 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "confirm_message_to_sent":
             await context.user_data["SendMessageAll"].end_conversation(update=update, context=context, query=query)
 
+        ##### UNLIMITED USER #####
+
+        case "unlimited_user":
+            context.user_data["ConversationManager"].set_active_conversation("UnlimitedUser")
+            await context.user_data["UnlimitedUser"].start_conversation(update=None, context=context, query=query,
+                                                                        current_batch="unlimited_user")
+
+        case "acquire_card_unlimited":
+            await context.user_data["UnlimitedUser"].forward_conversation(query, context,
+                                                                          current_batch="acquire_card_unlimited")
+
+        case "confirm_data_unlimited":
+            await context.user_data["UnlimitedUser"].forward_conversation(query, context,
+                                                                          current_batch="confirm_data_unlimited")
+
+        case "create_unlimited_user":
+            await context.user_data["UnlimitedUser"].end_conversation(update=update, context=context, query=query)
+
         ##### STORAGE MENU #####
 
         case "main_storage":
@@ -190,7 +208,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "new_product_storage":
             context.user_data["ConversationManager"].set_active_conversation("NewProduct")
             await context.user_data["NewProduct"].start_conversation(update=None, context=context, query=query,
-                                                                      current_batch="new_product")
+                                                                     current_batch="new_product")
 
         case "remove_product_storage":
             # Funzione da implementare in futuro
@@ -198,7 +216,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "acquire_price_product":
             await context.user_data["NewProduct"].forward_conversation(query, context,
-                                                                        current_batch="acquire_price_product")
+                                                                       current_batch="acquire_price_product")
 
         case "product_added":
             await context.user_data["NewProduct"].end_conversation(update=update, context=context, query=query)
@@ -314,6 +332,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         idCard = update.message.text
         chat_id = update.message.chat_id
         message_id = update.message.message_id
+        card_number_not_exist = not CheckCardExists(idCard)
         is_string = not idCard.isdigit()
         await context.user_data["VerifyUser"].acquire_conversation_param(context,
                                                                          previous_batch="action_to_apply",
@@ -322,7 +341,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                          chat_id=chat_id,
                                                                          message_id=message_id,
                                                                          typed_string=idCard,
-                                                                         flag=True,
+                                                                         flag=card_number_not_exist,
                                                                          flag2=is_string)
 
     elif conversation_id == ACQUIRE_USERNAME_ADD_ADMIN:
@@ -392,6 +411,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         idCard = update.message.text
         chat_id = update.message.chat_id
         message_id = update.message.message_id
+        card_number_not_exist = not CheckCardExists(idCard)
         is_string = not idCard.isdigit()
         await context.user_data["ChangeCard"].acquire_conversation_param(context,
                                                                          previous_batch="acquire_username",
@@ -400,7 +420,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                          chat_id=chat_id,
                                                                          message_id=message_id,
                                                                          typed_string=idCard,
-                                                                         flag=True,
+                                                                         flag=card_number_not_exist,
                                                                          flag2=is_string)
 
     elif conversation_id == ACQUIRE_NEW_PRODUCT:
@@ -431,6 +451,35 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                          typed_num=converted_price,
                                                                          flag=valid_number,
                                                                          flag2=is_negative)
+
+    elif conversation_id == ACQUIRE_USERNAME_UNLIMITED:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        await context.user_data["UnlimitedUser"].acquire_conversation_param(context,
+                                                                            previous_batch="unlimited_user",
+                                                                            current_batch="acquire_username",
+                                                                            next_batch="acquire_card",
+                                                                            chat_id=chat_id,
+                                                                            message_id=message_id,
+                                                                            typed_string=username,
+                                                                            flag=True,
+                                                                            flag2=False)
+    elif conversation_id == ACQUIRE_CARD_UNLIMITED:
+        idCard = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        card_number_not_exist = not CheckCardExists(idCard)
+        is_string = not idCard.isdigit()
+        await context.user_data["UnlimitedUser"].acquire_conversation_param(context,
+                                                                            previous_batch="acquire_username",
+                                                                            current_batch="acquire_card",
+                                                                            next_batch="secure_confirm",
+                                                                            chat_id=chat_id,
+                                                                            message_id=message_id,
+                                                                            typed_string=idCard,
+                                                                            flag=card_number_not_exist,
+                                                                            flag2=is_string)
 
     else:
         # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin
@@ -477,5 +526,3 @@ def check_regex_age(age: str) -> bool:
     """Controlla se l'età inserita ha il formato corretto"""
     pattern = r"^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/((19|20)\d\d)$"
     return re.match(pattern, age)
-
-

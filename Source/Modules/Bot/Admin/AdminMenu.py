@@ -23,6 +23,7 @@ class AdminMenu(SubMenu):
                  [InlineKeyboardButton("Resoconto Utenti Excel 📃", callback_data='send_resoconto')],
                  [InlineKeyboardButton("Manda messaggio a tutti gli utenti 📣",
                                        callback_data='send_message_to_everyone')],
+                 [InlineKeyboardButton("Crea utente illimitato ♾", callback_data='unlimited_user')],
                  [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]),
 
         }

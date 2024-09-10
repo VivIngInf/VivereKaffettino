@@ -19,9 +19,11 @@ ACQUIRE_USERNAME_CARD_CHANGE = "IxylYTF4FvHARdOo"
 ACQUIRE_CARD_NUMBER_CHANGE = "ym4rhDgd54OMJL-n"
 ACQUIRE_NEW_PRODUCT = "sp_z6OkxdW4yrOe3"
 ACQUIRE_PRICE_PRODUCT = "x2AkueUDv6gYUkuI"
+ACQUIRE_USERNAME_UNLIMITED = "8v6uq4n-VxbLNNmj"
+ACQUIRE_CARD_UNLIMITED = "DePANQG74P8A39mi"
 
 CONVERSATION_CLASSES = ["ConversationManager", "Registration", "Recharge", "AdminMenu", "VerifyUser", "AddAdmin",
                         "RemoveAdmin", "SendMessageAll", "ChangeCard"]
 
 GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}
-DB_GENDER_DICT = {"D": "a", "U": "o", "A": "ə"}
+DB_GENDER_DICT = {"D": "a", "U": "o", "A": "ə", "M": "o", "F": "a"}

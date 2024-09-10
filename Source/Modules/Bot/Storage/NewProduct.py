@@ -9,7 +9,8 @@ class NewProduct(SubMenu):
     def __init__(self):
         super().__init__()
 
-        # conversation_batches = []
+        # conversation_batches = ["new_product", "acquire_product", "acquire_price_product", "acquire_price",
+        # "product_added"]
 
         self.product_params = {
 
@@ -113,7 +114,6 @@ class NewProduct(SubMenu):
                                           reply_markup=self.WARNING_KEYBOARDS[current_batch])
 
     async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None):
-        """Different for each class"""
         auletta = self.product_params["auletta"]
         product_name = self.product_params["acquire_product"]
         product_price = self.product_params["acquire_price"]

@@ -2,8 +2,8 @@ from Modules.Bot.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from Modules.Bot.Utility import *
-from Modules.Shared.Query import GetUnverifiedUsers, GetMyAuletta, assignCard, GetIdTelegram, getGender, SetIsVerified, \
-    removeUser
+from Modules.Shared.Query import (GetUnverifiedUsers, GetMyAuletta, assignCard, GetIdTelegram, getGender,
+                                  SetIsVerified, removeUser)
 
 
 class VerifyUser(SubMenu):
@@ -75,6 +75,8 @@ class VerifyUser(SubMenu):
 
             "acquire_username": "Utente non trovato, riprova o seleziona l'utente con i bottoni",
 
+            "acquire_card_number": "L'ID CARD esiste già, riprova"
+
         }
 
     async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None,
@@ -125,10 +127,9 @@ class VerifyUser(SubMenu):
         else:
             query = self.query
             await query.edit_message_text(text=self.ERROR_MESSAGES[current_batch],
-                                          reply_markup=self.UNVERIFIED_USERS_LIST_KEYBOARD)
+                                          reply_markup=self.keyboard_to_show(current_batch, flag2, next_batch, flag))
 
     async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None):
-        # Complete user verification once the CARD number is entered
         assignCard(GetIdTelegram(self.user_params["acquire_username"]), self.user_params["acquire_card_number"])
         idTelegram = GetIdTelegram(username=self.user_params["acquire_username"])
         gender = getGender(idTelegram=idTelegram)
@@ -164,11 +165,14 @@ class VerifyUser(SubMenu):
             return (f"Sicuro di voler confermare {self.user_params['acquire_username']} "
                     f"con idCard: {self.user_params['acquire_card_number']}?")
 
-    def keyboard_to_show(self, current_batch: str = None, flag2: bool = False, next_batch: str = None) -> str:
+    def keyboard_to_show(self, current_batch: str = None, flag2: bool = False, next_batch: str = None,
+                         flag: bool = True) -> str:
         """Base on the current batch the keyboard to show need is different"""
         if current_batch == "acquire_username" and flag2:
             return self.UNVERIFIED_USERS_LIST_KEYBOARD
-        elif current_batch == "acquire_card_number":
+        elif current_batch == "acquire_card_number" and flag:
             return self.KEYBOARDS[next_batch]
+        elif current_batch == "acquire_card_number" and not flag:
+            return self.KEYBOARDS[current_batch]
         else:
             return self.KEYBOARDS[self.current_batch]

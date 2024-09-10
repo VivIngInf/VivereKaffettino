@@ -1,4 +1,4 @@
-from telegram.ext import  CallbackContext
+from telegram.ext import CallbackContext
 from ..Shared.Configs import GetChannelID
 from ..Shared.Query import GetOperazioniExcel, GetUsersExcel, GetRicaricheExcel, GetRicaricheMensiliExcel, GetOperazioniMensiliExcel
 import pandas
