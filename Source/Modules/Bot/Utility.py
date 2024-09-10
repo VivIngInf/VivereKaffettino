@@ -17,6 +17,8 @@ ACQUIRE_USERNAME_REMOVE_ADMIN = "GqRI4J9kGURvhy8P"
 ACQUIRE_MESSAGE_TO_SEND_ALL = "RWSxXiHZAPNZKuPI"
 ACQUIRE_USERNAME_CARD_CHANGE = "IxylYTF4FvHARdOo"
 ACQUIRE_CARD_NUMBER_CHANGE = "ym4rhDgd54OMJL-n"
+ACQUIRE_NEW_PRODUCT = "sp_z6OkxdW4yrOe3"
+ACQUIRE_PRICE_PRODUCT = "x2AkueUDv6gYUkuI"
 
 CONVERSATION_CLASSES = ["ConversationManager", "Registration", "Recharge", "AdminMenu", "VerifyUser", "AddAdmin",
                         "RemoveAdmin", "SendMessageAll", "ChangeCard"]

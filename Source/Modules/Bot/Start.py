@@ -15,6 +15,8 @@ from Modules.Bot.ChangeCard import ChangeCard
 from Modules.Bot.Admin.AddAdmin import AddAdmin
 from Modules.Bot.Admin.RemoveAdmin import RemoveAdmin
 from Modules.Bot.SendMessageAll import SendMessageAll
+from Modules.Bot.Storage.StorageMenu import StorageMenu
+from Modules.Bot.Storage.NewProduct import NewProduct
 
 
 class Start(SubMenu):
@@ -37,7 +39,7 @@ class Start(SubMenu):
         saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="balance")
         ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="recharge")
         admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="main_admin")
-        storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
+        storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="main_storage")
         info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
         removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌",
                                           callback_data="delete_request_registration_account")
@@ -75,7 +77,8 @@ class Start(SubMenu):
 
             classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser(),
                                     "ChangeCard": ChangeCard(), "AddAdmin": AddAdmin(), "RemoveAdmin": RemoveAdmin(),
-                                    "SendMessageAll": SendMessageAll()}
+                                    "SendMessageAll": SendMessageAll(), "StorageMenu": StorageMenu(),
+                                    "NewProduct": NewProduct()}
 
             mainMenuKeyboard.append([saldo])
             mainMenuKeyboard.append([ricarica])

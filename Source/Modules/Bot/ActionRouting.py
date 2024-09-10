@@ -181,56 +181,27 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         ##### STORAGE MENU #####
 
-        case "storage":
-            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
-            if "acquire" in context.user_data:
-                context.user_data.pop('nome_prodotto')
+        case "main_storage":
             # TODO: Sotto menu per lo storage e relative comunicazioni con il DB
-            buttons = [[InlineKeyboardButton("Rimuovi Prodotto 🟥", callback_data='remove_storage')],
-                       [InlineKeyboardButton("Aggiungi Prodotto ➕", callback_data='new_storage')],
-                       [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
-            keyboard = InlineKeyboardMarkup(buttons)
-            await query.edit_message_text(f"GESTIONE MAGAZZINO", reply_markup=keyboard)
+            delete_all_conversations(context)
+            await context.user_data["StorageMenu"].start_conversation(update=None, context=context, query=query,
+                                                                      current_batch="main_storage")
 
-        case "new_storage":
-            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
-            if "acquire_nome_prodotto" in context.user_data:
-                context.user_data.pop('acquire_nome_prodotto')
-            context.user_data["acquire_nome_prodotto"] = query
-            username = query.from_user.first_name
-            admin_who_makes_the_query = query.from_user.id
-            auletta = GetNomeAuletta(GetMyAuletta(admin_who_makes_the_query))
-            context.user_data["auletta_4storage"] = auletta
-            buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
-            keyboard = InlineKeyboardMarkup(buttons)
-            await query.edit_message_text(
-                f"Ciao {username}, dimmi pure il prodotto da aggiungere nella tua Auletta ({auletta})",
-                reply_markup=keyboard)
+        case "new_product_storage":
+            context.user_data["ConversationManager"].set_active_conversation("NewProduct")
+            await context.user_data["NewProduct"].start_conversation(update=None, context=context, query=query,
+                                                                      current_batch="new_product")
 
-        case "remove_storage":
+        case "remove_product_storage":
             # Funzione da implementare in futuro
             pass
 
-        case "acquire_costo_prodotto":
-            context.user_data["acquire_costo_prodotto"] = query
-            buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
-            keyboard = InlineKeyboardMarkup(buttons)
-            await query.edit_message_text("Ora dimmi quanto costa per favore", reply_markup=keyboard)
+        case "acquire_price_product":
+            await context.user_data["NewProduct"].forward_conversation(query, context,
+                                                                        current_batch="acquire_price_product")
 
-        case "confirm_new_prodotto":
-            auletta = context.user_data["auletta_4storage"]
-            nome_prodotto = context.user_data["nome_prodotto"]
-            costo_prodotto = context.user_data["costo_prodotto"]
-            # TODO: Query per l'aggiunta al DB
-            context.user_data.pop("auletta_4storage")
-            context.user_data.pop("nome_prodotto")
-            context.user_data.pop("costo_prodotto")
-            buttons = [[InlineKeyboardButton("🔙 Torna al menu principale", callback_data='back_main_menu')]]
-            keyboard = InlineKeyboardMarkup(buttons)
-            await query.edit_message_text(
-                f"{nome_prodotto} al costo di {costo_prodotto}, aggiunto all'Auletta {auletta} correttamente!",
-                reply_markup=keyboard)
-
+        case "product_added":
+            await context.user_data["NewProduct"].end_conversation(update=update, context=context, query=query)
 
         case _:
             try:
@@ -260,9 +231,9 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
     active_conversation = context.user_data["ConversationManager"].get_active_conversation()
     current_batch = context.user_data["ConversationManager"].get_current_conversation_batch(context)
 
-    print("##################")
-    print(active_conversation, current_batch)
-    print("##################")
+    # print("##################")
+    # print(active_conversation, current_batch)
+    # print("##################")
 
     conversation_id = safe_hash_name(active_conversation, current_batch)
 
@@ -312,7 +283,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         amount = str(update.message.text).replace(",", ".")
         chat_id = update.message.chat_id
         message_id = update.message.message_id
-        valid_number, is_negative, converted_amount = validate_amount(amount)
+        valid_number, is_negative, converted_amount = validate_string_to_float(amount)
         await context.user_data["Recharge"].acquire_conversation_param(context,
                                                                        previous_batch="acquire_username",
                                                                        current_batch="acquire_amount",
@@ -432,6 +403,35 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                          flag=True,
                                                                          flag2=is_string)
 
+    elif conversation_id == ACQUIRE_NEW_PRODUCT:
+        product_name = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        await context.user_data["NewProduct"].acquire_conversation_param(context,
+                                                                         previous_batch="main_storage",
+                                                                         current_batch="acquire_product",
+                                                                         next_batch="acquire_price",
+                                                                         chat_id=chat_id,
+                                                                         message_id=message_id,
+                                                                         typed_string=product_name,
+                                                                         flag=True,
+                                                                         flag2=False)
+    elif conversation_id == ACQUIRE_PRICE_PRODUCT:
+        price_product = str(update.message.text).replace(",", ".")
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        valid_number, is_negative, converted_price = validate_string_to_float(price_product)
+        await context.user_data["NewProduct"].acquire_conversation_param(context,
+                                                                         previous_batch="acquire_product",
+                                                                         current_batch="acquire_price",
+                                                                         next_batch="product_added",
+                                                                         chat_id=chat_id,
+                                                                         message_id=message_id,
+                                                                         typed_string="",
+                                                                         typed_num=converted_price,
+                                                                         flag=valid_number,
+                                                                         flag2=is_negative)
+
     else:
         # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin
         IdGroups = [item[0] for item in GetIdGruppiTelegramAdmin() if item[0] is not None]
@@ -451,7 +451,7 @@ def delete_all_conversations_and_manager(context: ContextTypes.DEFAULT_TYPE):
             context.user_data.pop(_class)
 
 
-def validate_amount(amount: str) -> [bool, bool, float]:
+def validate_string_to_float(amount: str) -> [bool, bool, float]:
     """Support function for validate amount to charge"""
     valid_number = False
     is_negative = True
@@ -479,30 +479,3 @@ def check_regex_age(age: str) -> bool:
     return re.match(pattern, age)
 
 
-def reconstruct_message_with_markdown(text, entities):
-    formatted_text = ""
-    last_offset = 0
-
-    for entity in entities:
-        formatted_text += escape_markdown_v2(text[last_offset:entity.offset])
-
-        entity_text = escape_markdown_v2(text[entity.offset:entity.offset + entity.length])
-
-        if entity.type == 'bold':
-            formatted_text += f"*{entity_text}*"
-        elif entity.type == 'italic':
-            formatted_text += f"_{entity_text}_"
-        elif entity.type == 'code':
-            formatted_text += f"`{entity_text}`"
-        # Add handling for other entity types if necessary
-
-        last_offset = entity.offset + entity.length
-
-    formatted_text += escape_markdown_v2(text[last_offset:])
-
-    return formatted_text
-
-
-def escape_markdown_v2(text):
-    escape_chars = r'_*[]()~`>#+-=|{}.!'
-    return ''.join(f'\\{char}' if char in escape_chars else char for char in text)
