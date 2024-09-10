@@ -1,18 +1,15 @@
-from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
-from telegram.constants import ParseMode
-from Modules.Shared.Query import (CheckUsernameExists, GetAuletta, GetAulette, GetIdGruppiTelegramAdmin,
-                                  GetIdGruppoTelegram, GetIdGruppoTelegram, GetIdTelegram, GetIsAdmin, GetIsVerified,
-                                  GetMyAuletta, GetNomeAuletta, GetUnverifiedUsers, GetUsername, InsertUser,
-                                  InsertUser, SetAdminDB, SetIsVerified, assignCard, getGender, getIDCard, getUsers,
-                                  incrementaSaldo, removeUser)
+from Modules.Shared.Query import (GetAulette, GetIdGruppiTelegramAdmin,
+                                  GetIdTelegram, GetIsAdmin, GetIsVerified,
+                                  GetMyAuletta, GetNomeAuletta, GetUnverifiedUsers, removeUser)
 
-from Modules.Bot.New_Menu.Stop import stop, stop_after_registration, stop_command, stop_to_restart_again
-from Modules.Bot.New_Menu.UserInfo import Info
+from Modules.Bot.Stop import stop, stop_to_restart_again
+from Modules.Bot.UserInfo import Info
 from Modules.Bot.Resoconti import SendUsersResoconto
-from Modules.Bot.New_Menu.ShowBalance import ShowBalance
-from Modules.Bot.New_Menu.Start import Start
-from Modules.Bot.New_Menu.Utility import *
+from Modules.Bot.ShowBalance import ShowBalance
+from Modules.Bot.Start import Start
+from Modules.Bot.Utility import *
 import re
 
 
@@ -170,8 +167,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await SendUsersResoconto(context)
             keyboard = InlineKeyboardMarkup(
                 [[InlineKeyboardButton("🔙 Torna al menu admin", callback_data='main_admin')]])
-            await query.edit_message_text(f"Resoconto inviato",
-                                          reply_markup=keyboard)
+            await query.edit_message_text("Resoconto inviato", reply_markup=keyboard)
 
         ##### SEND MESSAGE TO EVERYONE #####
 
@@ -182,6 +178,58 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "confirm_message_to_sent":
             await context.user_data["SendMessageAll"].end_conversation(update=update, context=context, query=query)
+
+        ##### STORAGE MENU #####
+
+        case "storage":
+            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
+            if "acquire" in context.user_data:
+                context.user_data.pop('nome_prodotto')
+            # TODO: Sotto menu per lo storage e relative comunicazioni con il DB
+            buttons = [[InlineKeyboardButton("Rimuovi Prodotto 🟥", callback_data='remove_storage')],
+                       [InlineKeyboardButton("Aggiungi Prodotto ➕", callback_data='new_storage')],
+                       [InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(f"GESTIONE MAGAZZINO", reply_markup=keyboard)
+
+        case "new_storage":
+            # Elimino l'eventuale conversazione nel caso premo il bottone per tornare indietro
+            if "acquire_nome_prodotto" in context.user_data:
+                context.user_data.pop('acquire_nome_prodotto')
+            context.user_data["acquire_nome_prodotto"] = query
+            username = query.from_user.first_name
+            admin_who_makes_the_query = query.from_user.id
+            auletta = GetNomeAuletta(GetMyAuletta(admin_who_makes_the_query))
+            context.user_data["auletta_4storage"] = auletta
+            buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(
+                f"Ciao {username}, dimmi pure il prodotto da aggiungere nella tua Auletta ({auletta})",
+                reply_markup=keyboard)
+
+        case "remove_storage":
+            # Funzione da implementare in futuro
+            pass
+
+        case "acquire_costo_prodotto":
+            context.user_data["acquire_costo_prodotto"] = query
+            buttons = [[InlineKeyboardButton("🔙 Torna indietro", callback_data='new_storage')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text("Ora dimmi quanto costa per favore", reply_markup=keyboard)
+
+        case "confirm_new_prodotto":
+            auletta = context.user_data["auletta_4storage"]
+            nome_prodotto = context.user_data["nome_prodotto"]
+            costo_prodotto = context.user_data["costo_prodotto"]
+            # TODO: Query per l'aggiunta al DB
+            context.user_data.pop("auletta_4storage")
+            context.user_data.pop("nome_prodotto")
+            context.user_data.pop("costo_prodotto")
+            buttons = [[InlineKeyboardButton("🔙 Torna al menu principale", callback_data='back_main_menu')]]
+            keyboard = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(
+                f"{nome_prodotto} al costo di {costo_prodotto}, aggiunto all'Auletta {auletta} correttamente!",
+                reply_markup=keyboard)
 
 
         case _:

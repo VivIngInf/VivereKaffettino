@@ -1,4 +1,4 @@
-from Modules.Bot.New_Menu.SubMenu import SubMenu
+from Modules.Bot.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
 from Modules.Shared.Query import SetAdminDB, GetIdTelegram

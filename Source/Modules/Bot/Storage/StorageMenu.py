@@ -1,46 +1,29 @@
 from Modules.Bot.New_Menu.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from Modules.Shared.Query import SetAdminDB, GetIdTelegram
 
 
-class RemoveAdmin(SubMenu):
+class StorageMenu(SubMenu):
 
     def __init__(self):
         super().__init__()
 
-        # conversation_batches = ["remove_admin", "acquire_username", "done"]
+        # conversation_batches = []
+
+        self.user_params = {
+            "telegramID": 0,
+        }
 
         self.INTRO_MESSAGES = {
-
-            "remove_admin": "Digita l'username dell'utente da rimuovere dagli admin",
-
-            "acquire_username": ["Ok, l'utente", "è stato tolto dagli Admin"]
-
         }
 
         self.KEYBOARDS = {
-
-            "remove_admin": InlineKeyboardMarkup([[InlineKeyboardButton("❌ Annulla", callback_data='main_admin')]]),
-
-            "acquire_username": InlineKeyboardMarkup(
-                [[InlineKeyboardButton("❌ Annulla", callback_data='main_admin')]]),
-
-            "done": InlineKeyboardMarkup(
-                [[InlineKeyboardButton("🔙 Ritorna al menu admin", callback_data='main_admin')]])
-
         }
 
         self.WARNING_MESSAGES = {
-
-            "acquire_username": "L'utente non è un admin, riprova oppure annulla"
-
         }
 
         self.ERROR_MESSAGES = {
-
-            "acquire_username": "Utente non trovato riprova oppure annulla",
-
         }
 
     async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None,
@@ -58,16 +41,30 @@ class RemoveAdmin(SubMenu):
             if flag2:
                 query = self.query
                 await query.edit_message_text(text=self.WARNING_MESSAGES[current_batch],
-                                              reply_markup=self.KEYBOARDS[next_batch])
+                                              reply_markup=self.KEYBOARDS[current_batch])
             else:
                 query = self.query
-                self.current_batch = next_batch
-                SetAdminDB(GetIdTelegram(username=typed_string), False)
-                await query.edit_message_text(f"{self.INTRO_MESSAGES[current_batch][0]} "
-                                              f"{typed_string} {self.INTRO_MESSAGES[current_batch][1]}",
-                                              reply_markup=self.KEYBOARDS[next_batch])
+                self.user_params[current_batch] = typed_string
+                self.current_batch = current_batch
+                self.user_params["telegramID"] = chat_id
+                await query.edit_message_text(self.text_to_send(current_batch=current_batch,
+                                                                optional_param=typed_string),
+                                              reply_markup=self.keyboard_to_show(current_batch))
 
         else:
             query = self.query
             await query.edit_message_text(text=self.ERROR_MESSAGES[current_batch],
                                           reply_markup=self.KEYBOARDS[current_batch])
+
+    async def end_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None):
+        """Different for each class"""
+        self.current_batch = ""
+
+    def text_to_send(self, optional_param: str = None, current_batch: str = None) -> str:
+        """Base on the current batch the message to send need to be manipulated"""
+        return optional_param
+
+    def keyboard_to_show(self, current_batch: str = None) -> str:
+        """Base on the current batch the keyboard to show need is different"""
+        return self.KEYBOARDS[current_batch]
+

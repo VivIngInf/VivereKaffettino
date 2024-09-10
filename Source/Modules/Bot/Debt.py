@@ -1,4 +1,4 @@
-from telegram.ext import  CallbackContext
+from telegram.ext import CallbackContext
 from telegram import InputFile
 from ..Shared.Query import GetDebitori
 import random

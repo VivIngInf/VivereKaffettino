@@ -1,9 +1,9 @@
-from Modules.Bot.New_Menu.SubMenu import SubMenu
+from Modules.Bot.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from Modules.Bot.New_Menu.Utility import *
+from Modules.Bot.Utility import *
 from Modules.Shared.Query import GetAulette, InsertUser, GetIdGruppoTelegram, GetAuletta
-from Modules.Bot.New_Menu.Stop import stop_after_registration
+from Modules.Bot.Stop import stop_after_registration
 
 
 class Registration(SubMenu):
