@@ -83,6 +83,7 @@ JsonArray products;
 #define CONNECTING 12 // Ci stiamo connettendo
 #define HTTPERR 13	  // C'è satto un errore nella richiesta http
 #define AUGURI 69	  // Il bro che ha acquistato ha compiuto gli anni
+#define UNVERIFIED 70 // Il bro non ha la card abilitata
 
 int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 
@@ -779,6 +780,26 @@ void stampaoled(int i)
 		display.display(); // Show text
 
 		playCompleanno();
+
+		break;
+	}
+	case UNVERIFIED:
+	{
+		display.stopscroll();
+		display.clearDisplay();
+		display.setTextSize(2); // Draw 2X-scale text
+		display.setTextColor(SSD1306_WHITE);
+
+		display.setCursor(5, 5);
+		display.print("CARD");
+		display.display(); // Show text
+
+		display.setCursor(17, 25);
+		display.print("DISABILITATA");
+		display.setCursor(35, 45);
+		display.print("PEZZENTE");
+		delay(200);
+		display.display(); // Show text
 
 		break;
 	}

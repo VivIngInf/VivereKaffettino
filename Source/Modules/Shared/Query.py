@@ -356,7 +356,6 @@ def getIDCard(idTelegram: str) -> int:
     else:
         return 0
 
-
 # endregion
 
 # region Magazzino
@@ -510,6 +509,10 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
         idTelegram: str = GetIDTelegram(idCard=ID_Card)
     except:
         return 2  # Utente con idCard {ID_Card} non esistente
+
+    verified : bool = GetIsVerified(idTelegram=idTelegram)
+    if verified is False:
+        return 70 # Utente non verificato, card disabilitata!
 
     # Controllare se quantità disponibile
 
