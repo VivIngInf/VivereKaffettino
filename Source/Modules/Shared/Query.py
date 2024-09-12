@@ -147,14 +147,14 @@ def GetIsVerified(idTelegram: str) -> bool:
     return bool(user.isVerified)
 
 
-def SetIsVerified(idTelegram: str) -> int:
+def SetIsVerified(idTelegram: str, verified: bool) -> int:
     """DATABASE_HANDLER: Se l'utente esiste lo setta come verificato"""
 
     if not CheckUserExists(idTelegram=idTelegram):
         return 1
 
     user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
-    user.isVerified = True
+    user.isVerified = verified
     session.commit()
 
     return 0
@@ -333,7 +333,7 @@ def removeUser(idTelegram: str) -> dict:
 
 
 def assignCard(idTelegram: str, idCard: str) -> int:
-    if SetIsVerified(idTelegram=idTelegram) == 1:
+    if SetIsVerified(idTelegram=idTelegram, verified=True) == 1:
         return 1  # l'utente non esiste
 
     # Assegnamo la card
@@ -346,7 +346,7 @@ def assignCard(idTelegram: str, idCard: str) -> int:
 
 
 def getIDCard(idTelegram: str) -> int:
-    if SetIsVerified(idTelegram=idTelegram) == 1:
+    if CheckUserExists(idTelegram=idTelegram) is False:
         return 1  # l'utente non esiste
 
     user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
