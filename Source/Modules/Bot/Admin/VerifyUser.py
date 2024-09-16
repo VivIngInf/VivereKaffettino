@@ -133,7 +133,7 @@ class VerifyUser(SubMenu):
         assignCard(GetIdTelegram(self.user_params["acquire_username"]), self.user_params["acquire_card_number"])
         idTelegram = GetIdTelegram(username=self.user_params["acquire_username"])
         gender = getGender(idTelegram=idTelegram)
-        SetIsVerified(GetIdTelegram(self.user_params["acquire_username"]))
+        SetIsVerified(GetIdTelegram(self.user_params["acquire_username"]), True)
 
         keyboard = InlineKeyboardMarkup(
             [[InlineKeyboardButton("🔙 Ritorna al menu admin", callback_data='main_admin')]])

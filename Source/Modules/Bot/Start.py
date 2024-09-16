@@ -14,6 +14,9 @@ from Modules.Bot.Admin.VerifyUser import VerifyUser
 from Modules.Bot.Admin.ChangeCard import ChangeCard
 from Modules.Bot.Admin.AddAdmin import AddAdmin
 from Modules.Bot.Admin.RemoveAdmin import RemoveAdmin
+from Modules.Bot.Admin.ManageCard import ManageCard
+from Modules.Bot.Admin.ActivateCard import ActivateCard
+from Modules.Bot.Admin.DeactivateCard import DeactivateCard
 from Modules.Bot.Admin.UnlimitedUser import UnlimitedUser
 from Modules.Bot.Admin.SendMessageAll import SendMessageAll
 from Modules.Bot.Storage.StorageMenu import StorageMenu
@@ -79,7 +82,9 @@ class Start(SubMenu):
             classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser(),
                                     "ChangeCard": ChangeCard(), "AddAdmin": AddAdmin(), "RemoveAdmin": RemoveAdmin(),
                                     "SendMessageAll": SendMessageAll(), "StorageMenu": StorageMenu(),
-                                    "NewProduct": NewProduct(), "UnlimitedUser": UnlimitedUser()}
+                                    "NewProduct": NewProduct(), "UnlimitedUser": UnlimitedUser(),
+                                    "ManageCard": ManageCard(), "ActivateCard": ActivateCard(),
+                                    "DeactivateCard": DeactivateCard()}
 
             mainMenuKeyboard.append([saldo])
             mainMenuKeyboard.append([ricarica])

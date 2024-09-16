@@ -18,6 +18,7 @@ class AdminMenu(SubMenu):
             "main_admin": InlineKeyboardMarkup(
                 [[InlineKeyboardButton("Verifica Utente ☑", callback_data='verify_user')],
                  [InlineKeyboardButton("Cambia Tessera 🔄", callback_data='change_card')],
+                 [InlineKeyboardButton("Gestione Tessera ⏯", callback_data='manage_card')],
                  [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],
                  [InlineKeyboardButton("Rimuovi Admin 🔴", callback_data='remove_admin')],
                  [InlineKeyboardButton("Resoconto Utenti Excel 📃", callback_data='send_resoconto')],

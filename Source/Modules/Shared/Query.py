@@ -135,6 +135,11 @@ def GetUnverifiedUsers(idAuletta: int) -> list:
     """Ritorna la lista degli utenti non verificati afferenti all auletta con id specificato"""
     return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == False).all()
 
+def GetVerifiedUsers(idAuletta: int) -> list:
+    """Ritorna la lista degli utenti non verificati afferenti all auletta con id specificato"""
+    return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == True).all()
+
+
 def GetIsAdmin(idTelegram: str) -> bool:
     """DATABASE_HANDLER: Ritorna il ruolo dell'utente"""
 

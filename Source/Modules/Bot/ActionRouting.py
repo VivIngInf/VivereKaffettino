@@ -2,7 +2,7 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from Modules.Shared.Query import (GetAulette, GetIdGruppiTelegramAdmin,
                                   GetIdTelegram, GetIsAdmin, GetIsVerified,
-                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists)
+                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists, GetVerifiedUsers)
 
 from Modules.Bot.Stop import stop, stop_to_restart_again
 from Modules.Bot.UserInfo import Info
@@ -120,6 +120,36 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "change_card_done":
             await context.user_data["ChangeCard"].end_conversation(update=update, context=context, query=query)
 
+        ##### STORAGE MENU #####
+
+        case "manage_card":
+            delete_all_conversations(context)
+            await context.user_data["ManageCard"].start_conversation(update=None, context=context, query=query,
+                                                                     current_batch="manage_card")
+
+        case "activate_card":
+            context.user_data["ConversationManager"].set_active_conversation("ActivateCard")
+            await context.user_data["ActivateCard"].start_conversation(update=None, context=context, query=query,
+                                                                       current_batch="activate_card")
+        case "activate_user":
+            await context.user_data["ActivateCard"].end_conversation(update=update, context=context, query=query)
+
+        case "deactivate_card":
+            context.user_data["ConversationManager"].set_active_conversation("DeactivateCard")
+            await context.user_data["DeactivateCard"].start_conversation(update=None, context=context, query=query,
+                                                                         current_batch="deactivate_card")
+
+        case selected_user if selected_user in {utente[0] for utente in
+                                                GetVerifiedUsers(GetMyAuletta(query.from_user.id))}:
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("✔ Conferma", callback_data='deactivate_user')],
+                 [InlineKeyboardButton("🔙 Torna indietro", callback_data='deactivate_card')]])
+            context.user_data["DeactivateCard"].set_user_to_deactivate(selected_user)
+            await query.edit_message_text(f"Hai scelto {selected_user}, confermi?", reply_markup=keyboard)
+
+        case "deactivate_user":
+            await context.user_data["DeactivateCard"].end_conversation(update=update, context=context, query=query)
+
         ##### VERIFY USER #####
 
         case "verify_user":
@@ -129,10 +159,24 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case selected_user if selected_user in {utente[0] for utente in
                                                 GetUnverifiedUsers(GetMyAuletta(query.from_user.id))}:
-            keyboard = InlineKeyboardMarkup(
-                [[InlineKeyboardButton("✔ Conferma", callback_data='action_to_apply')],
-                 [InlineKeyboardButton("🔙 Torna indietro", callback_data='verify_user')]])
-            await query.edit_message_text(f"Hai scelto {selected_user}, confermi?", reply_markup=keyboard)
+
+            # This case is shared with the activate_card, since both use
+            # the buttons generates from UnverifiedUsers
+            active_conversation = context.user_data["ConversationManager"].get_active_conversation()
+            current_batch = context.user_data["ConversationManager"].get_current_conversation_batch(context)
+            conversation_id = safe_hash_name(active_conversation, current_batch)
+            if conversation_id == ACQUIRE_USERNAME_TO_ACTIVATE:
+                keyboard = InlineKeyboardMarkup(
+                    [[InlineKeyboardButton("✔ Conferma", callback_data='activate_user')],
+                     [InlineKeyboardButton("🔙 Torna indietro", callback_data='activate_card')]])
+                context.user_data["ActivateCard"].set_user_to_activate(selected_user)
+                await query.edit_message_text(f"Hai scelto {selected_user}, confermi?", reply_markup=keyboard)
+
+            else:
+                keyboard = InlineKeyboardMarkup(
+                    [[InlineKeyboardButton("✔ Conferma", callback_data='action_to_apply')],
+                     [InlineKeyboardButton("🔙 Torna indietro", callback_data='verify_user')]])
+                await query.edit_message_text(f"Hai scelto {selected_user}, confermi?", reply_markup=keyboard)
 
         case "action_to_apply":
             await context.user_data["VerifyUser"].forward_conversation(query, context, current_batch="action_to_apply")

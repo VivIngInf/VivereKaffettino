@@ -10,7 +10,7 @@ class StorageMenu(SubMenu):
 
         self.INTRO_MESSAGES = {
 
-            "main_storage": "GESTIONE MAGAZZINO",
+            "main_storage": "GESTIONE MAGAZZINO"
         }
 
         self.KEYBOARDS = {
