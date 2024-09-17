@@ -79,7 +79,7 @@ class Start(SubMenu):
             username = GetUsername(idTelegram=update.effective_chat.id)
             text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
-            classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser(),
+            classes_to_generate |= {"Recharge": Recharge(), "AdminMenu": AdminMenu(), "VerifyUser": VerifyUser(),
                                     "ChangeCard": ChangeCard(), "AddAdmin": AddAdmin(), "RemoveAdmin": RemoveAdmin(),
                                     "SendMessageAll": SendMessageAll(), "StorageMenu": StorageMenu(),
                                     "NewProduct": NewProduct(), "UnlimitedUser": UnlimitedUser(),

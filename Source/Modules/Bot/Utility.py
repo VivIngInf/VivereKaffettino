@@ -25,7 +25,9 @@ ACQUIRE_USERNAME_TO_ACTIVATE = "34uQ23-1KA3i8_3y"
 ACQUIRE_USERNAME_TO_DEACTIVATE = "rSYP1-x3XfdOCSaD"
 
 CONVERSATION_CLASSES = ["ConversationManager", "Registration", "Recharge", "AdminMenu", "VerifyUser", "AddAdmin",
-                        "RemoveAdmin", "SendMessageAll", "ChangeCard"]
+                        "RemoveAdmin", "SendMessageAll", "ChangeCard", 'StorageMenu', 'NewProduct', 'UnlimitedUser',
+                        'ManageCard', 'ActivateCard', 'DeactivateCard']
+
 
 GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}
 DB_GENDER_DICT = {"D": "a", "U": "o", "A": "ə", "M": "o", "F": "a"}
