@@ -176,6 +176,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 keyboard = InlineKeyboardMarkup(
                     [[InlineKeyboardButton("✔ Conferma", callback_data='action_to_apply')],
                      [InlineKeyboardButton("🔙 Torna indietro", callback_data='verify_user')]])
+                context.user_data["VerifyUser"].set_user_to_verify(selected_user)
                 await query.edit_message_text(f"Hai scelto {selected_user}, confermi?", reply_markup=keyboard)
 
         case "action_to_apply":

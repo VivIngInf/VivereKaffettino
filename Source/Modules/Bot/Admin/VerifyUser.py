@@ -79,6 +79,9 @@ class VerifyUser(SubMenu):
 
         }
 
+    def set_user_to_verify(self, user_to_verify: str):
+        self.user_params["acquire_username"] = user_to_verify
+
     async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None,
                                  current_batch: str = None):
         self.query = query
