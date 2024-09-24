@@ -1,7 +1,7 @@
 from Modules.Bot.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from Modules.Shared.Query import GetNomeAuletta, GetMyAuletta
+from Modules.Shared.Query import GetNomeAuletta, GetMyAuletta, InsertProdotto
 
 
 class NewProduct(SubMenu):
@@ -117,15 +117,15 @@ class NewProduct(SubMenu):
         auletta = self.product_params["auletta"]
         product_name = self.product_params["acquire_product"]
         product_price = self.product_params["acquire_price"]
-        # TODO: Query per l'aggiunta al DB
+
+        InsertProdotto(auletta, product_name, product_price)
+
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna al menu magazzino",
                                                                callback_data='main_storage')]])
         await query.edit_message_text(
             f"{product_name} al costo di {product_price}, aggiunto all'Auletta {auletta} correttamente!",
             reply_markup=keyboard)
-        print("##################")
-        print(product_name, product_price)
-        print("##################")
+
         self.current_batch = ""
 
     def text_to_send(self, optional_param: str = None, current_batch: str = None, another_optional_param: str = None) -> str:

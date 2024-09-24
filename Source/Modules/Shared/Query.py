@@ -392,6 +392,9 @@ def DecurtaMagazzino(idProdotto: int, idAuletta: int, quantita: int) -> dict:
 
     return {"State": "Done"}
 
+def GetIDProdotto(nomeProdotto: str) -> int:
+    """Ritorna l'id di un prodotto dato il suo nome"""
+    return session.query(Prodotto).filter(Prodotto.descrizione == f"{nomeProdotto}").one().ID_Prodotto
 
 def GetProdotti(idAuletta: int) -> str:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
@@ -465,6 +468,30 @@ def GetDebitori() -> list:
 def GetIdGruppoTelegram(ID_Auletta: int) -> str:
     """Dato l'id dell'auletta ritorna l'id del gruppo associato"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().ID_GruppoTelegram
+
+def InsertProdotto(ID_Auletta: int, nomeProdotto: str, costo: float) -> None:
+    """Inserisci un prodotto dato l'ID auletta, il suo nome ed il suo costo"""
+
+    prodotto = Prodotto(
+        ID_Prodotto=None,
+        descrizione=nomeProdotto
+    )
+
+    session.add(prodotto)
+    session.commit()
+
+    idProdotto : str = GetIDProdotto(nomeProdotto=nomeProdotto)
+
+    magazzino = Magazzino(
+        ID_Magazzino=None,
+        ID_Prodotto= idProdotto,
+        ID_Auletta=ID_Auletta,
+        quantita=0,
+        costo=costo
+    )
+
+    session.add(magazzino)
+    session.commit()
 
 # endregion
 
