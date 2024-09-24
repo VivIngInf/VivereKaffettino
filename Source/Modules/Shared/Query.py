@@ -469,7 +469,7 @@ def GetIdGruppoTelegram(ID_Auletta: int) -> str:
     """Dato l'id dell'auletta ritorna l'id del gruppo associato"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().ID_GruppoTelegram
 
-def InsertProdotto(ID_Auletta: int, nomeProdotto: str, costo: float) -> None:
+def InsertProdotto(NomeAuletta: str, nomeProdotto: str, costo: float) -> None:
     """Inserisci un prodotto dato l'ID auletta, il suo nome ed il suo costo"""
 
     prodotto = Prodotto(
@@ -480,12 +480,13 @@ def InsertProdotto(ID_Auletta: int, nomeProdotto: str, costo: float) -> None:
     session.add(prodotto)
     session.commit()
 
-    idProdotto : str = GetIDProdotto(nomeProdotto=nomeProdotto)
+    idProdotto : int = GetIDProdotto(nomeProdotto=nomeProdotto)
+    idAuletta : int = GetAuletta(auletta=NomeAuletta)
 
     magazzino = Magazzino(
         ID_Magazzino=None,
         ID_Prodotto= idProdotto,
-        ID_Auletta=ID_Auletta,
+        ID_Auletta=idAuletta,
         quantita=0,
         costo=costo
     )
