@@ -487,7 +487,7 @@ def InsertProdotto(NomeAuletta: str, nomeProdotto: str, costo: float) -> None:
         ID_Magazzino=None,
         ID_Prodotto= idProdotto,
         ID_Auletta=idAuletta,
-        quantita=0,
+        quantita=100,
         costo=costo
     )
 
