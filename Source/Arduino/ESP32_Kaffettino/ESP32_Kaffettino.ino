@@ -378,11 +378,6 @@ void loop()
 			digitalWrite(yellow, LOW);
 			digitalWrite(red, HIGH); // Led rosso simboleggia errore
 
-			// Segnale acustico
-			digitalWrite(buzzer, 1);
-			delay(300);
-			digitalWrite(buzzer, 0);
-
 			t = millis();
 
 			return;
@@ -659,6 +654,11 @@ void stampaoled(int i)
 	}
 	case NOSALDO:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -673,6 +673,11 @@ void stampaoled(int i)
 	}
 	case NOCARD:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -687,6 +692,11 @@ void stampaoled(int i)
 	}
 	case NOPROD:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+		
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -701,6 +711,11 @@ void stampaoled(int i)
 	}
 	case NOSELECTION:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+		
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -785,22 +800,34 @@ void stampaoled(int i)
 	}
 	case UNVERIFIED:
 	{
+		Serial.println("Card disabilitata");
+
 		display.stopscroll();
 		display.clearDisplay();
-		display.setTextSize(2); // Draw 2X-scale text
+		display.setTextSize(1); // Draw 2X-scale text
 		display.setTextColor(SSD1306_WHITE);
 
-		display.setCursor(5, 5);
+		display.setCursor(52, 5);
 		display.print("CARD");
 		display.display(); // Show text
-
-		display.setCursor(17, 25);
+		display.setTextSize(1); // Draw 2X-scale text
+		display.setCursor(30, 25);
 		display.print("DISABILITATA");
-		display.setCursor(35, 45);
+		display.setCursor(40, 45);
 		display.print("PEZZENTE");
+		digitalWrite(red, HIGH);
 		delay(200);
 		display.display(); // Show text
 
+		for (size_t i = 0; i < 10; i++)
+		{
+			// Segnale acustico
+			digitalWrite(buzzer, 1);
+			delay(500);
+			digitalWrite(buzzer, 0);	
+			delay(500);
+		}
+		
 		break;
 	}
 	case HTTPERR:
