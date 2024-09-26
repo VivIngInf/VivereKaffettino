@@ -1,7 +1,7 @@
 from Modules.Bot.SubMenu import SubMenu
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import ContextTypes
-from Modules.Shared.Query import GetNomeAuletta, GetMyAuletta, InsertProdotto
+from Modules.Shared.Query import GetNomeAuletta, GetMyAuletta, AssegnaProdotto
 
 
 class NewProduct(SubMenu):
@@ -118,7 +118,7 @@ class NewProduct(SubMenu):
         product_name = self.product_params["acquire_product"]
         product_price = self.product_params["acquire_price"]
 
-        InsertProdotto(auletta, product_name, product_price)
+        AssegnaProdotto(nomeAuletta=auletta, nomeProdotto=product_name, costo=product_price, isVisible=True)
 
         keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna al menu magazzino",
                                                                callback_data='main_storage')]])

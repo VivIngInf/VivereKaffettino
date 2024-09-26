@@ -10,13 +10,15 @@ class Magazzino(Base):
     ID_Auletta = Column("ID_Auletta", Integer, ForeignKey("Auletta.ID_Auletta"), nullable=False)
     quantita = Column("Quantità", Integer, nullable=False, default=0)
     costo = Column("Costo", Double, nullable=False, default=0.0)
+    isVisible = Column("IsVisible", Boolean, default=True, nullable=False)
 
-    def __init__(self, ID_Magazzino : int, ID_Prodotto : int, ID_Auletta : int, quantita : int, costo : Double):
+    def __init__(self, ID_Magazzino : int, ID_Prodotto : int, ID_Auletta : int, quantita : int, costo : Double, isVisible : Boolean):
         self.ID_Magazzino = ID_Magazzino
         self.ID_Prodotto = ID_Prodotto
         self.ID_Auletta = ID_Auletta
         self.quantita = quantita
         self.costo = costo
+        self.isVisible = isVisible
 
     def __repr__(self):
-        return f"{self.ID_Magazzino} {self.ID_Prodotto} {self.ID_Auletta} {self.quantita} {self.costo}"
+        return f"{self.ID_Magazzino} {self.ID_Prodotto} {self.ID_Auletta} {self.quantita} {self.costo} {self.isVisible}"

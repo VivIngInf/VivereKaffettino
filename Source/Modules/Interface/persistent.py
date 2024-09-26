@@ -67,7 +67,8 @@ def CreatePersistent():
         ID_Prodotto=1,
         ID_Auletta=1,
         quantita=100,
-        costo=0.4
+        costo=0.4,
+        isVisible=True
     )
 
     acquaIngegneria = Magazzino(
@@ -75,7 +76,8 @@ def CreatePersistent():
         ID_Prodotto=2,
         ID_Auletta=1,
         quantita=100,
-        costo=0.4
+        costo=0.4,
+        isVisible=True
     )
     
     gelatoIngegneria = Magazzino(
@@ -83,7 +85,8 @@ def CreatePersistent():
         ID_Prodotto=4,
         ID_Auletta=1,
         quantita=100,
-        costo=1.0
+        costo=1.0,
+        isVisible=True
     )
 
     caffeDeim = Magazzino(
@@ -91,7 +94,8 @@ def CreatePersistent():
         ID_Prodotto=1,
         ID_Auletta=2,
         quantita=100,
-        costo=0.4
+        costo=0.4,
+        isVisible=True
     )
 
     teDeim = Magazzino(
@@ -99,7 +103,8 @@ def CreatePersistent():
         ID_Prodotto=3,
         ID_Auletta=2,
         quantita=100,
-        costo=0.6
+        costo=0.6,
+        isVisible=True
     )
 
     session.add(caffeIngegneria)

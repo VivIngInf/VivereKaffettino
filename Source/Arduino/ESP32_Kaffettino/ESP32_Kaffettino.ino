@@ -560,6 +560,11 @@ void getProdotti()
 	// Per ogni prodotto nella lista di json objects ne creiamo uno con la nostra struct Prodotto
 	for (JsonObject product : products)
 	{
+		bool isVisible = product["isVisible"].as<bool>();
+
+		if (!isVisible)
+			continue;
+
 		Prodotto *prodotto = new Prodotto();
 		prodotto->id = product["ID_Prodotto"].as<String>().c_str();
 		prodotto->nome = product["descrizione"].as<String>().c_str();
@@ -696,7 +701,7 @@ void stampaoled(int i)
 		digitalWrite(buzzer, 1);
 		delay(300);
 		digitalWrite(buzzer, 0);
-		
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -715,7 +720,7 @@ void stampaoled(int i)
 		digitalWrite(buzzer, 1);
 		delay(300);
 		digitalWrite(buzzer, 0);
-		
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -809,7 +814,7 @@ void stampaoled(int i)
 
 		display.setCursor(52, 5);
 		display.print("CARD");
-		display.display(); // Show text
+		display.display();		// Show text
 		display.setTextSize(1); // Draw 2X-scale text
 		display.setCursor(30, 25);
 		display.print("DISABILITATA");
@@ -824,10 +829,10 @@ void stampaoled(int i)
 			// Segnale acustico
 			digitalWrite(buzzer, 1);
 			delay(500);
-			digitalWrite(buzzer, 0);	
+			digitalWrite(buzzer, 0);
 			delay(500);
 		}
-		
+
 		break;
 	}
 	case HTTPERR:

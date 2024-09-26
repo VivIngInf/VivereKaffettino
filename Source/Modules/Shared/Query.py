@@ -3,6 +3,7 @@ from mysql.connector import cursor, connect, MySQLConnection
 from .Session import session
 from sqlalchemy import select, func, distinct
 from sqlalchemy.orm import aliased, load_only
+from sqlalchemy.sql import exists
 
 from ..Database.Models.Auletta import Auletta
 from ..Database.Models.Magazzino import Magazzino
@@ -396,7 +397,7 @@ def GetIDProdotto(nomeProdotto: str) -> int:
     """Ritorna l'id di un prodotto dato il suo nome"""
     return session.query(Prodotto).filter(Prodotto.descrizione == f"{nomeProdotto}").one().ID_Prodotto
 
-def GetProdotti(idAuletta: int) -> str:
+def GetProdotti(idAuletta: int) -> list:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
 
     arr = []
@@ -405,8 +406,9 @@ def GetProdotti(idAuletta: int) -> str:
         ID_Prodotto: int
         descrizione: str
         costo: float
+        isVisible : bool
 
-    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto,
+    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo, Magazzino.isVisible).join(Prodotto,
                                                                                           Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(
         Magazzino.ID_Auletta == idAuletta).all()
 
@@ -416,18 +418,58 @@ def GetProdotti(idAuletta: int) -> str:
         p.ID_Prodotto = r[0]
         p.descrizione = r[1]
         p.costo = r[2]
+        p.isVisible = r[3]
 
         arr.append(p)
 
     return arr
 
+def GetProdottiNonAssociati(idAuletta: int) -> list:
+    """Dato l'ID di un auletta, restituisce tutti i prodotti che non sono venduti in quell'auletta"""
+
+    arr = []
+
+    class Prodotti:
+        ID_Prodotto: int
+        descrizione: str
+        IsVisible: bool
+
+    magazzino_alias = aliased(Magazzino)
+
+    subqueryNotIn = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione).filter(
+        ~session.query(magazzino_alias.ID_Prodotto)
+        .filter(magazzino_alias.ID_Prodotto == Prodotto.ID_Prodotto)
+        .filter(magazzino_alias.ID_Auletta == idAuletta)
+        .exists()
+    ).all()
+
+    subqueryIsVisibleFalse = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione).join(
+        Magazzino, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto
+    ).filter(
+        Magazzino.IsVisible == False,
+        Magazzino.ID_Auletta == idAuletta
+    )
+
+    unionQuery = subqueryNotIn.union(subqueryIsVisibleFalse)
+
+    res = unionQuery.all()
+
+    for r in res:
+        p = Prodotti()
+
+        p.ID_Prodotto = r[0]
+        p.descrizione = r[1]
+        p.IsVisible = r[2]
+
+        arr.append(p)
+
+    return arr
 
 def getMagazzino(idAuletta: int) -> list:
     """
         MAGAZZINO: Ritorna tutti i prodotti e la quantità in magazzino dell'auletta con id idAuletta
     """
     return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
-
 
 def ricaricaMagazzino(idAuletta: str, idProdotto: int, quantitaRicaricata: int) -> int:
     """
@@ -469,9 +511,8 @@ def GetIdGruppoTelegram(ID_Auletta: int) -> str:
     """Dato l'id dell'auletta ritorna l'id del gruppo associato"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().ID_GruppoTelegram
 
-def InsertProdotto(NomeAuletta: str, nomeProdotto: str, costo: float) -> None:
-    """Inserisci un prodotto dato l'ID auletta, il suo nome ed il suo costo"""
-
+def CreaProdotto(nomeProdotto : str) -> None:
+    """Dato il nome di un prodtto da creare, lo crea"""
     prodotto = Prodotto(
         ID_Prodotto=None,
         descrizione=nomeProdotto
@@ -480,15 +521,54 @@ def InsertProdotto(NomeAuletta: str, nomeProdotto: str, costo: float) -> None:
     session.add(prodotto)
     session.commit()
 
+def ExistsProdottoGenerale(nomeProdotto: str) -> bool:
+    """Dato il nome di un prodtto, controlla se esiste"""
+
+    query = session.query(Prodotto).filter(Prodotto.descrizione == f"{nomeProdotto}")
+    ex = session.query(query.exists()).scalar()
+
+    return bool(ex)
+
+def ExistsProdottoInAuletta(idProdotto : int, idAuletta : int) -> bool:
+    """Dato l'id del prodotto e l'auletta, controllare se esiste il prodotto nel magazzino"""
+
+    query = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}").filter(Magazzino.ID_Auletta == f"{idAuletta}")
+    ex = session.query(query.exists()).scalar()
+
+    return bool(ex)
+
+def SetProdottoVisibile(idProdotto : int, idAuletta : int, isVisible : bool) -> None:
+    """Dato l'id del prodotto, l'id dell'auletta e lo stato di visibilità, setta un determinato prodotto esistente in un auletta."""
+
+    mag: Magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}").filter(Magazzino.ID_Auletta == f"{idAuletta}").one()
+    mag.isVisible = isVisible
+    session.commit()
+
+def AssegnaProdotto(nomeAuletta: str, nomeProdotto: str, costo: float, isVisible : bool) -> None:
+    """Dato il nome di un auletta, il costo ed il nome del prodotto da aggiungere, lo aggiunge all'auletta al costo specificato e lo setta come visibile o meno dipndentemende da isVisible"""
+
+    ## Se il prodotto non esiste lo crea
+    if not ExistsProdottoGenerale(nomeProdotto=nomeProdotto):
+        CreaProdotto()
+
     idProdotto : int = GetIDProdotto(nomeProdotto=nomeProdotto)
-    idAuletta : int = GetAuletta(auletta=NomeAuletta)
+    idAuletta : int = GetAuletta(auletta=nomeAuletta)
+
+    # Se il prodotto era già stato associato, allora possiamo settarne la visibilità
+
+    if ExistsProdottoInAuletta(idProdotto=idProdotto, idAuletta=idAuletta):
+        SetProdottoVisibile(idProdotto=idProdotto, idAuletta=idAuletta, isVisible=isVisible)
+        return 
+
+    # Altrimenti, creiamo l'associazione prodotto - auletta tramite la tabella Magazzino e lo settiamo come visibile
 
     magazzino = Magazzino(
         ID_Magazzino=None,
         ID_Prodotto= idProdotto,
         ID_Auletta=idAuletta,
         quantita=100,
-        costo=costo
+        costo=costo,
+        isVisible=True
     )
 
     session.add(magazzino)
