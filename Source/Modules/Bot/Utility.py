@@ -17,7 +17,7 @@ ACQUIRE_USERNAME_REMOVE_ADMIN = "GqRI4J9kGURvhy8P"
 ACQUIRE_MESSAGE_TO_SEND_ALL = "RWSxXiHZAPNZKuPI"
 ACQUIRE_USERNAME_CARD_CHANGE = "IxylYTF4FvHARdOo"
 ACQUIRE_CARD_NUMBER_CHANGE = "ym4rhDgd54OMJL-n"
-ACQUIRE_NEW_PRODUCT = "sp_z6OkxdW4yrOe3"
+ACQUIRE_NEW_PRODUCT = "InbjTLYzVY2L_fqK"
 ACQUIRE_PRICE_PRODUCT = "x2AkueUDv6gYUkuI"
 ACQUIRE_USERNAME_UNLIMITED = "8v6uq4n-VxbLNNmj"
 ACQUIRE_CARD_UNLIMITED = "DePANQG74P8A39mi"
@@ -25,8 +25,8 @@ ACQUIRE_USERNAME_TO_ACTIVATE = "34uQ23-1KA3i8_3y"
 ACQUIRE_USERNAME_TO_DEACTIVATE = "rSYP1-x3XfdOCSaD"
 
 CONVERSATION_CLASSES = ["ConversationManager", "Registration", "Recharge", "AdminMenu", "VerifyUser", "AddAdmin",
-                        "RemoveAdmin", "SendMessageAll", "ChangeCard", 'StorageMenu', 'NewProduct', 'UnlimitedUser',
-                        'ManageCard', 'ActivateCard', 'DeactivateCard']
+                        "RemoveAdmin", "SendMessageAll", "ChangeCard", 'StorageMenu', 'NewProduct', "RemoveProduct",
+                        'UnlimitedUser', 'ManageCard', 'ActivateCard', 'DeactivateCard']
 
 
 GENDER_DICT = {"donna": "a", "uomo": "o", "altro": "ə"}

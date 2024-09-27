@@ -547,7 +547,7 @@ def AssegnaProdotto(nomeAuletta: str, nomeProdotto: str, costo: float, isVisible
 
     ## Se il prodotto non esiste lo crea
     if not ExistsProdottoGenerale(nomeProdotto=nomeProdotto):
-        CreaProdotto()
+        CreaProdotto(nomeProdotto)
 
     idProdotto : int = GetIDProdotto(nomeProdotto=nomeProdotto)
     idAuletta : int = GetAuletta(auletta=nomeAuletta)

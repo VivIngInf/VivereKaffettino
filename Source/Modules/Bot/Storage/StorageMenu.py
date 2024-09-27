@@ -17,7 +17,7 @@ class StorageMenu(SubMenu):
 
             "main_storage": InlineKeyboardMarkup(
                 [[InlineKeyboardButton("Rimuovi Prodotto 🟥", callback_data='remove_product_storage')],
-                 [InlineKeyboardButton("Aggiungi Prodotto ➕", callback_data='new_product_storage')],
+                 [InlineKeyboardButton("Aggiungi Prodotto ➕", callback_data='select_new_product')],
                  [InlineKeyboardButton("🔙 Ritorna al menu admin", callback_data='back_main_menu')]])
         }
 

@@ -1,8 +1,10 @@
+from sqlalchemy.exc import NoResultFound
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes
 from Modules.Shared.Query import (GetAulette, GetIdGruppiTelegramAdmin,
                                   GetIdTelegram, GetIsAdmin, GetIsVerified,
-                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists, GetVerifiedUsers)
+                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists, GetVerifiedUsers,
+                                  GetProdottiNonAssociati, GetIDProdotto, GetProdotti)
 
 from Modules.Bot.Stop import stop, stop_to_restart_again
 from Modules.Bot.UserInfo import Info
@@ -120,7 +122,7 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case "change_card_done":
             await context.user_data["ChangeCard"].end_conversation(update=update, context=context, query=query)
 
-        ##### STORAGE MENU #####
+        ##### MANAGE CARD MENU #####
 
         case "manage_card":
             delete_all_conversations(context)
@@ -245,26 +247,53 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ##### STORAGE MENU #####
 
         case "main_storage":
-            # TODO: Sotto menu per lo storage e relative comunicazioni con il DB
             delete_all_conversations(context)
             await context.user_data["StorageMenu"].start_conversation(update=None, context=context, query=query,
                                                                       current_batch="main_storage")
 
-        case "new_product_storage":
-            context.user_data["ConversationManager"].set_active_conversation("NewProduct")
+        case "select_new_product":
             await context.user_data["NewProduct"].start_conversation(update=None, context=context, query=query,
-                                                                     current_batch="new_product")
+                                                                     current_batch="select_new_product")
 
-        case "remove_product_storage":
-            # Funzione da implementare in futuro
-            pass
+        case selected_product_to_add if selected_product_to_add in {prodotto.descrizione for prodotto in
+                                                                    GetProdottiNonAssociati(
+                                                                        GetMyAuletta(query.from_user.id))}:
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("✔ Conferma", callback_data='product_added')],
+                 [InlineKeyboardButton("🔙 Torna indietro", callback_data='select_new_product')]])
+            context.user_data["NewProduct"].set_product_to_store(selected_product_to_add)
+            await query.edit_message_text(f"Hai scelto {selected_product_to_add}, confermi?",
+                                          reply_markup=keyboard)
+
+        case "custom_new_product_storage":
+            context.user_data["ConversationManager"].set_active_conversation("NewProduct")
+            await context.user_data["NewProduct"].forward_conversation(query, context,
+                                                                       current_batch="custom_new_product_storage")
 
         case "acquire_price_product":
+            context.user_data["ConversationManager"].set_active_conversation("NewProduct")
             await context.user_data["NewProduct"].forward_conversation(query, context,
                                                                        current_batch="acquire_price_product")
 
         case "product_added":
             await context.user_data["NewProduct"].end_conversation(update=update, context=context, query=query)
+
+        case "remove_product_storage":
+            await context.user_data["RemoveProduct"].start_conversation(update=None, context=context, query=query,
+                                                                        current_batch="remove_product_storage")
+
+        case selected_product_to_remove if selected_product_to_remove in {prodotto.descrizione for prodotto in
+                                                                          GetProdotti(
+                                                                              GetMyAuletta(query.from_user.id))}:
+            keyboard = InlineKeyboardMarkup(
+                [[InlineKeyboardButton("✔ Conferma", callback_data='remove_done')],
+                 [InlineKeyboardButton("🔙 Torna indietro", callback_data='remove_product_storage')]])
+            context.user_data["RemoveProduct"].set_product_to_remove(selected_product_to_remove)
+            await query.edit_message_text(f"Hai scelto {selected_product_to_remove}, confermi?",
+                                          reply_markup=keyboard)
+
+        case "remove_done":
+            await context.user_data["RemoveProduct"].end_conversation(update=update, context=context, query=query)
 
         case _:
             try:
@@ -472,6 +501,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
         product_name = update.message.text
         chat_id = update.message.chat_id
         message_id = update.message.message_id
+        product_name_not_exist = check_product(product_name)
         await context.user_data["NewProduct"].acquire_conversation_param(context,
                                                                          previous_batch="main_storage",
                                                                          current_batch="acquire_product",
@@ -479,7 +509,7 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                          chat_id=chat_id,
                                                                          message_id=message_id,
                                                                          typed_string=product_name,
-                                                                         flag=True,
+                                                                         flag=product_name_not_exist,
                                                                          flag2=False)
     elif conversation_id == ACQUIRE_PRICE_PRODUCT:
         price_product = str(update.message.text).replace(",", ".")
@@ -559,6 +589,16 @@ def validate_string_to_float(amount: str) -> [bool, bool, float]:
         if converted_amount > 0:
             is_negative = False
     return valid_number, is_negative, converted_amount
+
+
+def check_product(product_name: str) -> bool:
+    product_name_not_exist = True
+    try:
+        ID = GetIDProdotto(nomeProdotto=product_name)
+        product_name_not_exist = False
+    except NoResultFound:
+        product_name_not_exist = True
+    return product_name_not_exist
 
 
 def check_regex_username(username: str) -> bool:

@@ -23,7 +23,7 @@ class ManageCard(SubMenu):
             "manage_card": InlineKeyboardMarkup(
                 [[InlineKeyboardButton("Abilita Card ✅", callback_data='activate_card')],
                  [InlineKeyboardButton("Disabilita Card ⛔", callback_data='deactivate_card')],
-                 [InlineKeyboardButton("🔙 Ritorna al menu tessera", callback_data='manage_card')]])
+                 [InlineKeyboardButton("🔙 Ritorna al menu tessera", callback_data='main_admin')]])
         }
 
         self.WARNING_MESSAGES = {
