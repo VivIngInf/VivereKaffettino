@@ -1,7 +1,7 @@
 from mysql.connector import cursor, connect, MySQLConnection
 
 from .Session import session
-from sqlalchemy import select, func, distinct
+from sqlalchemy import select, func, distinct, literal
 from sqlalchemy.orm import aliased, load_only
 from sqlalchemy.sql import exists
 
@@ -432,21 +432,19 @@ def GetProdottiNonAssociati(idAuletta: int) -> list:
     class Prodotti:
         ID_Prodotto: int
         descrizione: str
-        IsVisible: bool
+        isVisible: bool
 
-    magazzino_alias = aliased(Magazzino)
-
-    subqueryNotIn = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione).filter(
-        ~session.query(magazzino_alias.ID_Prodotto)
-        .filter(magazzino_alias.ID_Prodotto == Prodotto.ID_Prodotto)
-        .filter(magazzino_alias.ID_Auletta == idAuletta)
+    subqueryNotIn = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, literal(True)).filter(
+        ~session.query(Magazzino.ID_Prodotto)
+        .filter(Magazzino.ID_Prodotto == Prodotto.ID_Prodotto)
+        .filter(Magazzino.ID_Auletta == idAuletta)
         .exists()
-    ).all()
+    )
 
-    subqueryIsVisibleFalse = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione).join(
+    subqueryIsVisibleFalse = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.isVisible).join(
         Magazzino, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto
     ).filter(
-        Magazzino.IsVisible == False,
+        Magazzino.isVisible == False,
         Magazzino.ID_Auletta == idAuletta
     )
 
@@ -459,7 +457,7 @@ def GetProdottiNonAssociati(idAuletta: int) -> list:
 
         p.ID_Prodotto = r[0]
         p.descrizione = r[1]
-        p.IsVisible = r[2]
+        p.isVisible = r[2]
 
         arr.append(p)
 
