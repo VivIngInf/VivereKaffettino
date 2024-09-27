@@ -560,8 +560,10 @@ void getProdotti()
 	// Per ogni prodotto nella lista di json objects ne creiamo uno con la nostra struct Prodotto
 	for (JsonObject product : products)
 	{
+		// Il prodotto è visibile all'auletta?
 		bool isVisible = product["isVisible"].as<bool>();
 
+		// Se no allora skippiamo, non vogliamo aggiungerlo nella lista.
 		if (!isVisible)
 			continue;
 
