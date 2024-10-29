@@ -1,6 +1,6 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, constants
 from telegram.ext import ContextTypes
-from ..Shared.Query import GetUsername, CheckUserExists, GetIsAdmin, GetIsVerified
+from ..Shared.Query import GetUsername, CheckUserExists, GetIsAdmin, GetIsVerified, getIDCard
 from Modules.Bot.Utility import *
 
 
@@ -11,12 +11,13 @@ async def Info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
     username = GetUsername(idTelegram=telegramID)
     isAdmin = GetIsAdmin(idTelegram=telegramID)
     isVerified = GetIsVerified(idTelegram=telegramID)
+    cardID = getIDCard(idTelegram=telegramID)
 
     state: str = "Verificato" if isVerified else "Richiesta in sospeso"
 
     role: str = "Amministratore" if isAdmin else "Utente"
 
-    text = f"""<b>ID Telegram</b>: {telegramID}\n<b>Username</b>: {username}\n<b>Stato</b>: {state}\n<b>Ruolo</b>: {role}\n"""
+    text = f"""<b>ID Telegram</b>: {telegramID}\n<b>ID Card</b>: {cardID}\n<b>Username</b>: {username}\n<b>Stato</b>: {state}\n<b>Ruolo</b>: {role}\n"""
 
     buttons = [[InlineKeyboardButton("🔙 Ritorna al menu principale", callback_data='back_main_menu')]]
     keyboard = InlineKeyboardMarkup(buttons)
