@@ -42,6 +42,9 @@ class UnlimitedUser(SubMenu):
 
         self.KEYBOARDS = {
 
+            "unlimited_user":
+                InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna indietro", callback_data='main_admin')]]),
+
             "acquire_username": InlineKeyboardMarkup(
                 [[InlineKeyboardButton("✔️ Conferma", callback_data='acquire_card_unlimited')],
                  [InlineKeyboardButton("🔙 Torna indietro", callback_data='main_admin')]]),
@@ -79,7 +82,7 @@ class UnlimitedUser(SubMenu):
         self.current_batch = current_batch
         admin_who_makes_the_query = query.from_user.id
         self.user_params["admin_id"] = admin_who_makes_the_query
-        await query.edit_message_text(self.INTRO_MESSAGES[current_batch])
+        await query.edit_message_text(self.INTRO_MESSAGES[current_batch], reply_markup=self.KEYBOARDS[current_batch])
 
     async def forward_conversation(self, query, context: ContextTypes.DEFAULT_TYPE, current_batch: str):
         self.query = query

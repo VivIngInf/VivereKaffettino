@@ -19,17 +19,20 @@ class SendMessageAll(SubMenu):
         }
 
         self.KEYBOARDS = {
-            "acquire_message": InlineKeyboardMarkup(
-            [[InlineKeyboardButton("✔ Conferma", callback_data='confirm_message_to_sent')],
-             [InlineKeyboardButton("🔙 Torna indietro", callback_data='main_admin')]])
-        }
 
+            "send_message_to_everyone":
+                InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Torna indietro", callback_data='main_admin')]]),
+
+            "acquire_message": InlineKeyboardMarkup(
+                [[InlineKeyboardButton("✔ Conferma", callback_data='confirm_message_to_sent')],
+                 [InlineKeyboardButton("🔙 Torna indietro", callback_data='main_admin')]])
+        }
 
     async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE, query=None,
                                  current_batch: str = None):
         self.query = query
         self.current_batch = current_batch
-        await query.edit_message_text(self.INTRO_MESSAGES[current_batch])
+        await query.edit_message_text(self.INTRO_MESSAGES[current_batch], reply_markup=self.KEYBOARDS[current_batch])
 
     async def acquire_conversation_param(self, context: ContextTypes.DEFAULT_TYPE, previous_batch: str,
                                          current_batch: str, next_batch: str, chat_id: int, message_id: int,

@@ -11,6 +11,7 @@ from Modules.Bot.Registration import Registration
 from Modules.Bot.Recharge import Recharge
 from Modules.Bot.Admin.AdminMenu import AdminMenu
 from Modules.Bot.Admin.VerifyUser import VerifyUser
+from Modules.Bot.Admin.ViewHistory import ViewHistory
 from Modules.Bot.Admin.ChangeCard import ChangeCard
 from Modules.Bot.Admin.AddAdmin import AddAdmin
 from Modules.Bot.Admin.RemoveAdmin import RemoveAdmin
@@ -42,6 +43,7 @@ class Start(SubMenu):
 
         register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="register")
         saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="balance")
+        storico = InlineKeyboardButton(text="📊 STORICO PERSONALE 📊", callback_data="history")
         ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="recharge")
         admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="main_admin")
         storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="main_storage")
@@ -71,6 +73,7 @@ class Start(SubMenu):
             text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
             mainMenuKeyboard.append([saldo])
+            mainMenuKeyboard.append([storico])
             mainMenuKeyboard.append([info])
             mainMenuKeyboard.append([stop])
 
@@ -81,6 +84,7 @@ class Start(SubMenu):
             text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
             classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser(),
+                                    "ViewHistory": ViewHistory(),
                                     "ChangeCard": ChangeCard(), "AddAdmin": AddAdmin(), "RemoveAdmin": RemoveAdmin(),
                                     "SendMessageAll": SendMessageAll(), "StorageMenu": StorageMenu(),
                                     "NewProduct": NewProduct(), "RemoveProduct": RemoveProduct(),
@@ -88,6 +92,7 @@ class Start(SubMenu):
                                     "ActivateCard": ActivateCard(), "DeactivateCard": DeactivateCard()}
 
             mainMenuKeyboard.append([saldo])
+            mainMenuKeyboard.append([storico])
             mainMenuKeyboard.append([ricarica])
             mainMenuKeyboard.append([admin])
             mainMenuKeyboard.append([storage])

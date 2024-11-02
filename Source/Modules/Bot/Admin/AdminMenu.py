@@ -17,6 +17,7 @@ class AdminMenu(SubMenu):
 
             "main_admin": InlineKeyboardMarkup(
                 [[InlineKeyboardButton("Verifica Utente ☑", callback_data='verify_user')],
+                 [InlineKeyboardButton("Storico Utente 📊", callback_data='user_history')],
                  [InlineKeyboardButton("Cambia Tessera 🔄", callback_data='change_card')],
                  [InlineKeyboardButton("Gestione Tessera ⏯", callback_data='manage_card')],
                  [InlineKeyboardButton("Aggiungi Admin 🟢", callback_data='add_admin')],

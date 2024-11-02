@@ -35,8 +35,9 @@ class ActivateCard(SubMenu):
 
         buttons = []
         for utente in GetUnverifiedUsers(GetMyAuletta(admin_who_makes_the_query)):
-            button = InlineKeyboardButton(text=utente[0], callback_data=utente[0])
-            buttons.append([button])
+            if str(utente[0]).split(".")[0] != "Auletta":
+                button = InlineKeyboardButton(text=utente[0], callback_data=utente[0])
+                buttons.append([button])
         buttons.append([InlineKeyboardButton("🔙 Torna indietro", callback_data='manage_card')])
         self.UNVERIFIED_USERS_LIST_KEYBOARD = InlineKeyboardMarkup(buttons)
 

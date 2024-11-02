@@ -23,8 +23,10 @@ ACQUIRE_USERNAME_UNLIMITED = "8v6uq4n-VxbLNNmj"
 ACQUIRE_CARD_UNLIMITED = "DePANQG74P8A39mi"
 ACQUIRE_USERNAME_TO_ACTIVATE = "34uQ23-1KA3i8_3y"
 ACQUIRE_USERNAME_TO_DEACTIVATE = "rSYP1-x3XfdOCSaD"
+ACQUIRE_USERNAME_HISTORY = "dh0dPnn11aPYNZ76"
 
 CONVERSATION_CLASSES = ["ConversationManager", "Registration", "Recharge", "AdminMenu", "VerifyUser", "AddAdmin",
+                        "ViewHistory",
                         "RemoveAdmin", "SendMessageAll", "ChangeCard", 'StorageMenu', 'NewProduct', "RemoveProduct",
                         'UnlimitedUser', 'ManageCard', 'ActivateCard', 'DeactivateCard']
 

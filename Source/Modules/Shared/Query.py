@@ -137,7 +137,7 @@ def GetUnverifiedUsers(idAuletta: int) -> list:
     return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == False).all()
 
 def GetVerifiedUsers(idAuletta: int) -> list:
-    """Ritorna la lista degli utenti non verificati afferenti all auletta con id specificato"""
+    """Ritorna la lista degli utenti verificati afferenti all auletta con id specificato"""
     return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == True).all()
 
 

@@ -1,6 +1,6 @@
 from sqlalchemy.exc import NoResultFound
 from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
-from telegram.ext import ContextTypes
+from telegram.ext import ContextTypes, ConversationHandler
 from Modules.Shared.Query import (GetAulette, GetIdGruppiTelegramAdmin,
                                   GetIdTelegram, GetIsAdmin, GetIsVerified,
                                   GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists, GetVerifiedUsers,
@@ -10,6 +10,7 @@ from Modules.Bot.Stop import stop, stop_to_restart_again
 from Modules.Bot.UserInfo import Info
 from Modules.Bot.Resoconti import SendUsersResoconto
 from Modules.Bot.ShowBalance import ShowBalance
+from Modules.Bot.History import History
 from Modules.Bot.Start import Start
 from Modules.Bot.Utility import *
 import re
@@ -29,6 +30,21 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text="Il Bot si è riavviato per aggiornarsi 😃.\nPremi /start e ricominciamooo!! 😊"
         )
         return
+
+    if "Admin" not in context.user_data and GetIsAdmin(str(query.message.chat_id)):
+        text = "Sei stato promosso ad Admin, riavvia il Bot per aggiornarsi 😃.\nPremi /start e ricominciamooo!! 😊"
+        # Tolgo lo stato iniziale dal dizionario
+        if "first_start" in context.user_data:
+            context.user_data.pop("first_start")
+            await context.bot.edit_message_text(chat_id=query.message.chat_id,
+                                                message_id=context.user_data["initial_message"].message_id,
+                                                text=text)
+            for _class in CONVERSATION_CLASSES:
+                if _class in context.user_data:
+                    context.user_data.pop(_class)
+
+            context.user_data.pop("initial_message")
+            return ConversationHandler.END
 
     if "first_start" in context.user_data:
         context.user_data['first_start'] = False
@@ -69,6 +85,9 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case 'balance':
             await ShowBalance(update, context)
+
+        case "history":
+            await History(update, context)
 
         ##### REGISTRATION #####
 
@@ -193,6 +212,20 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         case "delete_user":
             await context.user_data["VerifyUser"].bad_ending_conversation(update=update, context=context, query=query)
+
+        ##### USER HISTORY #####
+
+        case "user_history":
+            context.user_data["ConversationManager"].set_active_conversation("ViewHistory")
+            await context.user_data["ViewHistory"].start_conversation(update=None, context=context, query=query,
+                                                                      current_batch="user_history")
+
+        case selected_user if selected_user in {utente[0] + "h" for utente in
+                                                GetVerifiedUsers(GetMyAuletta(query.from_user.id))}:
+            # Adding an 'h' at the end of the username so this make difference between other cases
+            # of course, before passing to the function, we need to remove that 'h'
+            await context.user_data["ViewHistory"].end_conversation(update=update, context=context)
+            await History(update, context, "user_history", GetIdTelegram(selected_user[:-1]))
 
         ##### ADD ADMIN #####
 
@@ -555,6 +588,23 @@ async def handle_messages(update: Update, context: ContextTypes.DEFAULT_TYPE):
                                                                             typed_string=idCard,
                                                                             flag=card_number_not_exist,
                                                                             flag2=is_string)
+
+    elif conversation_id == ACQUIRE_USERNAME_HISTORY:
+        username = update.message.text
+        chat_id = update.message.chat_id
+        message_id = update.message.message_id
+        user_is_valid = GetIdTelegram(username=username) != "None"
+        user_isnt_same_auletta_as_admin = GetMyAuletta(chat_id) != GetMyAuletta(
+            int(GetIdTelegram(username))) if user_is_valid else False
+        await context.user_data["ViewHistory"].acquire_conversation_param(context,
+                                                                          previous_batch="user_history",
+                                                                          current_batch="acquire_username",
+                                                                          next_batch="history_done",
+                                                                          chat_id=chat_id,
+                                                                          message_id=message_id,
+                                                                          typed_string=username,
+                                                                          flag=user_is_valid,
+                                                                          flag2=user_isnt_same_auletta_as_admin)
 
     else:
         # I messaggi vengono eliminati solo se al di fuori dei gruppi degli admin
