@@ -8,7 +8,7 @@
 
 SELECT LANGUAGE [🇬🇧](./README.md) [🇮🇹](./Docs/README.ita.md)
 
-## Good mornin', COFFEEE!??!
+## Good mornin', COFFEEE!?!
 
 Vivere Kaffettino is a **Telegram application** that allows the members of the University of Palermo, belonging to the **Vivere Ingegneria** association, to **pay for their coffee in an easy, fast, and intuitive way**.
 
