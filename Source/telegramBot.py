@@ -64,7 +64,7 @@ def main() -> None:
 
     job_queue = application.job_queue
     job_queue.run_daily(SendDailyResoconto,
-                        time=datetime.time(hour=6, minute=00, second=00, tzinfo=pytz.timezone('Europe/Rome')))
+                        time=datetime.time(hour=23, minute=59, second=00, tzinfo=pytz.timezone('Europe/Rome')))
     job_queue.run_daily(FlushBirthdayList,
                         time=datetime.time(hour=23, minute=59, second=59, tzinfo=pytz.timezone('Europe/Rome')))
 
