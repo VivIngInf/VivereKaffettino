@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Response
-from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard, GetRecharges, InsertInfiniteUser
+from Modules.Shared.Query import GetAulette, PayDB, GetProdotti, getCaffeGiornalieri, getOperazioniGiornaliere, incrementaSaldo, getUsers, getStoricoPersonale, getMagazzino, ricaricaMagazzino, removeUser, DecurtaMagazzino, DecurtaSaldo, assignCard, GetRecharges, InsertInfiniteUser, GetProdottiNonAssociati
 from Modules.Api.requests import CoffeRequest, SaldoRequest, ProdottiRequest, MagazzinoRequest, DeleteUserRequest, ImpostaSaldoRequest, StoricoPersonaleRequest, ModificaMagazzinoRequest, AssignCardRequest, InfiniteUserRequest
 from dotenv import load_dotenv, find_dotenv
 from os import environ
@@ -72,6 +72,10 @@ async def getRicariche():
 #endregion routes
 
 #region Post Routes
+
+@app.post("/getProdottiNotInAuletta")
+async def getProdottiNotInAuletta(request: ProdottiRequest):
+    return GetProdottiNonAssociati(request.ID_Auletta)
 
 @app.post("/prodotti")
 async def prodotti(request: ProdottiRequest):

@@ -5,171 +5,210 @@ from telegram import Update, InputFile, InlineKeyboardMarkup, InlineKeyboardButt
 from telegram.ext import ContextTypes
 from ..Shared.Query import GetIsAdmin, CheckUserExists, GetIsVerified, GetUsername
 from Modules.Bot.Utility import *
+from Modules.Bot.SubMenu import SubMenu
+from Modules.Bot.ConversationManager import ConversationManager
+from Modules.Bot.Registration import Registration
+from Modules.Bot.Recharge import Recharge
+from Modules.Bot.Admin.AdminMenu import AdminMenu
+from Modules.Bot.Admin.VerifyUser import VerifyUser
+from Modules.Bot.Admin.ViewHistory import ViewHistory
+from Modules.Bot.Admin.ChangeCard import ChangeCard
+from Modules.Bot.Admin.AddAdmin import AddAdmin
+from Modules.Bot.Admin.RemoveAdmin import RemoveAdmin
+from Modules.Bot.Admin.ManageCard import ManageCard
+from Modules.Bot.Admin.ActivateCard import ActivateCard
+from Modules.Bot.Admin.DeactivateCard import DeactivateCard
+from Modules.Bot.Admin.UnlimitedUser import UnlimitedUser
+from Modules.Bot.Admin.SendMessageAll import SendMessageAll
+from Modules.Bot.Storage.StorageMenu import StorageMenu
+from Modules.Bot.Storage.NewProduct import NewProduct
+from Modules.Bot.Storage.RemoveProduct import RemoveProduct
 
-def GiornoCorrente() -> str:
-    """Funzione per ottenere il giorno della settimana attuale come stringa"""
-    
-    weekdays : list = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
-    return weekdays[datetime.now().weekday()]
 
-def GiornoFestivo():
-    """ Funzione per verificare se la data attuale è una festività specifica"""
-    
-    current_date = datetime.now()
-    pasqua : datetime = calcola_pasqua(datetime.now().year)
-    
-    festive_dates = [
-        (12, 13),  # Santa Lucia (13 dicembre)
-        (12, 24),  # Vigilia Natale (24 dicembre)
-        (12, 25),  # Natale (25 dicembre)
-        (pasqua.month, pasqua.day), # Pasqua
-        (pasqua.month, pasqua.day + 1) # Pasquetta 
-        # Aggiungi altre festività qui
-    ]
-    
-    return (current_date.month, current_date.day) in festive_dates
+class Start(SubMenu):
 
-def calcola_pasqua(anno) -> datetime:
-    """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
+    def __init__(self):
+        super().__init__()
 
-    a = anno % 19
-    b = anno // 100
-    c = anno % 100
-    d = b // 4
-    e = b % 4
-    f = (b + 8) // 25
-    g = (b - f + 1) // 3
-    h = (19 * a + b - d - g + 15) % 30
-    i = c // 4
-    k = c % 4
-    l = (32 + 2 * e + 2 * i - h - k) % 7
-    m = (a + 11 * h + 22 * l) // 451
+    async def start_conversation(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
 
-    # Creare un oggetto datetime anziché chiamare datetime.date()
-    data_pasqua = datetime(anno, (h + l - 7 * m + 114) // 31, ((h + l - 7 * m + 114) % 31) + 1)
+        image: InputFile = self.SendRandomImage()
+        caption = "☕ Benvenuto su Vivere Kaffettino! ☕"
 
-    return data_pasqua
+        text = ""
+        mainMenuKeyboard = []
+        classes_to_generate = {"ConversationManager": ConversationManager()}
 
-def SendRandomImage() -> InputFile:
-    """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
+        # ----- BOTTONI -----
 
-    # Determina la data attuale
-    current_date = datetime.now()
+        register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="register")
+        saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="balance")
+        storico = InlineKeyboardButton(text="📊 STORICO PERSONALE 📊", callback_data="history")
+        ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="recharge")
+        admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="main_admin")
+        storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="main_storage")
+        info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
+        removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌",
+                                          callback_data="delete_request_registration_account")
+        stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="stop")
 
-    # Elenco delle possibili cartelle in cui cercare le immagini
-    possible_folders = []
+        # -------------------
 
-    # Verifica se è dicembre
-    if current_date.month == 12:
-        possible_folders.append('Natale')
+        if (not CheckUserExists(idTelegram=update.effective_chat.id)):  # Non sei ancora registrato
+            text = "👀 Hey, è la prima volta che visiti vivere kaffetino? 👀\n🔻 Registrati premendo il bottone sottostante! 🔻"
 
-    # Verifica se è Pasqua o Pasquetta
-    pasqua_date = calcola_pasqua(current_date.year)
+            classes_to_generate |= {"Registration": Registration()}
+            mainMenuKeyboard.append([register])
+            mainMenuKeyboard.append([stop])
 
-    if (current_date.month, current_date.day) == (pasqua_date.month, pasqua_date.day):
-        possible_folders.append('Pasqua')
-    elif (current_date.month, current_date.day) == (pasqua_date.month, pasqua_date.day + 1):
-        possible_folders.append('Pasquetta')
+        elif (not GetIsVerified(idTelegram=update.effective_chat.id)):  # Il tuo account non è attivato
+            text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRicordati di andare in auletta e pagare 1€ per avevere la tua card!"
 
-    # Verifica se è Santa Lucia
-    if (current_date.month, current_date.day) == (12, 13):
-        possible_folders.append('Santa Lucia')
+            mainMenuKeyboard.append([info])
+            mainMenuKeyboard.append([removeUser])
+            mainMenuKeyboard.append([stop])
 
-    # Se non è un giorno festivo, aggiungi 'generiche' e la cartella specifica del giorno della settimana
-    if not possible_folders:
-        possible_folders.extend(['Generiche', GiornoCorrente()])
+        elif (not GetIsAdmin(idTelegram=update.effective_chat.id)):  # Non sei amministratore
+            username = GetUsername(idTelegram=update.effective_chat.id)
+            text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
-    # Seleziona casualmente una cartella tra quelle possibili
-    selected_folder = random.choice(possible_folders)
+            mainMenuKeyboard.append([saldo])
+            mainMenuKeyboard.append([storico])
+            mainMenuKeyboard.append([info])
+            mainMenuKeyboard.append([stop])
 
-    # Ottieni il percorso completo della cartella selezionata
-    modulePath = os.path.dirname(os.path.abspath(__file__)) # Otteniamo il percorso di questo file
-    
-    while os.path.basename(modulePath) != 'VivereKaffettino':
-        modulePath = os.path.dirname(modulePath)
+        else:  # Sei amministratore
+            # Eventualmente proteggere il DB da eventuali SQL Injection
+            # che darebbe accesso a tutte le funzioni di Admin
+            username = GetUsername(idTelegram=update.effective_chat.id)
+            text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
 
-    folder_path = os.path.join(modulePath, "Resources", "Images", selected_folder)
+            classes_to_generate |= {"Recharge": Recharge(), "Admin": AdminMenu(), "VerifyUser": VerifyUser(),
+                                    "ViewHistory": ViewHistory(),
+                                    "ChangeCard": ChangeCard(), "AddAdmin": AddAdmin(), "RemoveAdmin": RemoveAdmin(),
+                                    "SendMessageAll": SendMessageAll(), "StorageMenu": StorageMenu(),
+                                    "NewProduct": NewProduct(), "RemoveProduct": RemoveProduct(),
+                                    "UnlimitedUser": UnlimitedUser(), "ManageCard": ManageCard(),
+                                    "ActivateCard": ActivateCard(), "DeactivateCard": DeactivateCard()}
 
-    # Ottieni la lista dei file nella cartella selezionata
-    image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+            mainMenuKeyboard.append([saldo])
+            mainMenuKeyboard.append([storico])
+            mainMenuKeyboard.append([ricarica])
+            mainMenuKeyboard.append([admin])
+            mainMenuKeyboard.append([storage])
+            mainMenuKeyboard.append([info])
+            mainMenuKeyboard.append([stop])
 
-    if image_files:
-        # Seleziona casualmente un'immagine dalla cartella selezionata
-        random_image = random.choice(image_files)
+        keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
 
-        # Costruisci il percorso completo del file selezionato
-        image_path = os.path.join(folder_path, random_image)
+        # Verifico se è il primo avvio o meno
+        if "first_start" not in context.user_data:
+            await update.message.reply_photo(
+                photo=image,
+                caption=caption
+            )
+            initial_message = await update.message.reply_text(text=text, reply_markup=keyboard)
+            context.user_data['first_start'] = True
+            context.user_data['initial_message'] = initial_message
+            for key, value in classes_to_generate.items():
+                context.user_data[key] = value
+        else:
+            await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
 
-        # Invia l'immagine all'utente
-        return open(image_path, 'rb')
+    @staticmethod
+    def GiornoCorrente() -> str:
+        """Get current day of the week"""
+        weekdays: list = ["Lunedì", "Martedì", "Mercoledì", "Giovedì", "Venerdì", "Sabato", "Domenica"]
+        return weekdays[datetime.now().weekday()]
 
-async def Start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> str:
-    image : InputFile = SendRandomImage()
-    caption = "☕ Benvenuto su vivere kaffettino! ☕"
+    def GiornoFestivo(self):
+        """Verify if current date is a festivity day"""
 
-    text = ""
-    mainMenuKeyboard = []
+        current_date = datetime.now()
+        pasqua: datetime = self.calcola_pasqua(datetime.now().year)
 
-    # ----- BOTTONI -----
+        festive_dates = [
+            (12, 13),  # Santa Lucia (13 dicembre)
+            (12, 24),  # Vigilia Natale (24 dicembre)
+            (12, 25),  # Natale (25 dicembre)
+            (pasqua.month, pasqua.day),  # Pasqua
+            (pasqua.month, pasqua.day + 1)  # Pasquetta
+            # Aggiungi altre festività qui
+        ]
 
-    register = InlineKeyboardButton(text="📝 REGISTRATI 📝", callback_data="registra")
-    saldo = InlineKeyboardButton(text="📈 SALDO 📉", callback_data="saldo")
-    ricarica = InlineKeyboardButton(text="💸 RICARICA 💸", callback_data="ricarica")
-    admin = InlineKeyboardButton(text="👨🏽‍🔧 ADMIN MENU 🏽‍🔧", callback_data="admin")
-    storage = InlineKeyboardButton(text="👨🏽‍🔧 GESTIONE MAGAZZINO 🗄🔧", callback_data="storage")
-    info = InlineKeyboardButton(text="❓ INFO ❓", callback_data="info")
-    removeUser = InlineKeyboardButton(text="❌ ELIMINA RICHIESTA ❌", callback_data="ask_for_restart_again")
-    stop = InlineKeyboardButton(text="🛑 STOP 🛑", callback_data="stop")
+        return (current_date.month, current_date.day) in festive_dates
 
-    # -------------------
+    @staticmethod
+    def calcola_pasqua(anno) -> datetime:
+        """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
 
-    if(not CheckUserExists(idTelegram=update.effective_chat.id)): # Non sei ancora registrato
-        text = "👀 Hey, è la prima volta che visiti vivere kaffetino? 👀\n🔻 Registrati premendo il bottone sottostante! 🔻"
+        a = anno % 19
+        b = anno // 100
+        c = anno % 100
+        d = b // 4
+        e = b % 4
+        f = (b + 8) // 25
+        g = (b - f + 1) // 3
+        h = (19 * a + b - d - g + 15) % 30
+        i = c // 4
+        k = c % 4
+        l = (32 + 2 * e + 2 * i - h - k) % 7
+        m = (a + 11 * h + 22 * l) // 451
 
-        mainMenuKeyboard.append([register])
-        mainMenuKeyboard.append([stop])
+        # Creare un oggetto datetime anziché chiamare datetime.date()
+        data_pasqua = datetime(anno, (h + l - 7 * m + 114) // 31, ((h + l - 7 * m + 114) % 31) + 1)
 
-    elif (not GetIsVerified(idTelegram=update.effective_chat.id)): # Il tuo account non è attivato
-        text = "🛑 Ancora non ti è stato attivato l'account! 🛑\nRicordati di andare in auletta e pagare 1€ per avevere la tua card!"
+        return data_pasqua
 
-        mainMenuKeyboard.append([info])
-        mainMenuKeyboard.append([removeUser])
-        mainMenuKeyboard.append([stop])
+    def SendRandomImage(self) -> InputFile:
+        """'Sta funzione l'ha fatta chatGPT, non mi volevo studiare come funzionasse l'algoritmo kekw"""
 
-    elif(not GetIsAdmin(idTelegram=update.effective_chat.id)): # Non sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)
-        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
+        # Determina la data attuale
+        current_date = datetime.now()
 
-        mainMenuKeyboard.append([saldo])
-        mainMenuKeyboard.append([info])
-        mainMenuKeyboard.append([stop])
+        # Elenco delle possibili cartelle in cui cercare le immagini
+        possible_folders = []
 
-    else: # Sei amministratore
-        username = GetUsername(idTelegram=update.effective_chat.id)
-        text = f"👋🏽 {username}, è un piacere rivederti! 👋🏽\nChe vuoi fare? 👀"
+        # Verifica se è dicembre
+        if current_date.month == 12:
+            possible_folders.append('Natale')
 
-        mainMenuKeyboard.append([saldo])
-        mainMenuKeyboard.append([ricarica])
-        mainMenuKeyboard.append([admin])
-        mainMenuKeyboard.append([storage])
-        mainMenuKeyboard.append([info])
-        mainMenuKeyboard.append([stop])
+        # Verifica se è Pasqua o Pasquetta
+        pasqua_date = self.calcola_pasqua(current_date.year)
 
-    keyboard = InlineKeyboardMarkup(mainMenuKeyboard)
+        if (current_date.month, current_date.day) == (pasqua_date.month, pasqua_date.day):
+            possible_folders.append('Pasqua')
+        elif (current_date.month, current_date.day) == (pasqua_date.month, pasqua_date.day + 1):
+            possible_folders.append('Pasquetta')
 
-    # Verifico se è il primo avvio o meno
-    if "first_start" in context.user_data:
-        FIRST_START = False
-    else:
-        FIRST_START = True
+        # Verifica se è Santa Lucia
+        if (current_date.month, current_date.day) == (12, 13):
+            possible_folders.append('Santa Lucia')
 
-    if FIRST_START:
-        await update.message.reply_photo(
-            photo=image,
-            caption=caption
-        )
-        initial_message = await update.message.reply_text(text=text, reply_markup=keyboard)
-        context.user_data['first_start'] = True
-        context.user_data['initial_message'] = initial_message
-    else:
-        await update.callback_query.edit_message_text(text=text, reply_markup=keyboard)
+        # Se non è un giorno festivo, aggiungi 'generiche' e la cartella specifica del giorno della settimana
+        if not possible_folders:
+            possible_folders.extend(['Generiche', self.GiornoCorrente()])
+
+        # Seleziona casualmente una cartella tra quelle possibili
+        selected_folder = random.choice(possible_folders)
+
+        # Ottieni il percorso completo della cartella selezionata
+        modulePath = os.path.dirname(os.path.abspath(__file__))  # Otteniamo il percorso di questo file
+
+        while os.path.basename(modulePath) != 'VivereKaffettino':
+            modulePath = os.path.dirname(modulePath)
+
+        folder_path = os.path.join(modulePath, "Resources", "Images", selected_folder)
+
+        # Ottieni la lista dei file nella cartella selezionata
+        image_files = [f for f in os.listdir(folder_path) if os.path.isfile(os.path.join(folder_path, f))]
+
+        if image_files:
+            # Seleziona casualmente un'immagine dalla cartella selezionata
+            random_image = random.choice(image_files)
+
+            # Costruisci il percorso completo del file selezionato
+            image_path = os.path.join(folder_path, random_image)
+
+            # Invia l'immagine all'utente
+            return open(image_path, 'rb')

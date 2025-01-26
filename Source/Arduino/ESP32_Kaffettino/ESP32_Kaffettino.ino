@@ -83,6 +83,7 @@ JsonArray products;
 #define CONNECTING 12 // Ci stiamo connettendo
 #define HTTPERR 13	  // C'è satto un errore nella richiesta http
 #define AUGURI 69	  // Il bro che ha acquistato ha compiuto gli anni
+#define UNVERIFIED 70 // Il bro non ha la card abilitata
 
 int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 
@@ -377,11 +378,6 @@ void loop()
 			digitalWrite(yellow, LOW);
 			digitalWrite(red, HIGH); // Led rosso simboleggia errore
 
-			// Segnale acustico
-			digitalWrite(buzzer, 1);
-			delay(300);
-			digitalWrite(buzzer, 0);
-
 			t = millis();
 
 			return;
@@ -564,6 +560,13 @@ void getProdotti()
 	// Per ogni prodotto nella lista di json objects ne creiamo uno con la nostra struct Prodotto
 	for (JsonObject product : products)
 	{
+		// Il prodotto è visibile all'auletta?
+		bool isVisible = product["isVisible"].as<bool>();
+
+		// Se no allora skippiamo, non vogliamo aggiungerlo nella lista.
+		if (!isVisible)
+			continue;
+
 		Prodotto *prodotto = new Prodotto();
 		prodotto->id = product["ID_Prodotto"].as<String>().c_str();
 		prodotto->nome = product["descrizione"].as<String>().c_str();
@@ -658,6 +661,11 @@ void stampaoled(int i)
 	}
 	case NOSALDO:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -672,6 +680,11 @@ void stampaoled(int i)
 	}
 	case NOCARD:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -686,6 +699,11 @@ void stampaoled(int i)
 	}
 	case NOPROD:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -700,6 +718,11 @@ void stampaoled(int i)
 	}
 	case NOSELECTION:
 	{
+		// Segnale acustico
+		digitalWrite(buzzer, 1);
+		delay(300);
+		digitalWrite(buzzer, 0);
+
 		display.stopscroll();
 		display.clearDisplay();
 		delay(10);
@@ -779,6 +802,38 @@ void stampaoled(int i)
 		display.display(); // Show text
 
 		playCompleanno();
+
+		break;
+	}
+	case UNVERIFIED:
+	{
+		Serial.println("Card disabilitata");
+
+		display.stopscroll();
+		display.clearDisplay();
+		display.setTextSize(1); // Draw 2X-scale text
+		display.setTextColor(SSD1306_WHITE);
+
+		display.setCursor(52, 5);
+		display.print("CARD");
+		display.display();		// Show text
+		display.setTextSize(1); // Draw 2X-scale text
+		display.setCursor(30, 25);
+		display.print("DISABILITATA");
+		display.setCursor(40, 45);
+		display.print("PEZZENTE");
+		digitalWrite(red, HIGH);
+		delay(200);
+		display.display(); // Show text
+
+		for (size_t i = 0; i < 10; i++)
+		{
+			// Segnale acustico
+			digitalWrite(buzzer, 1);
+			delay(500);
+			digitalWrite(buzzer, 0);
+			delay(500);
+		}
 
 		break;
 	}

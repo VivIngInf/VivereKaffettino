@@ -1,8 +1,9 @@
 from mysql.connector import cursor, connect, MySQLConnection
 
 from .Session import session
-from sqlalchemy import select, func, distinct
+from sqlalchemy import select, func, distinct, literal
 from sqlalchemy.orm import aliased, load_only
+from sqlalchemy.sql import exists
 
 from ..Database.Models.Auletta import Auletta
 from ..Database.Models.Magazzino import Magazzino
@@ -135,6 +136,11 @@ def GetUnverifiedUsers(idAuletta: int) -> list:
     """Ritorna la lista degli utenti non verificati afferenti all auletta con id specificato"""
     return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == False).all()
 
+def GetVerifiedUsers(idAuletta: int) -> list:
+    """Ritorna la lista degli utenti verificati afferenti all auletta con id specificato"""
+    return session.query(Utente.username).filter(Utente.ID_Auletta == f"{idAuletta}", Utente.isVerified == True).all()
+
+
 def GetIsAdmin(idTelegram: str) -> bool:
     """DATABASE_HANDLER: Ritorna il ruolo dell'utente"""
 
@@ -147,14 +153,14 @@ def GetIsVerified(idTelegram: str) -> bool:
     return bool(user.isVerified)
 
 
-def SetIsVerified(idTelegram: str) -> int:
+def SetIsVerified(idTelegram: str, verified: bool) -> int:
     """DATABASE_HANDLER: Se l'utente esiste lo setta come verificato"""
 
     if not CheckUserExists(idTelegram=idTelegram):
         return 1
 
     user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
-    user.isVerified = True
+    user.isVerified = verified
     session.commit()
 
     return 0
@@ -333,7 +339,7 @@ def removeUser(idTelegram: str) -> dict:
 
 
 def assignCard(idTelegram: str, idCard: str) -> int:
-    if SetIsVerified(idTelegram=idTelegram) == 1:
+    if SetIsVerified(idTelegram=idTelegram, verified=True) == 1:
         return 1  # l'utente non esiste
 
     # Assegnamo la card
@@ -346,7 +352,7 @@ def assignCard(idTelegram: str, idCard: str) -> int:
 
 
 def getIDCard(idTelegram: str) -> int:
-    if SetIsVerified(idTelegram=idTelegram) == 1:
+    if CheckUserExists(idTelegram=idTelegram) is False:
         return 1  # l'utente non esiste
 
     user: Utente = session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one()
@@ -355,7 +361,6 @@ def getIDCard(idTelegram: str) -> int:
         return int(card)
     else:
         return 0
-
 
 # endregion
 
@@ -388,8 +393,11 @@ def DecurtaMagazzino(idProdotto: int, idAuletta: int, quantita: int) -> dict:
 
     return {"State": "Done"}
 
+def GetIDProdotto(nomeProdotto: str) -> int:
+    """Ritorna l'id di un prodotto dato il suo nome"""
+    return session.query(Prodotto).filter(Prodotto.descrizione == f"{nomeProdotto}").one().ID_Prodotto
 
-def GetProdotti(idAuletta: int) -> str:
+def GetProdotti(idAuletta: int) -> list:
     """WEB_API: Dato l'ID di un'auletta, restituisce i suoi prodotti"""
 
     arr = []
@@ -398,8 +406,9 @@ def GetProdotti(idAuletta: int) -> str:
         ID_Prodotto: int
         descrizione: str
         costo: float
+        isVisible : bool
 
-    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo).join(Prodotto,
+    res = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.costo, Magazzino.isVisible).join(Prodotto,
                                                                                           Prodotto.ID_Prodotto == Magazzino.ID_Prodotto).filter(
         Magazzino.ID_Auletta == idAuletta).all()
 
@@ -409,18 +418,56 @@ def GetProdotti(idAuletta: int) -> str:
         p.ID_Prodotto = r[0]
         p.descrizione = r[1]
         p.costo = r[2]
+        p.isVisible = r[3]
 
         arr.append(p)
 
     return arr
 
+def GetProdottiNonAssociati(idAuletta: int) -> list:
+    """Dato l'ID di un auletta, restituisce tutti i prodotti che non sono venduti in quell'auletta"""
+
+    arr = []
+
+    class Prodotti:
+        ID_Prodotto: int
+        descrizione: str
+        isVisible: bool
+
+    subqueryNotIn = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, literal(True)).filter(
+        ~session.query(Magazzino.ID_Prodotto)
+        .filter(Magazzino.ID_Prodotto == Prodotto.ID_Prodotto)
+        .filter(Magazzino.ID_Auletta == idAuletta)
+        .exists()
+    )
+
+    subqueryIsVisibleFalse = session.query(Prodotto.ID_Prodotto, Prodotto.descrizione, Magazzino.isVisible).join(
+        Magazzino, Prodotto.ID_Prodotto == Magazzino.ID_Prodotto
+    ).filter(
+        Magazzino.isVisible == False,
+        Magazzino.ID_Auletta == idAuletta
+    )
+
+    unionQuery = subqueryNotIn.union(subqueryIsVisibleFalse)
+
+    res = unionQuery.all()
+
+    for r in res:
+        p = Prodotti()
+
+        p.ID_Prodotto = r[0]
+        p.descrizione = r[1]
+        p.isVisible = r[2]
+
+        arr.append(p)
+
+    return arr
 
 def getMagazzino(idAuletta: int) -> list:
     """
         MAGAZZINO: Ritorna tutti i prodotti e la quantità in magazzino dell'auletta con id idAuletta
     """
     return session.query(Magazzino).filter(Magazzino.ID_Auletta == f"{idAuletta}").all()
-
 
 def ricaricaMagazzino(idAuletta: str, idProdotto: int, quantitaRicaricata: int) -> int:
     """
@@ -461,6 +508,69 @@ def GetDebitori() -> list:
 def GetIdGruppoTelegram(ID_Auletta: int) -> str:
     """Dato l'id dell'auletta ritorna l'id del gruppo associato"""
     return session.query(Auletta).filter(Auletta.ID_Auletta == f"{ID_Auletta}").one().ID_GruppoTelegram
+
+def CreaProdotto(nomeProdotto : str) -> None:
+    """Dato il nome di un prodtto da creare, lo crea"""
+    prodotto = Prodotto(
+        ID_Prodotto=None,
+        descrizione=nomeProdotto
+    )
+
+    session.add(prodotto)
+    session.commit()
+
+def ExistsProdottoGenerale(nomeProdotto: str) -> bool:
+    """Dato il nome di un prodtto, controlla se esiste"""
+
+    query = session.query(Prodotto).filter(Prodotto.descrizione == f"{nomeProdotto}")
+    ex = session.query(query.exists()).scalar()
+
+    return bool(ex)
+
+def ExistsProdottoInAuletta(idProdotto : int, idAuletta : int) -> bool:
+    """Dato l'id del prodotto e l'auletta, controllare se esiste il prodotto nel magazzino"""
+
+    query = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}").filter(Magazzino.ID_Auletta == f"{idAuletta}")
+    ex = session.query(query.exists()).scalar()
+
+    return bool(ex)
+
+def SetProdottoVisibile(idProdotto : int, idAuletta : int, isVisible : bool) -> None:
+    """Dato l'id del prodotto, l'id dell'auletta e lo stato di visibilità, setta un determinato prodotto esistente in un auletta."""
+
+    mag: Magazzino = session.query(Magazzino).filter(Magazzino.ID_Prodotto == f"{idProdotto}").filter(Magazzino.ID_Auletta == f"{idAuletta}").one()
+    mag.isVisible = isVisible
+    session.commit()
+
+def AssegnaProdotto(nomeAuletta: str, nomeProdotto: str, costo: float, isVisible : bool) -> None:
+    """Dato il nome di un auletta, il costo ed il nome del prodotto da aggiungere, lo aggiunge all'auletta al costo specificato e lo setta come visibile o meno dipndentemende da isVisible"""
+
+    ## Se il prodotto non esiste lo crea
+    if not ExistsProdottoGenerale(nomeProdotto=nomeProdotto):
+        CreaProdotto(nomeProdotto)
+
+    idProdotto : int = GetIDProdotto(nomeProdotto=nomeProdotto)
+    idAuletta : int = GetAuletta(auletta=nomeAuletta)
+
+    # Se il prodotto era già stato associato, allora possiamo settarne la visibilità
+
+    if ExistsProdottoInAuletta(idProdotto=idProdotto, idAuletta=idAuletta):
+        SetProdottoVisibile(idProdotto=idProdotto, idAuletta=idAuletta, isVisible=isVisible)
+        return 
+
+    # Altrimenti, creiamo l'associazione prodotto - auletta tramite la tabella Magazzino e lo settiamo come visibile
+
+    magazzino = Magazzino(
+        ID_Magazzino=None,
+        ID_Prodotto= idProdotto,
+        ID_Auletta=idAuletta,
+        quantita=100,
+        costo=costo,
+        isVisible=True
+    )
+
+    session.add(magazzino)
+    session.commit()
 
 # endregion
 
@@ -510,6 +620,10 @@ def PayDB(ID_Prodotto: int, ID_Auletta: int, ID_Card: str) -> int:
         idTelegram: str = GetIDTelegram(idCard=ID_Card)
     except:
         return 2  # Utente con idCard {ID_Card} non esistente
+
+    verified : bool = GetIsVerified(idTelegram=idTelegram)
+    if verified is False:
+        return 70 # Utente non verificato, card disabilitata!
 
     # Controllare se quantità disponibile
 
