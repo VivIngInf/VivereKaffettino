@@ -3,7 +3,7 @@ from telegram import Update, InlineKeyboardMarkup, InlineKeyboardButton
 from telegram.ext import ContextTypes, ConversationHandler
 from Modules.Shared.Query import (GetAulette, GetIdGruppiTelegramAdmin,
                                   GetIdTelegram, GetIsAdmin, GetIsVerified,
-                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists, GetVerifiedUsers,
+                                  GetMyAuletta, GetUnverifiedUsers, removeUser, CheckCardExists, CheckUserExists, GetVerifiedUsers,
                                   GetProdottiNonAssociati, GetIDProdotto, GetProdotti)
 
 from Modules.Bot.Stop import stop, stop_to_restart_again
@@ -31,20 +31,21 @@ async def button_callbacks(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return
 
-    if "Admin" not in context.user_data and GetIsAdmin(str(query.message.chat_id)):
-        text = "Sei stato promosso ad Admin, riavvia il Bot per aggiornarsi 😃.\nPremi /start e ricominciamooo!! 😊"
-        # Tolgo lo stato iniziale dal dizionario
-        if "first_start" in context.user_data:
-            context.user_data.pop("first_start")
-            await context.bot.edit_message_text(chat_id=query.message.chat_id,
-                                                message_id=context.user_data["initial_message"].message_id,
-                                                text=text)
-            for _class in CONVERSATION_CLASSES:
-                if _class in context.user_data:
-                    context.user_data.pop(_class)
+    if CheckUserExists(str(query.message.chat_id)):
+        if "Admin" not in context.user_data and GetIsAdmin(str(query.message.chat_id)):
+            text = "Sei stato promosso ad Admin, riavvia il Bot per aggiornarsi 😃.\nPremi /start e ricominciamooo!! 😊"
+            # Tolgo lo stato iniziale dal dizionario
+            if "first_start" in context.user_data:
+                context.user_data.pop("first_start")
+                await context.bot.edit_message_text(chat_id=query.message.chat_id,
+                                                    message_id=context.user_data["initial_message"].message_id,
+                                                    text=text)
+                for _class in CONVERSATION_CLASSES:
+                    if _class in context.user_data:
+                        context.user_data.pop(_class)
 
-            context.user_data.pop("initial_message")
-            return ConversationHandler.END
+                context.user_data.pop("initial_message")
+                return ConversationHandler.END
 
     if "first_start" in context.user_data:
         context.user_data['first_start'] = False
