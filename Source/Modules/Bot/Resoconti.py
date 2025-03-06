@@ -1,6 +1,6 @@
 from telegram.ext import CallbackContext
 from ..Shared.Configs import GetChannelID
-from ..Shared.Query import GetOperazioniExcel, GetUsersExcel, GetRicaricheExcel, GetRicaricheMensiliExcel, GetOperazioniMensiliExcel
+from ..Shared.Query import GetOperazioniExcel, GetUsersExcel, GetRicaricheExcel, GetRicaricheMensiliExcel, GetOperazioniMensiliExcel, GetDebitiTraAulette
 import pandas
 from io import BytesIO
 from datetime import datetime
@@ -149,4 +149,36 @@ async def SendUsersResoconto(context: CallbackContext):
     excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
 
     await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'ResocontoUtenti-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto utenti del {datetime.date(datetime.now())} inviato!")
+    excel_buffer.close()
+
+async def SendDebtResoconto(context: CallbackContext):
+
+    columns = ['Auletta Debitrice', 'Auletta Creditrice', 'Importo Netto']
+    rows = GetDebitiTraAulette()
+
+    rowsDataframe = []
+
+    for au_db, au_cr, im_nt in rows:
+        tempArr = [au_db, au_cr, im_nt]
+        rowsDataframe.append(tempArr)
+
+    df = pandas.DataFrame(rowsDataframe, columns=columns)
+
+    excel_buffer = BytesIO()
+    
+    with pandas.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
+        df.to_excel(writer, index=False, sheet_name='Debiti Aulette')
+        
+        worksheet = writer.sheets['Debiti Aulette']
+        
+        # Imposta la larghezza delle colonne
+        for i, col in enumerate(df.columns):
+            max_len = max(
+                df[col].astype(str).map(len).max(),  # lunghezza massima dei dati
+                len(col)  # lunghezza del nome della colonna
+            ) + 2  # margine extra
+            worksheet.set_column(i, i, max_len)
+    
+    excel_buffer.seek(0)  # Riposiziona il cursore all'inizio del buffer
+    await context.bot.send_document(chat_id=f"{GetChannelID()}", document=excel_buffer, filename=f'ResocontoDebitiAulette-{datetime.date(datetime.now())}.xlsx', caption=f"Resoconto debito aulette del {datetime.date(datetime.now())} inviato!")
     excel_buffer.close()

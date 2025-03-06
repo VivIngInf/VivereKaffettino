@@ -15,7 +15,7 @@ from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, Conve
 # un porcile nel file main (hai fatto bene bro)
 from Modules.Shared.Configs import LoadConfigs, GetToken
 from Modules.Bot.Nostalgia import Nostalgia
-from Modules.Bot.Resoconti import SendDailyResoconto, SendUsersResoconto, SendMonthlyResoconto
+from Modules.Bot.Resoconti import SendDailyResoconto, SendUsersResoconto, SendMonthlyResoconto, SendDebtResoconto
 from Modules.Bot.BirthdayList import FlushBirthdayList
 from Modules.Bot.Debt import SendMessageToDebtors
 
@@ -63,6 +63,7 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(button_callbacks))
 
     job_queue = application.job_queue
+    
     job_queue.run_daily(SendDailyResoconto,
                         time=datetime.time(hour=23, minute=59, second=00, tzinfo=pytz.timezone('Europe/Rome')))
     job_queue.run_daily(FlushBirthdayList,
@@ -71,11 +72,13 @@ def main() -> None:
     job_queue.run_daily(SendMessageToDebtors,
                         time=datetime.time(hour=7, minute=0, second=0, tzinfo=pytz.timezone('Europe/Rome')), days=(1,))
 
+    job_queue.run_monthly(SendDebtResoconto, day=-1,
+                          when=datetime.time(hour=23, minute=59, second=30, tzinfo=pytz.timezone('Europe/Rome')), job_kwargs={"misfire_grace_time":None})
+
     job_queue.run_monthly(SendMonthlyResoconto, day=-1,
-                          when=datetime.time(hour=23, minute=59, second=55, tzinfo=pytz.timezone('Europe/Rome')))
+                          when=datetime.time(hour=23, minute=58, second=0, tzinfo=pytz.timezone('Europe/Rome')))
 
     application.run_polling(allowed_updates=Update.ALL_TYPES)
-
 
 if __name__ == "__main__":
     main()

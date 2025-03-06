@@ -1,9 +1,9 @@
 from mysql.connector import cursor, connect, MySQLConnection
 
 from .Session import session
-from sqlalchemy import select, func, distinct, literal
+from sqlalchemy import select, distinct, literal, outerjoin
 from sqlalchemy.orm import aliased, load_only
-from sqlalchemy.sql import exists
+from sqlalchemy.sql import exists, func, case
 
 from ..Database.Models.Auletta import Auletta
 from ..Database.Models.Magazzino import Magazzino
@@ -751,5 +751,56 @@ def GetRicaricheMensiliExcel():
 
     ricariche = session.execute(select(Ricarica.ID_Ricarica, Ricarica.beneficiario.label('ID_Beneficiario'), user1.username.label('Username_Beneficiario'), Ricarica.amministratore.label('ID_Amministratore'), user2.username.label('Username_Amministratore'), Ricarica.importo, Ricarica.saldoPrima, Ricarica.saldoDopo, Ricarica.dateTimeRicarica).join(user1, Ricarica.beneficiario  == user1.ID_Telegram).join(user2, Ricarica.amministratore == user2.ID_Telegram).filter(func.date(Ricarica.dateTimeRicarica) >= start_of_month, func.date(Ricarica.dateTimeRicarica) <= end_of_month))
     return ricariche 
+
+def GetDebitiTraAulette():
+
+    # Alias per la tabella Utente
+    U1 = aliased(Utente)
+
+    # Alias per la tabella Operazione
+    O1 = aliased(Operazione)
+
+    # Alias per la tabella Auletta
+    A1 = aliased(Auletta)  # Per l'auletta debitrice
+    A2 = aliased(Auletta)  # Per l'auletta creditrice
+
+    # Primo step: calcolare quanto ogni auletta deve alle altre
+    spese_subquery = (
+        select(
+            U1.ID_Auletta.label("Auletta_Creditrice"),  # L'auletta che riceve il denaro
+            O1.ID_Auletta.label("Auletta_Debitrice"),   # L'auletta che deve pagare
+            func.sum(O1.costo).label("Totale_Spesa")
+        )
+        .join(U1, O1.ID_Telegram == U1.ID_Telegram)
+        .group_by(U1.ID_Auletta, O1.ID_Auletta)
+        .subquery()
+    )
+
+    # Secondo step: calcolare la differenza tra debiti reciproci
+    spese_alias_1 = aliased(spese_subquery)
+    spese_alias_2 = aliased(spese_subquery)
+
+    saldo_debiti = (
+        select(
+            A1.Nome.label("Auletta_Debitrice"),
+            A2.Nome.label("Auletta_Creditrice"),
+            (func.coalesce(spese_alias_1.c.Totale_Spesa, 0) -
+                func.coalesce(spese_alias_2.c.Totale_Spesa, 0)).label("Importo_Netto")
+        )
+        .outerjoin(
+            spese_alias_2,
+            (spese_alias_1.c.Auletta_Debitrice == spese_alias_2.c.Auletta_Creditrice) &
+            (spese_alias_1.c.Auletta_Creditrice == spese_alias_2.c.Auletta_Debitrice)
+        )
+        .join(A1, A1.ID_Auletta == spese_alias_1.c.Auletta_Debitrice)  # Join per ottenere i nomi
+        .join(A2, A2.ID_Auletta == spese_alias_1.c.Auletta_Creditrice)  # Join per ottenere i nomi
+        .where((func.coalesce(spese_alias_1.c.Totale_Spesa, 0) - func.coalesce(spese_alias_2.c.Totale_Spesa, 0)) > 0)
+        .order_by(A1.Nome, A2.Nome)
+    )
+
+    # Esegui la query
+    risultati = session.execute(saldo_debiti).fetchall()
+
+    return risultati
 
 #endregion
