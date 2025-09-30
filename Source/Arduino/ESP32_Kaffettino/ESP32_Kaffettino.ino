@@ -16,7 +16,7 @@
 // Quel file non verrà condiviso con github, in modo tale che le credenziali rimangano segrete.
 #include "arduino_secrets.h"
 
-// Lib lettore
+// Lib lettore NFC
 #include <SPI.h>
 #include <MFRC522.h> // MFRC522 by Github Community
 
@@ -31,19 +31,23 @@
 
 // Lib Oled
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h> // Adafruit SSD1306 by Adafruit (Con dipendenze)
+#include <U8g2lib.h> // Font per schermo UTF8
+
+U8G2_SSD1306_128X64_NONAME_F_HW_I2C display(U8G2_R0, /*reset=*/ U8X8_PIN_NONE);
 
 // Lib audio
 #include <Arduino.h>
 #include "DFRobotDFPlayerMini.h" // DFRobotDFPlayerMini by DFRobot
 
 // Credenziali wifi
-#define WIFI_SSID SECRET_SSID		  // SSID WiFi
-#define WIFI_IDENTITY SECRET_USERNAME // Es: mario.rossi03
-#define WIFI_PASSWORD SECRET_PASSWORD
-#define WIFI_USERNAME SECRET_USERNAME // Stesso di EAP_IDENTITY
-#define IS_EAP SECRET_IS_EAP		  // Se siamo collegati ad una rete EAP
+#define WIFI_SSID SECRET_SSID                   // Nome del WiFi
+#define WIFI_IDENTITY SECRET_USERNAME           // Username in caso di EAP
+#define WIFI_PASSWORD SECRET_PASSWORD           // Password del WIFI
+#define WIFI_USERNAME SECRET_USERNAME           // Altro username in caso di EAP
+
+// Secrets
+
+#define IS_EAP SECRET_IS_EAP                    // Se siamo collegati ad una rete EAP
 #define PAY_ROUTE SECRET_PAY
 #define PRODUCTS_ROUTE SECRET_PRODUCTS
 #define ID_AULETTA SECRET_ID_AULETTA // Gestione prodotti
@@ -55,6 +59,7 @@ const char *serverAddressPay = PAY_ROUTE;
 const char *serverAddressProdotti = PRODUCTS_ROUTE;
 WiFiClient wifiClient;
 
+// Definiamo la classe prodotto per come viene ritornata dal server in JSON
 class Prodotto
 {
 public:
@@ -66,24 +71,27 @@ public:
 LinkedList<Prodotto *> listaProdotti = LinkedList<Prodotto *>(); // Array dei prodotti disponibili
 int currentProdotto = -1;
 
-int pointer = 0;
-int IDProdotto = 1;
-
-JsonArray products;
+JsonArray products; // Array di elementi json che conterrà i prodotti
 
 // Codici di stampa per la funzione stampaOled()
-#define PAGATO 0	  // Il pagamento è andato a buon fine
-#define NOSALDO 1	  // Non hai abbastanza saldo nella carta per quel determinato prodotto
-#define NOCARD 2	  // Non esiste la carta nel database
-#define NOPROD 3	  // Non esiste il prodotto nel database (cosa che non dovrebbe comunque succedere)
-#define NOSELECTION 4 // Non è stato selezionato alcun prodotto
-#define STAMPAPROD 7  // Stampa il prodotto con id == currentProdotto
-#define VIV 10		  // Codice di stampa vivere kaffettino
-#define NOC 11		  // Non c'è connessione
-#define CONNECTING 12 // Ci stiamo connettendo
-#define HTTPERR 13	  // C'è satto un errore nella richiesta http
-#define AUGURI 69	  // Il bro che ha acquistato ha compiuto gli anni
-#define UNVERIFIED 70 // Il bro non ha la card abilitata
+
+#define VISUALIZZA_ERRORE_HW -6		// C'è stato un errore hardware, è importante!
+#define CONNESSIONE_IN_CORSO -5		// Stiamo provando a connetterci
+#define CONNESSIONE_NON_RIUSCITA -4	// Non siamo riusciti a connetterci al server
+#define CONNESSIONE_RIUSCITA -3		// Siamo riusciti a connetterci al server
+#define RICHIESTA_IN_CORSO -2		// Stiamo contattando il server
+#define VISUALIZZA_ERRORE -1 		// C'è stato un errore nella richiesta http
+
+#define VISUALIZZA_PAGATO 0	  		// Il pagamento è andato a buon fine
+#define VISUALIZZA_NOSALDO 1		// Non hai abbastanza saldo nella carta per quel determinato prodotto
+#define VISUALIZZA_NOCARD 2	  		// Non esiste la carta nel database
+#define VISUALIZZA_NOPROD 3	  		// Non esiste il prodotto nel database (cosa che non dovrebbe comunque succedere)
+#define VISUALIZZA_NOSELECTION 4	// Non è stato selezionato alcun prodotto
+#define VISUALIZZA_STAMPAPROD 7  	// Stampa il prodotto con id == currentProdotto
+#define VISUALIZZA_VIVERE 10		// Codice di stampa vivere kaffettino
+
+#define AUGURI 69	  				// Il bro che ha acquistato ha compiuto gli anni
+#define UNVERIFIED 70 				// Il bro non ha la card abilitata
 
 int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 
@@ -101,11 +109,7 @@ int alreadyPrint = 0; // Se abbiamo già printato qualcosa
 #define SCREEN_HEIGHT 64	// OLED display height, in pixels
 #define OLED_RESET -1		// Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C // See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
-#define VIV 6
-#define PAG 0
 
-// Creazione "oggetto" display
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 void stampaoled(int i);
 
 // Impostazione lettore
@@ -121,27 +125,74 @@ DFRobotDFPlayerMini myDFPlayer;
 
 // Gestione temporale
 long long int t;
-bool flag = true;
+bool canReadCards = true;
 #define attesa 3000
 bool firstBoot = true;
+bool firstBootError = true; 
 
 long long int t3;  // variabile temporale per la pressione prolungata
 int durata = 5000; // costante in ms per la pressione 5sec kaffettino, 10sec bella ciao, 15sec faccetta
-int pressed = 0;   // variabile che controlla se il pulsante è premuto ed è già stato azzerato t3
+int buttonBeenPressed = 0;   // variabile che controlla se il pulsante è premuto ed è già stato azzerato t3
 int butt = 15;	   // pin del pulsante
 
 int timerResetProd = 0;		// timer reset selezione prodotto
 int durataResetProd = 5000; // durata della selezione prodotto
 bool startedTimer = false;
 
-void setup()
+// Funzione utilizzata quando è necessario brickare l'arduino perché
+// determinate interfacce non si sono inizializzate correttamente
+void errorBricker(String s)
 {
+	if(Serial)
+		Serial.println(s);
 
+	tone(buzzer, 500, 5000); // Il suono della morte
+
+	while (true) // non procedere, cicla all'infinito
+	{
+		delay(1000);
+		digitalWrite(red, HIGH);
+		delay(1000);
+		digitalWrite(red, LOW);
+	}
+}
+
+// Funzione per inizializzare i seriali di comunicazione
+void initSerial(){
+	Serial.begin(115200);	// Initialize serial communications with the PC
 	mySoftwareSerial.begin(9600, SERIAL_8N1, 32, 33); // speed, type, RX, TX
-	Serial.begin(115200);							  // Initialize serial communications with the PC
-	delay(1000);
-	Serial.println("Setup");
 
+	// Se le connessioni seriali non sono state inizializzate correttamente,
+	// stoppiamo l'esecuzione e tiriamo un errore
+	if (!Serial || !mySoftwareSerial) 
+		errorBricker("Allocazione seriale fallita!");	   
+}
+
+// Inizializziamo il lettore card NFC
+void initNFC(){
+	SPI.begin();					   // Init SPI bus
+	mfrc522.PCD_Init();				   // Init MFRC522
+	mfrc522.PCD_DumpVersionToSerial(); // Show details of PCD - MFRC522 Card Reader details
+	Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
+
+	// Se le connessioni seriali non sono state inizializzate correttamente,
+	// stoppiamo l'esecuzione e tiriamo un errore
+	byte v = mfrc522.PCD_ReadRegister(MFRC522::VersionReg);
+	if (v == 0x00 || v == 0xFF) {
+		errorBricker(F("MFRC522 non rilevato (controlla cablaggio/SPI/RST)."));
+	}
+}
+
+// Inizializziamo il seriale dello schermo
+void initSchermo(){
+  	display.begin();
+  	display.enableUTF8Print();                       // abilita UTF-8 per print()
+  	display.setFont(u8g2_font_logisoso20_tf);    // font che include "€" (e tanti simboli)
+	display.clearBuffer();   
+}
+
+// Inizializziamo tutti i pin in input ed output
+void initPins(){
 	pinMode(butt, INPUT_PULLUP);
 	pinMode(GND, OUTPUT);
 	digitalWrite(GND, LOW);
@@ -153,315 +204,8 @@ void setup()
 	pinMode(red, OUTPUT);
 	digitalWrite(buzzer, LOW);
 	digitalWrite(4, LOW); // pin 14 usato temporaneamente come ground
-	Serial.println("Buzzer Test...");
 
 	pinMode(butt, INPUT_PULLUP);
-	t3 = millis();
-	while (!Serial)
-		;							   // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
-	SPI.begin();					   // Init SPI bus
-	mfrc522.PCD_Init();				   // Init MFRC522
-	mfrc522.PCD_DumpVersionToSerial(); // Show details of PCD - MFRC522 Card Reader details
-	Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
-
-	if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS))
-	{
-		Serial.println(F("SSD1306 allocation failed"));
-		while (true) // non procedere, cicla all'infinito
-		{
-			delay(1000);
-			digitalWrite(red, HIGH);
-			delay(1000);
-			digitalWrite(red, LOW);
-		}
-	}
-
-	connettiWifi(); // Ci connettiamo al wifi
-
-	setupAudio(); // Setup modulo sd audio
-
-	getProdotti(); // Chiediamo al server di mandarci i prodotti dell'auletta
-
-	setupDisplay(); // Stato di default del display
-}
-
-void loop()
-{
-	// Se non siamo connessi allora blocca tutto
-	if (WiFi.status() != WL_CONNECTED)
-	{
-		Serial.println("Connessione WiFi mancante, riprovo a connettermi...");
-		stampaoled(NOC);
-
-		digitalWrite(green, LOW);
-		digitalWrite(yellow, LOW);
-
-		digitalWrite(red, HIGH);
-		delay(1000);
-		digitalWrite(red, LOW);
-		delay(1000);
-
-		t = millis();
-		flag = 0;
-
-		return;
-	}
-
-	// Se non siamo riusciti a connetterci al server ma il wifi c'è vuol dire che c'è stato un problema al server
-	while (verify == HTTPERR)
-	{
-		flag = 0; // Disabilitiamo tutto
-
-		if (!digitalRead(butt)) // Se il pulsante è premuto riproviamo
-		{
-			digitalWrite(buzzer, 1);
-			delay(1000);
-			digitalWrite(buzzer, 0);
-			delay(500);
-			getProdotti(); // Chiediamo al server di mandarci i prodotti dell'auletta
-		}
-
-		if (verify == HTTPERR && alreadyPrint == 0)
-		{
-			digitalWrite(green, LOW);
-			digitalWrite(yellow, LOW);
-			digitalWrite(red, HIGH);
-
-			stampaoled(HTTPERR);
-			alreadyPrint = 1;
-
-			Serial.println("ERRORE HTTP!!!");
-		}
-		else if (verify != HTTPERR)
-		{
-			Serial.println("ABEMUS PRODOTTI!!!");
-			flag = 1;
-
-			if (verify != 69)
-				stampaoled(VIV);
-			else
-				stampaoled(AUGURI);
-
-			delay(2000);
-			break;
-		}
-	}
-
-	if (!digitalRead(butt) && pressed == 0) // Pressione del tasto
-	{
-		pressed = 1;   // metto ad 1 per non far rientrare in questo if durante la pressione
-		t3 = millis(); //"azzero" t3 rispetto  millis per avere un punto temporale di partenza
-		Serial.println("Premuto");
-		buttRoutine(); // alla pressione richiamo la funziona per il cambio prodotto
-	}
-
-	// Se non è stato utilizzato il bottone o non è stato pagato
-	// entro durataResetProd secondi allora resetta allo stato iniziale
-	if (millis() >= timerResetProd + durataResetProd && currentProdotto != -1 && startedTimer == true)
-	{
-		Serial.println("Reset selezione prodotto");
-		stampaoled(VIV);
-		currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
-		startedTimer = false;
-	}
-
-	if (digitalRead(butt) && pressed == 1) // Rilascio del tasto
-	{
-		pressed = 0;													// Riazzero per riabilitare la lettura della pressione
-		if (millis() > (t3 + durata) && millis() < (t3 + (2 * durata))) // Se sono passati 5 secondi
-		{
-			myDFPlayer.play(1); // Play the first mp3
-			Serial.println("Play caffettino");
-			stampaoled(VIV);
-			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
-		}
-		else if (millis() > (t3 + (2 * durata)) /*&& millis() < (t3 + (3 * durata))*/) // Se sono passati 10 secondi
-		{
-			playCompleanno();
-			stampaoled(VIV);
-			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
-		}
-		/*else if(millis() > (t3 + (3 * durata)) )  //Se sono passati 15 secondi
-		{
-		  myDFPlayer.play(2);  //Play the first mp3
-		  Serial.println("Faccetta nera");
-		  stampaoled(VIV);
-		  currentProdotto = 0; //se parte la musica resettiamo il counter prodotto
-		}*/
-		else
-		{
-			timerResetProd = millis();
-			startedTimer = true;
-		}
-		Serial.println("Rilasciato");
-	}
-
-	if (firstBoot == true)
-	{
-		stampaoled(VIV);
-		myDFPlayer.play(1);
-		firstBoot = false;
-	}
-
-	if (millis() == (t + attesa)) // Vero solo se dall'ultimo tag è passato più di "attesa"
-	{
-		flag = true;
-		stampaoled(VIV);
-	}
-
-	if (flag == true) // riattiva la lettura delle carte
-	{
-
-		// reset led
-		digitalWrite(green, HIGH);
-		digitalWrite(yellow, LOW);
-		digitalWrite(red, LOW);
-
-		// Se non rileva la card o la card non ha un numero seriale
-		if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
-		{
-			return; // Ritorna all'inizio del loop
-		}
-
-		// Se non è stato selezionato nessun prodotto
-		if (currentProdotto == -1)
-		{
-			digitalWrite(green, LOW);
-			digitalWrite(red, HIGH);
-
-			stampaoled(NOSELECTION);
-
-			digitalWrite(buzzer, 1);
-			delay(100);
-			digitalWrite(buzzer, 0);
-
-			delay(100);
-			digitalWrite(buzzer, 1);
-			delay(100);
-			digitalWrite(buzzer, 0);
-
-			delay(100);
-			digitalWrite(buzzer, 1);
-			delay(100);
-			digitalWrite(buzzer, 0);
-
-			delay(100);
-			digitalWrite(buzzer, 1);
-			delay(100);
-			digitalWrite(buzzer, 0);
-
-			delay(1000);
-
-			stampaoled(VIV);
-
-			digitalWrite(green, HIGH);
-			digitalWrite(red, LOW);
-
-			return;
-		}
-
-		verify = 0; // reset variabile di controllo, il valore deve essere il ritorno del server
-
-		logCard(); // Siccome è stata riconosciuta una card, logghiamo le sue caratteristiche.
-
-		pay();
-
-		currentProdotto = -1; // Resettiamo il prodottoCorrente resettiamo il counter prodotto.
-		flag = false;		  // Reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
-		t = millis();		  // Reset t perché è stata letta una carta
-
-		if (verify != 0) // Se il codice di ritorno non è 0 questo vuol dire che c'è stato un errore.
-		{
-			stampaoled(verify); // Mandiamo a schermo l'errore
-
-			digitalWrite(green, LOW);
-			digitalWrite(yellow, LOW);
-			digitalWrite(red, HIGH); // Led rosso simboleggia errore
-
-			t = millis();
-
-			return;
-		}
-
-		// Se è stato pagato
-
-		stampaoled(PAG);
-		digitalWrite(green, LOW);
-		digitalWrite(yellow, HIGH);
-
-		digitalWrite(buzzer, 1);
-		delay(500);
-		digitalWrite(buzzer, 0);
-		delay(100);
-		digitalWrite(buzzer, 1);
-		delay(1000);
-		digitalWrite(buzzer, 0);
-	}
-}
-
-void connettiWifi()
-{
-	if (IS_EAP)
-		WiFi.begin(WIFI_SSID, WPA2_AUTH_PEAP, WIFI_USERNAME, WIFI_USERNAME, WIFI_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
-	else
-		WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-
-	while (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
-	{
-		Serial.println("Connessione WiFi in corso...");
-
-		digitalWrite(green, LOW);
-		digitalWrite(red, LOW); // Accendiamo solo il LED rosso
-		digitalWrite(yellow, LOW);
-
-		delay(1000);
-		digitalWrite(yellow, HIGH);
-		delay(1000);
-
-		stampaoled(CONNECTING); // Stampiamo che non c'è connessione
-
-		if (flag == 1)
-		{
-			flag = 0;
-		}
-	}
-
-	flag = 1;
-
-	Serial.println("Connesso alla rete WiFi");
-}
-
-// Helper routine to dump a byte array as hex values to Serial
-void dump_byte_array(byte *buffer, byte bufferSize)
-{
-
-	for (byte i = 0; i < bufferSize; i++)
-	{
-		Serial.print(buffer[i]); // stampo in decimale
-		Serial.print("  ");
-
-		if (controllo[i] != buffer[i])
-			verify++; // verifica dello UID sostituire con invio al server
-	}
-}
-
-void logCard()
-{
-	// Show some details of the PICC (that is: the tag/card)
-	Serial.print(F("Card UID:"));
-	dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size); // stampa lo uid sul monitor seriale
-	Serial.println();
-	Serial.println(verify); // stampa di controllo dell'errore
-}
-
-void buttRoutine()
-{
-	currentProdotto++;
-
-	if (currentProdotto >= listaProdotti.size())
-		currentProdotto = 0;
-
-	stampaoled(7); // 7 per avere un offset rispetto alle stampe di pagato ed errori 6 in tot
 }
 
 void setupAudio() // Funzione che inizializza il playermp3
@@ -490,17 +234,130 @@ void setupAudio() // Funzione che inizializza il playermp3
 	myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
 }
 
-void setupDisplay()
+void handleWifi()
 {
-	digitalWrite(green, HIGH); // impostazione iniziale led
+
+	connettiWifi(); // Ci connettiamo al wifi
+
+	if(WiFi.status() != WL_CONNECTED)
+	{
+		Serial.println("Connessione WiFi mancante, riprovo a connettermi...");
+		stampaoled(CONNESSIONE_NON_RIUSCITA);
+		
+		digitalWrite(green, LOW);
+		digitalWrite(yellow, LOW);
+		digitalWrite(red, HIGH);
+
+		if(firstBootError)
+		{
+			tone(buzzer, 500, 2000); // Il suono della morte lo riproduciamo solo la prima volta per farlo attenzionare!
+			firstBootError = false;
+		}
+	}
+
+	delay(3000);
+
+	digitalWrite(green, LOW);
 	digitalWrite(yellow, LOW);
 	digitalWrite(red, LOW);
+	
+	return;
+
 	t = millis();
-	Serial.println("Setup done");
+	canReadCards = 0;
+
+	return;
+
 }
 
-void getProdotti()
+void connettiWifi()
 {
+	canReadCards = 0; // Se la lettura delle cards è abilitata, la disabilitamo
+
+	if (IS_EAP) // Per WiFi Unipa
+		WiFi.begin(WIFI_SSID, WPA2_AUTH_PEAP, WIFI_USERNAME, WIFI_USERNAME, WIFI_PASSWORD); // Passiamo le credenziali e istanziamo una nuova connessione
+	else		// Per altri wifi senza credenziali singole
+		WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+	digitalWrite(green, LOW);
+	digitalWrite(red, LOW);
+	digitalWrite(yellow, HIGH);
+
+    stampaoled(CONNESSIONE_IN_CORSO); // Mostriamo lo stato di connessione
+    Serial.println("Connessione WiFi in corso...");
+
+	delay(1000);
+
+	if (WiFi.status() != WL_CONNECTED) // Se non siamo ancora connessi
+	{
+		delay(5000); // Aspettiamo altri 5 secondi per collegarci
+
+        // Se ancora non ci siamo collegati torniamo indietro
+        if(WiFi.status() != WL_CONNECTED)
+            return;
+	}
+
+	digitalWrite(green, HIGH);
+	digitalWrite(red, LOW);
+	digitalWrite(yellow, LOW);
+
+	canReadCards = 1; // Riabilitiamo le carte se ci siamo collegati
+	stampaoled(CONNESSIONE_RIUSCITA); // Stampiamo che ci siamo connessi
+
+    tone(buzzer, 500, 250);     // Tono gioviale
+    tone(buzzer, 1500, 500);    // E molto felice
+
+    delay(500);
+
+	digitalWrite(green, LOW);
+	digitalWrite(red, LOW);
+	digitalWrite(yellow, HIGH);
+
+	Serial.println("Connesso alla rete WiFi");
+}
+
+// Helper routine to dump a byte array as hex values to Serial
+void dump_byte_array(byte *buffer, byte bufferSize)
+{
+
+	for (byte i = 0; i < bufferSize; i++)
+	{
+		Serial.print(buffer[i]); // stampo in decimale
+		Serial.print("  ");
+
+		if (controllo[i] != buffer[i])
+			verify++; // verifica dello UID sostituire con invio al server
+	}
+}
+
+void logCard()
+{
+	// Show some details of the PICC (that is: the tag/card)
+	Serial.print(F("Card UID:"));
+	dump_byte_array(mfrc522.uid.uidByte, mfrc522.uid.size); // stampa lo uid sul monitor seriale
+	Serial.println();
+	Serial.println(verify); // stampa di controllo dell'errore
+}
+
+void changeProduct()
+{
+	currentProdotto++;
+
+	if (currentProdotto >= listaProdotti.size())
+		currentProdotto = 0;
+
+	stampaoled(VISUALIZZA_STAMPAPROD); // 7 per avere un offset rispetto alle stampe di pagato ed errori 6 in tot
+}
+
+void getProdotti() // Funzione che effettua una chiamata al server e riceve i prodotti vendibili nell'auletta di riferimento
+{
+
+	digitalWrite(green, LOW);
+	digitalWrite(red, LOW);
+	digitalWrite(yellow, HIGH);
+
+	stampaoled(RICHIESTA_IN_CORSO);
+
 	const size_t bufferSize = JSON_OBJECT_SIZE(1);
 	DynamicJsonDocument doc(bufferSize);
 
@@ -523,7 +380,7 @@ void getProdotti()
 	String response;
 
 	// Se il codice di risposta è maggiore di 0 vuol dire che è stato un successo e possiamo mostrare la response
-	if (httpResponseCode > 0)
+	if (httpResponseCode > 0 && httpResponseCode < 400)
 	{
 		response = http.getString();
 		Serial.print("Response Body: ");
@@ -533,13 +390,28 @@ void getProdotti()
 	else
 	{
 		Serial.println("Errore nella richiesta HTTP");
-		verify = HTTPERR;
+		stampaoled(VISUALIZZA_ERRORE);
+		verify = VISUALIZZA_ERRORE;
+		
+		digitalWrite(green, LOW);
+		digitalWrite(red, HIGH);
+		digitalWrite(yellow, LOW);
+
+		if(firstBootError)
+		{
+			tone(buzzer, 500, 2000); // Il suono della morte lo riproduciamo solo la prima volta per farlo attenzionare!
+			firstBootError = false;
+		}
+
+		delay(5000);
 	}
 
 	// Free resources
 	http.end();
 
-	if (verify == HTTPERR)
+	delay(2000);
+
+	if (verify == VISUALIZZA_ERRORE)
 		return;
 
 	// Trasformiamo in json la rispsota che ci ha dato il server
@@ -635,7 +507,7 @@ void pay()
 	else
 	{
 		Serial.println("Errore nella richiesta HTTP");
-		verify = HTTPERR;
+		verify = VISUALIZZA_ERRORE;
 	}
 
 	// Free resources
@@ -647,159 +519,191 @@ void stampaoled(int i)
 	switch (i)
 	{
 
-	case PAG:
+	case VISUALIZZA_PAGATO:
 	{
-		display.stopscroll();	// ferma lo spostamento del testo
-		display.clearDisplay(); // elimina la scritta
+		display.clearBuffer(); // elimina la scritta
 		delay(10);
-		display.setTextSize(3);				 // Dimensione font
-		display.setTextColor(SSD1306_WHITE); // colore, ma il nostro è monocromo (le prima righe gialle)
 		display.setCursor(13, 22);			 // inizio del testo, pixel in alto a sinista, serve per centrare
 		display.print("PAGATO");
-		display.display(); // Attiva il testo
+		display.sendBuffer(); // Attiva il testo
 		break;
 	}
-	case NOSALDO:
+	case VISUALIZZA_NOSALDO:
 	{
 		// Segnale acustico
 		digitalWrite(buzzer, 1);
 		delay(300);
 		digitalWrite(buzzer, 0);
 
-		display.stopscroll();
-		display.clearDisplay();
+		display.clearBuffer();
 		delay(10);
-		display.setTextSize(2);
-		display.setTextColor(SSD1306_WHITE);
 		display.setCursor(20, 12);
 		display.print("SALDO NON");
 		display.setCursor(10, 35);
 		display.print("SUFF.");
-		display.display();
+		display.sendBuffer();
 		break;
 	}
-	case NOCARD:
+	case VISUALIZZA_NOCARD:
 	{
 		// Segnale acustico
 		digitalWrite(buzzer, 1);
 		delay(300);
 		digitalWrite(buzzer, 0);
 
-		display.stopscroll();
-		display.clearDisplay();
+		display.clearBuffer();
 		delay(10);
-		display.setTextSize(2);
-		display.setTextColor(SSD1306_WHITE);
+
 		display.setCursor(17, 15);
 		display.print("CARD NON");
 		display.setCursor(10, 35);
 		display.print("ESISTENTE");
-		display.display();
+		display.sendBuffer();
 		break;
 	}
-	case NOPROD:
+	case VISUALIZZA_NOPROD:
 	{
 		// Segnale acustico
 		digitalWrite(buzzer, 1);
 		delay(300);
 		digitalWrite(buzzer, 0);
 
-		display.stopscroll();
-		display.clearDisplay();
+		display.clearBuffer();
 		delay(10);
-		display.setTextSize(2);
-		display.setTextColor(SSD1306_WHITE);
+
 		display.setCursor(20, 15);
 		display.print("PROD NON");
 		display.setCursor(10, 35);
 		display.print("ESISTENTE");
-		display.display();
+		display.sendBuffer();
 		break;
 	}
-	case NOSELECTION:
+	case VISUALIZZA_NOSELECTION:
 	{
 		// Segnale acustico
 		digitalWrite(buzzer, 1);
 		delay(300);
 		digitalWrite(buzzer, 0);
 
-		display.stopscroll();
-		display.clearDisplay();
+		display.clearBuffer();
 		delay(10);
-		display.setTextSize(2);
-		display.setTextColor(SSD1306_WHITE);
+
 		display.setCursor(10, 15);
 		display.print("SCEGLI IL");
 		display.setCursor(12, 35);
 		display.print("PRODOTTO!");
-		display.display();
+		display.sendBuffer();
 		break;
 	}
-	case VIV:
+	case VISUALIZZA_VIVERE:
 	{
-		display.clearDisplay();
+		display.clearBuffer();
 		delay(10);
-		display.setTextSize(2);
-		display.setTextColor(SSD1306_WHITE);
-		display.setCursor(1, 17);
-		display.print("  VIVERE\nKAFFETTINO");
-		display.display();
-		display.startscrollleft(0x00, 0x0F); // riattiva lo spostamento del testo con le coordinate di inizio e fine
+		
+		display.setCursor(25, 30);
+		display.print("VIVERE");
+		display.setCursor(1, 60);
+		display.print("KAFFETTINO");
+		display.sendBuffer();
+
 		break;
 	}
-	case STAMPAPROD:
+	case VISUALIZZA_STAMPAPROD:
 	{
 		Prodotto *p = listaProdotti.get(currentProdotto);
-		display.stopscroll();
-		display.clearDisplay();
+		display.clearBuffer();
 		delay(10);
-		display.setTextSize(2);
-		display.setTextColor(SSD1306_WHITE);
-		display.setCursor(35, 15);
+		display.setCursor(30, 30);
 		display.print(p->nome);
-		display.setCursor(45, 35);
-		display.print(p->prezzo);
-		display.display();
+		display.setCursor(40, 60);
+		display.print(p->prezzo.toFloat());
+		display.sendBuffer();
 		break;
 	}
-	case CONNECTING:
+	case CONNESSIONE_IN_CORSO:
 	{
-		display.stopscroll();
-		display.clearDisplay();
-		display.setTextSize(2); // Draw 2X-scale text
-		display.setTextColor(SSD1306_WHITE);
+		display.clearBuffer();
 
-		display.setCursor(5, 17);
+		display.setCursor(0, 30);
 		display.print("CONNECTING");
-		display.display(); // Show text
+		display.sendBuffer(); // Show text
 
-		display.setCursor(46, 40);
-		display.print(".");
-		delay(200);
-		display.display(); // Show text
+		delay(300);
+		display.setCursor(35, 55);
+		display.setFont(u8g2_font_unifont_h_symbols);
+		display.print("○ ");
+		delay(300);
+		display.sendBuffer(); // Show text
 
-		display.print(".");
-		delay(200);
-		display.display(); // Show text
+		display.print(" ○ ");
+		delay(300);
+		display.sendBuffer(); // Show text
 
-		display.print(".");
-		delay(200);
-		display.display(); // Show initial text
+		display.print(" ○");
+		delay(300);
+		display.sendBuffer(); // Show initial text
+
+		display.setFont(u8g2_font_logisoso20_tf);
 
 		break;
 	}
+	case CONNESSIONE_NON_RIUSCITA:
+    {
+        display.clearBuffer(); // elimina la scritta
+        delay(10);
+        display.setCursor(0, 30);
+        display.print("CONNECTION");
+        display.setCursor(30, 55);
+        display.print("FAILED");
+        display.sendBuffer(); // Attiva il testo
+        break;
+    }
+    case CONNESSIONE_RIUSCITA:
+    {
+        display.clearBuffer(); // elimina la scritta
+        delay(10);
+        display.setCursor(13, 40);
+        display.print("CONNESSO");
+        display.sendBuffer(); // Attiva il testo
+        break;
+    }
+    case RICHIESTA_IN_CORSO:
+    {
+        display.clearBuffer(); // elimina la scritta
+        delay(10);
+        display.setCursor(10, 20);
+        display.print("SCARICO I");
+        display.setCursor(15, 45);
+        display.print("PRODOTTI");
+        
+		delay(300);
+        display.setCursor(35, 60);
+		display.setFont(u8g2_font_unifont_h_symbols);
+		display.print("○ ");
+		delay(300);
+		display.sendBuffer(); // Show text
+
+		display.print(" ○ ");
+		delay(300);
+		display.sendBuffer(); // Show text
+
+		display.print(" ○");
+		delay(300);
+		display.sendBuffer(); // Show initial text
+
+		display.setFont(u8g2_font_logisoso20_tf);
+        display.sendBuffer(); // Attiva il testo
+        break;
+    }
 	case AUGURI:
 	{
 		Serial.println("AUGURIIIIII!");
 
-		display.stopscroll();
-		display.clearDisplay();
-		display.setTextSize(2); // Draw 2X-scale text
-		display.setTextColor(SSD1306_WHITE);
+		display.clearBuffer();
 
 		display.setCursor(25, 30);
 		display.print("AUGURI!");
-		display.display(); // Show text
+		display.sendBuffer(); // Show text
 
 		playCompleanno();
 
@@ -809,22 +713,19 @@ void stampaoled(int i)
 	{
 		Serial.println("Card disabilitata");
 
-		display.stopscroll();
-		display.clearDisplay();
-		display.setTextSize(1); // Draw 2X-scale text
-		display.setTextColor(SSD1306_WHITE);
+		display.clearBuffer();
 
 		display.setCursor(52, 5);
 		display.print("CARD");
-		display.display();		// Show text
-		display.setTextSize(1); // Draw 2X-scale text
+		display.sendBuffer();		// Show text
+
 		display.setCursor(30, 25);
 		display.print("DISABILITATA");
 		display.setCursor(40, 45);
 		display.print("PEZZENTE");
 		digitalWrite(red, HIGH);
 		delay(200);
-		display.display(); // Show text
+		display.sendBuffer(); // Show text
 
 		for (size_t i = 0; i < 10; i++)
 		{
@@ -837,23 +738,18 @@ void stampaoled(int i)
 
 		break;
 	}
-	case HTTPERR:
+	case VISUALIZZA_ERRORE:
 	{
-		display.stopscroll();
-		display.clearDisplay();
-		display.setTextSize(2); // Draw 2X-scale text
-		display.setTextColor(SSD1306_WHITE);
+		display.clearBuffer();
 
-		display.setCursor(5, 5);
-		display.print("SERV ERROR");
-		display.display(); // Show text
+        display.setCursor(25, 30);
+        display.print("SERVER");
+        display.setCursor(32, 55);
+        display.print("ERROR");
+		display.sendBuffer(); // Show text
 
-		display.setCursor(17, 25);
-		display.print("CONTATTA");
-		display.setCursor(35, 45);
-		display.print("ADMIN");
 		delay(200);
-		display.display(); // Show text
+		display.sendBuffer(); // Show text
 
 		break;
 	}
@@ -864,4 +760,238 @@ void playCompleanno()
 {
 	myDFPlayer.play(2); // Play compleanno mp3
 	Serial.println("Play compleanno");
+}
+
+void setup()
+{
+	initPins();
+	initSerial();
+
+	delay(1000);
+	Serial.println("Setup");
+
+	initNFC();
+	initSchermo();
+	
+	t3 = millis();
+
+	setupAudio(); // Setup modulo sd audio
+
+    tone(buzzer, 500, 250);     // Tono gioviale
+}
+
+void loop()
+{
+	// Se non siamo ancora collegati, o la connessione è esplosa, proviamo a collegarci al wifi
+	while (WiFi.status() != WL_CONNECTED)
+		handleWifi();
+
+	// Se abbiamo acceso ora kaffettino, facciamo la richiesta per i prodotti
+	if(firstBoot){
+
+		// Continuiamo a provare a prendere i prodotti fino a quando non avremo i prodotti in lista
+		while(listaProdotti.size() <= 0)
+			getProdotti();
+
+		stampaoled(VISUALIZZA_VIVERE);
+		myDFPlayer.play(1);
+		firstBoot = false;
+		firstBootError = false;
+
+		Serial.println("Setup done");
+	}
+
+	// Adesso possiamo iniziare a prendere gli ordini!
+	// Diamo il via con i led verdi!
+
+	digitalWrite(green, HIGH); // impostazione iniziale led
+	digitalWrite(yellow, LOW);
+	digitalWrite(red, LOW);
+	t = millis();
+
+	// Se non siamo riusciti a connetterci al server ma il wifi c'è vuol dire che c'è stato un problema al server
+	while (verify == VISUALIZZA_ERRORE)
+	{
+		canReadCards = 0; // Disabilitiamo tutto
+
+		if (!digitalRead(butt)) // Se il pulsante è premuto riproviamo
+		{
+			digitalWrite(buzzer, 1);
+			delay(1000);
+			digitalWrite(buzzer, 0);
+			delay(500);
+			getProdotti(); // Chiediamo al server di mandarci i prodotti dell'auletta
+		}
+
+		if (verify == VISUALIZZA_ERRORE && alreadyPrint == 0)
+		{
+			digitalWrite(green, LOW);
+			digitalWrite(yellow, LOW);
+			digitalWrite(red, HIGH);
+
+			stampaoled(VISUALIZZA_ERRORE);
+			alreadyPrint = 1;
+
+			Serial.println("ERRORE HTTP!!!");
+		}
+		else if (verify != VISUALIZZA_ERRORE)
+		{
+			Serial.println("ABEMUS PRODOTTI!!!");
+			canReadCards = 1;
+
+			if (verify != 69)
+				stampaoled(VISUALIZZA_VIVERE);
+			else
+				stampaoled(AUGURI);
+
+			delay(2000);
+			break;
+		}
+	}
+
+	// Quando premiamo il tasto per ciclare i prodotti e rilasciamo subito
+	if (!digitalRead(butt) && buttonBeenPressed == 0)
+	{
+		buttonBeenPressed = 1;   // metto ad 1 per non far rientrare in questo if durante la pressione
+		t3 = millis(); //"azzero" t3 rispetto  millis per avere un punto temporale di partenza
+		Serial.println("Premuto");
+		changeProduct(); // alla pressione richiamo la funziona per il cambio prodotto
+	}
+
+	// Se non è stato utilizzato il bottone o non è stato pagato
+	// entro durataResetProd secondi allora resetta allo stato iniziale
+	if (millis() >= timerResetProd + durataResetProd && currentProdotto != -1 && startedTimer == true)
+	{
+		Serial.println("Reset selezione prodotto");
+		stampaoled(VISUALIZZA_VIVERE);
+		currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
+		startedTimer = false;
+	}
+
+	// Se manteniamo premuto il pulsante e poi lo rilasciamo
+	if (digitalRead(butt) && buttonBeenPressed == 1)
+	{
+		buttonBeenPressed = 0;													// Riazzero per riabilitare la lettura della pressione
+		if (millis() > (t3 + durata) && millis() < (t3 + (2 * durata))) // Se sono passati 5 secondi
+		{
+			myDFPlayer.play(1); // Play the first mp3
+			Serial.println("Play caffettino");
+			stampaoled(VISUALIZZA_VIVERE);
+			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
+		}
+		else if (millis() > (t3 + (2 * durata)) /*&& millis() < (t3 + (3 * durata))*/) // Se sono passati 10 secondi
+		{
+			playCompleanno();
+			stampaoled(VISUALIZZA_VIVERE);
+			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
+		}
+		/*else if(millis() > (t3 + (3 * durata)) )  //Se sono passati 15 secondi
+		{
+		  myDFPlayer.play(2);  //Play the first mp3
+		  Serial.println("Musica particolare");
+		  stampaoled(VIV);
+		  currentProdotto = 0; //se parte la musica resettiamo il counter prodotto
+		}*/
+		else
+		{
+			timerResetProd = millis();
+			startedTimer = true;
+		}
+		Serial.println("Rilasciato");
+	}
+
+	if (millis() == (t + attesa)) // Vero solo se dall'ultimo tag è passato più di "attesa"
+	{
+		canReadCards = true;
+		stampaoled(VISUALIZZA_VIVERE);
+	}
+
+	if (canReadCards == true) // riattiva la lettura delle carte
+	{
+
+		// reset led
+		digitalWrite(green, HIGH);
+		digitalWrite(yellow, LOW);
+		digitalWrite(red, LOW);
+
+		// Se non rileva la card o la card non ha un numero seriale
+		if (!mfrc522.PICC_IsNewCardPresent() || !mfrc522.PICC_ReadCardSerial())
+		{
+			return; // Ritorna all'inizio del loop
+		}
+
+		// Se non è stato selezionato nessun prodotto
+		if (currentProdotto == -1)
+		{
+			digitalWrite(green, LOW);
+			digitalWrite(red, HIGH);
+
+			stampaoled(VISUALIZZA_NOSELECTION);
+
+			digitalWrite(buzzer, 1);
+			delay(100);
+			digitalWrite(buzzer, 0);
+
+			delay(100);
+			digitalWrite(buzzer, 1);
+			delay(100);
+			digitalWrite(buzzer, 0);
+
+			delay(100);
+			digitalWrite(buzzer, 1);
+			delay(100);
+			digitalWrite(buzzer, 0);
+
+			delay(100);
+			digitalWrite(buzzer, 1);
+			delay(100);
+			digitalWrite(buzzer, 0);
+
+			delay(1000);
+
+			stampaoled(VISUALIZZA_VIVERE);
+
+			digitalWrite(green, HIGH);
+			digitalWrite(red, LOW);
+
+			return;
+		}
+
+		verify = 0; // reset variabile di controllo, il valore deve essere il ritorno del server
+
+		logCard(); // Siccome è stata riconosciuta una card, logghiamo le sue caratteristiche.
+
+		pay();
+
+		currentProdotto = -1; // Resettiamo il prodottoCorrente resettiamo il counter prodotto.
+		canReadCards = false;		  // Reset flag per impedire la lettura di carte durante l'invio al server/lampeggio/beep
+		t = millis();		  // Reset t perché è stata letta una carta
+
+		if (verify != 0) // Se il codice di ritorno non è 0 questo vuol dire che c'è stato un errore.
+		{
+			stampaoled(verify); // Mandiamo a schermo l'errore
+
+			digitalWrite(green, LOW);
+			digitalWrite(yellow, LOW);
+			digitalWrite(red, HIGH); // Led rosso simboleggia errore
+
+			t = millis();
+
+			return;
+		}
+
+		// Se è stato pagato
+
+		stampaoled(VISUALIZZA_PAGATO);
+		digitalWrite(green, LOW);
+		digitalWrite(yellow, HIGH);
+
+		digitalWrite(buzzer, 1);
+		delay(500);
+		digitalWrite(buzzer, 0);
+		delay(100);
+		digitalWrite(buzzer, 1);
+		delay(1000);
+		digitalWrite(buzzer, 0);
+	}
 }

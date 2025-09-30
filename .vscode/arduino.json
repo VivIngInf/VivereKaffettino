@@ -1,4 +1,5 @@
 {
     "board": "esp32:esp32:esp32",
-    "port": "COM3"
+    "port": "COM3",
+    "sketch": "Source\\Arduino\\ESP32_Kaffettino\\ESP32_Kaffettino.ino"
 }
