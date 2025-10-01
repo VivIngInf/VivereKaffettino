@@ -523,7 +523,7 @@ void stampaoled(int i)
 	{
 		display.clearBuffer(); // elimina la scritta
 		delay(10);
-		display.setCursor(13, 22);			 // inizio del testo, pixel in alto a sinista, serve per centrare
+		display.setCursor(25, 30);			 // inizio del testo, pixel in alto a sinista, serve per centrare
 		display.print("PAGATO");
 		display.sendBuffer(); // Attiva il testo
 		break;
@@ -588,9 +588,9 @@ void stampaoled(int i)
 		display.clearBuffer();
 		delay(10);
 
-		display.setCursor(10, 15);
+		display.setCursor(10, 30);
 		display.print("SCEGLI IL");
-		display.setCursor(12, 35);
+		display.setCursor(12, 55);
 		display.print("PRODOTTO!");
 		display.sendBuffer();
 		break;
@@ -906,7 +906,7 @@ void loop()
 		stampaoled(VISUALIZZA_VIVERE);
 	}
 
-	if (canReadCards == true) // riattiva la lettura delle carte
+	if (canReadCards == true) // Se possiamo leggere la carta, la leggiamo
 	{
 
 		// reset led
@@ -983,8 +983,9 @@ void loop()
 		// Se è stato pagato
 
 		stampaoled(VISUALIZZA_PAGATO);
-		digitalWrite(green, LOW);
-		digitalWrite(yellow, HIGH);
+		digitalWrite(green, HIGH);
+		digitalWrite(yellow, LOW);
+		digitalWrite(red, LOW);
 
 		digitalWrite(buzzer, 1);
 		delay(500);
@@ -993,5 +994,13 @@ void loop()
 		digitalWrite(buzzer, 1);
 		delay(1000);
 		digitalWrite(buzzer, 0);
+
+		stampaoled(VISUALIZZA_VIVERE);
+		digitalWrite(green, LOW);
+		digitalWrite(yellow, HIGH);
+		digitalWrite(red, LOW);
+
+		canReadCards = true;
+
 	}
 }
