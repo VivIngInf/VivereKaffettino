@@ -220,18 +220,16 @@ void setupAudio() // Funzione che inizializza il playermp3
 		Serial.println(F("Unable to begin:"));
 		Serial.println(F("1.Please recheck the connection!"));
 		Serial.println(F("2.Please insert the SD card!"));
-		while (true)
-			;
 	}
 
 	Serial.println(F("DFPlayer Mini online."));
-	myDFPlayer.setTimeOut(500); // Set serial communictaion time out 500ms
+	//myDFPlayer.setTimeOut(500); // Set serial communictaion time out 500ms
 
 	//----Set volume----
-	myDFPlayer.volume(25);	 // Set volume value (0~30).
-	myDFPlayer.volumeUp();	 // Volume Up
-	myDFPlayer.volumeDown(); // Volume Down
-	myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
+	//myDFPlayer.volume(25);	 // Set volume value (0~30).
+	//myDFPlayer.volumeUp();	 // Volume Up
+	//myDFPlayer.volumeDown(); // Volume Down
+	//myDFPlayer.outputDevice(DFPLAYER_DEVICE_SD);
 }
 
 void handleWifi()
@@ -758,7 +756,7 @@ void stampaoled(int i)
 
 void playCompleanno()
 {
-	myDFPlayer.play(2); // Play compleanno mp3
+	//myDFPlayer.play(2); // Play compleanno mp3
 	Serial.println("Play compleanno");
 }
 
@@ -794,7 +792,7 @@ void loop()
 			getProdotti();
 
 		stampaoled(VISUALIZZA_VIVERE);
-		myDFPlayer.play(1);
+		//myDFPlayer.play(1);
 		firstBoot = false;
 		firstBootError = false;
 
@@ -874,7 +872,7 @@ void loop()
 		buttonBeenPressed = 0;													// Riazzero per riabilitare la lettura della pressione
 		if (millis() > (t3 + durata) && millis() < (t3 + (2 * durata))) // Se sono passati 5 secondi
 		{
-			myDFPlayer.play(1); // Play the first mp3
+			//myDFPlayer.play(1); // Play the first mp3
 			Serial.println("Play caffettino");
 			stampaoled(VISUALIZZA_VIVERE);
 			currentProdotto = -1; // se parte la musica resettiamo il counter prodotto
