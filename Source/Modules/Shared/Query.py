@@ -179,11 +179,26 @@ def GetBalance(idTelegram: str) -> float:
     return session.query(Utente).filter(Utente.ID_Telegram == f"{idTelegram}").one().saldo
 
 
-def getStoricoPersonale(idTelegram: str) -> list:
+def getStoricoPersonale(idTelegram: str) -> tuple[list, float]:
     """
-        USER: Ritorna tuto lo storico personale
+        USER: Ritorna le prime 50 operazioni (dalla meno recente)
+              e il costo totale di tutte le operazioni
     """
-    return session.query(Operazione).filter(Operazione.ID_Telegram == f"{idTelegram}").all()
+    operazioni = (
+        session.query(Operazione)
+        .filter(Operazione.ID_Telegram == idTelegram)
+        .order_by(Operazione.dateTimeOperazione.asc())
+        .limit(50)
+        .all()
+    )
+
+    costoTotale = (
+        session.query(func.sum(Operazione.costo))   # sostituisci 'costo' con la tua colonna
+        .filter(Operazione.ID_Telegram == idTelegram)
+        .scalar()
+    )
+
+    return operazioni, costoTotale or 0.0
 
 def getGender(idTelegram: str) -> str:
     """

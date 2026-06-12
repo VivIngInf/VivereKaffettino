@@ -24,19 +24,21 @@ async def History(update: Update, context: ContextTypes.DEFAULT_TYPE, custom_cal
 
 
 def get_history(idTelegram: str) -> str:
-    storico = getStoricoPersonale(idTelegram)
+    storico, costoTotale = getStoricoPersonale(idTelegram)
     username = GetUsername(idTelegram)
 
     if not storico:
         text = f"🚫 {username}, non ci sono operazioni disponibili nello storico 🚫"
     else:
         formatted_history = "\n".join(
-            f"• **{op.dateTimeOperazione.strftime('%d-%m-%Y')}** --> {op.costo}€" for op in storico
+            f"• **{op.dateTimeOperazione.strftime('%d-%m-%Y')}** --> {op.costo}€"
+            for op in storico
         )
-
+        costoParziale = fsum(op.costo for op in storico)
         text = (
             f"📜 **Storico di {username}**:\n\n"
             f"{formatted_history}\n\n"
-            f"**Totale**: {fsum([op.costo for op in storico])}€"
+            f"**Totale mostrate ({len(storico)})**: {costoParziale}€\n"
+            f"**Totale generale**: {costoTotale}€"
         )
     return text
