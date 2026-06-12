@@ -187,7 +187,7 @@ def getStoricoPersonale(idTelegram: str) -> tuple[list, float]:
     operazioni = (
         session.query(Operazione)
         .filter(Operazione.ID_Telegram == idTelegram)
-        .order_by(Operazione.dateTimeOperazione.asc())
+        .order_by(Operazione.dateTimeOperazione.desc())
         .limit(50)
         .all()
     )
