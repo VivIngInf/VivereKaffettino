@@ -193,7 +193,7 @@ def getStoricoPersonale(idTelegram: str) -> tuple[list, float]:
     )
 
     costoTotale = (
-        session.query(func.sum(Operazione.costo))   # sostituisci 'costo' con la tua colonna
+        session.query(func.round(func.sum(Operazione.costo), 2))   # sostituisci 'costo' con la tua colonna
         .filter(Operazione.ID_Telegram == idTelegram)
         .scalar()
     )
