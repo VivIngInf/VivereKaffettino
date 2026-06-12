@@ -39,6 +39,6 @@ def get_history(idTelegram: str) -> str:
             f"📜 **Storico di {username}**:\n\n"
             f"{formatted_history}\n\n"
             f"**Totale mostrate ({len(storico)})**: {costoParziale}€\n"
-            f"**Totale generale**: {costoTotale}€"
+            f"**Totale generale**: {costoTotale:.2f}€"
         )
     return text
